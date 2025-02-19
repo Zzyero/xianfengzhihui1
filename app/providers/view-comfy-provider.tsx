@@ -1,6 +1,7 @@
 import type { IMultiValueInput } from '@/lib/workflow-api-parser';
 import React, { createContext, useContext, useReducer, type ReactNode, type Dispatch } from 'react';
 
+// 视图模式基础接口
 export interface IViewComfyBase {
     title: string;
     description: string;
@@ -10,16 +11,19 @@ export interface IViewComfyBase {
     advancedInputs: IMultiValueInput[];
 }
 
+// 视图模式草稿接口
 export interface IViewComfyDraft {
     viewComfyJSON: IViewComfyBase;
     workflowApiJSON?: object | undefined;
     file?: File | undefined;
 }
 
+// 视图模式工作流接口
 export interface IViewComfyWorkflow extends IViewComfyBase {
     id: string;
 }
 
+// ViewComfy JSON 文件接口
 export interface IViewComfyJSON {
     file_type?: string;
     file_version?: string;
@@ -27,19 +31,21 @@ export interface IViewComfyJSON {
     workflows: IViewComfy[];
 }
 
+// ViewComfy 配置接口
 export interface IViewComfy {
     viewComfyJSON: IViewComfyWorkflow;
     workflowApiJSON?: object | undefined;
     file?: File | undefined;
 }
 
+// 视图模式状态接口
 export interface IViewComfyState {
     viewComfys: IViewComfy[];
     viewComfyDraft: IViewComfyDraft | undefined;
     currentViewComfy: IViewComfy | undefined;
 }
 
-// Define action types as an enum
+// 定义 Action 类型
 export enum ActionType {
     ADD_VIEW_COMFY = "ADD_VIEW_COMFY",
     UPDATE_VIEW_COMFY = "UPDATE_VIEW_COMFY",
@@ -50,7 +56,7 @@ export enum ActionType {
     INIT_VIEW_COMFY = "INIT_VIEW_COMFY"
 }
 
-// Update the Action type to use the enum
+// 更新 Action 类型以使用枚举
 export type Action =
     | { type: ActionType.ADD_VIEW_COMFY; payload: IViewComfy }
     | { type: ActionType.SET_VIEW_COMFY_DRAFT; payload: IViewComfyDraft | undefined }
@@ -60,10 +66,12 @@ export type Action =
     | { type: ActionType.RESET_CURRENT_AND_DRAFT_VIEW_COMFY; payload: undefined }
     | { type: ActionType.INIT_VIEW_COMFY; payload: IViewComfyJSON }
 
+// 状态处理器
 function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfyState {
 
     switch (action.type) {
         case ActionType.ADD_VIEW_COMFY: {
+            // 添加新的视图配置
             const data = {
                 ...state,
                 viewComfys: [...state.viewComfys, { ...action.payload }],
@@ -160,9 +168,11 @@ interface ViewComfyContextType {
     viewComfyStateDispatcher: Dispatch<Action>;
 }
 
+// 创建 Context
 const ViewComfyContext = createContext<ViewComfyContextType | undefined>(undefined);
 
 export function ViewComfyProvider({ children }: { children: ReactNode }) {
+    // 使用 Reducer 创建状态和分派器
     const [viewComfyState, dispatch] = useReducer(viewComfyReducer, { viewComfys: [], viewComfyDraft: undefined, currentViewComfy: undefined });
 
     return (
@@ -172,6 +182,7 @@ export function ViewComfyProvider({ children }: { children: ReactNode }) {
     );
 }
 
+// 自定义 Hook
 export function useViewComfy() {
     const context = useContext(ViewComfyContext);
     if (context === undefined) {
