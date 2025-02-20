@@ -27,12 +27,14 @@ import { PreviewOutputsImageGallery } from "@/components/images-preview"
 
 const apiErrorHandler = new ApiErrorHandler();
 
+//页面内容组件
 function PlaygroundPageContent() {
     const [results, SetResults] = useState<{ [key: string]: { outputs: Blob, url: string }[] }>({});
     const { viewComfyState, viewComfyStateDispatcher } = useViewComfy();
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     const [errorAlertDialog, setErrorAlertDialog] = useState<{ open: boolean, errorTitle: string | undefined, errorDescription: React.JSX.Element, onClose: () => void }>({ open: false, errorTitle: undefined, errorDescription: <></>, onClose: () => { } });
 
+    //获取视图配置
     useEffect(() => {
         if (viewMode) {
             const fetchViewComfy = async () => {
@@ -80,8 +82,11 @@ function PlaygroundPageContent() {
     //     }
     // }, [viewComfyState?.viewComfyJSON]);
 
+
     function onSubmit(data: IViewComfyWorkflow) {
         // setFormState(data);
+
+        //获取输入
         const inputs: { key: string, value: string }[] = [];
 
         for (const dataInputs of data.inputs) {
@@ -101,6 +106,7 @@ function PlaygroundPageContent() {
             textOutputEnabled: data.textOutputEnabled ?? false
         };
 
+        //提交表单
         doPost({
             viewComfy: generationData,
             workflow: viewComfyState.currentViewComfy?.workflowApiJSON,
@@ -154,6 +160,7 @@ function PlaygroundPageContent() {
             </div>
         </>;
     }
+    //渲染页面
     return (
         <>
             <div className="flex flex-col h-full">

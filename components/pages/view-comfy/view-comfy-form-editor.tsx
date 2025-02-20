@@ -12,14 +12,16 @@ interface ViewComfyFormEditorProps {
     viewComfyJSON: IViewComfyBase;
 }
 
-
+//视图配置表单编辑器组件
 export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewComfyFormEditorProps) {
 
+    //获取视图配置
     const { viewComfyState } = useViewComfy();
     const { toast } = useToast();
 
     const [downloadJson, setDownloadJson] = useState<boolean>(false);
 
+    //默认值
     const defaultValues: IViewComfyBase = {
         title: viewComfyJSON.title,
         description: viewComfyJSON.description,
@@ -29,20 +31,24 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
         advancedInputs: viewComfyJSON.advancedInputs,
     }
 
+    //表单
     const form = useForm<IViewComfyBase>({
         defaultValues
     });
 
+    //输入框
     const inputFieldArray = useFieldArray({
         control: form.control,
         name: "inputs"
     });
 
+    //高级输入框
     const advancedFieldArray = useFieldArray({
         control: form.control,
         name: "advancedInputs"
     });
 
+    //当配置更新时重置表单
     useEffect(() => {
         if (viewComfyJSON) {
             form.reset({
@@ -56,13 +62,14 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
         }
     }, [viewComfyJSON, form]);
 
-
+    //提交表单
     function submitOnCLick(data: IViewComfyBase) {
         onSubmit(data);
 
+        //提示  
         toast({
-            title: "Form Saved!",
-            description: "Go to the Playground to run it",
+            title: "表单保存成功!",
+            description: "去 Playground 运行它",
             duration: 3000,
             action: (
                 <ToastAction altText="Goto schedule to undo">
@@ -72,12 +79,14 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
         });
     }
 
+    //下载视图配置
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function downloadViewComfyJSON(data: any) {
         onSubmit(data);
         setDownloadJson(true);
     }
 
+    //下载视图配置
     useEffect(() => {
         if (downloadJson) {
             const workflows = viewComfyState.viewComfys.map((item) => {
@@ -93,6 +102,7 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
                 workflows
             }
 
+            //转换为json字符串  
             const jsonString = JSON.stringify(viewComfyJSON, null, 2);
             const blob = new Blob([jsonString], { type: 'application/json' });
             const url = window.URL.createObjectURL(blob);
@@ -108,6 +118,7 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
         }
     }, [downloadJson, viewComfyState.viewComfys]);
 
+    //渲染表单
     return (
         <div className="flex flex-col h-full overflow-hidden">
             <ViewComfyForm 
@@ -123,6 +134,7 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
     )
 }
 
+//将工作流API类型转换为输入HTML类型
 export function parseWorkflowApiTypeToInputHtmlType(type: string): HTMLInputElement["type"] {
 
     switch (type) {

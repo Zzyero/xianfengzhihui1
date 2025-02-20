@@ -7,11 +7,13 @@ import { WandSparkles } from "lucide-react";
 import "./PlaygroundForm.css";
 import { useEffect } from "react";
 
+//表单组件
 export default function PlaygroundForm(props: {
     viewComfyJSON: IViewComfyWorkflow, onSubmit: (data: IViewComfyWorkflow) => void, loading: boolean
 }) {
     const { viewComfyJSON, onSubmit, loading } = props;
 
+    //默认值
     const defaultValues = {
         title: viewComfyJSON.title,
         description: viewComfyJSON.description,
@@ -20,21 +22,24 @@ export default function PlaygroundForm(props: {
         advancedInputs: viewComfyJSON.advancedInputs,
     }
 
+    //表单
     const form = useForm<IViewComfyBase>({
         defaultValues
     });
 
+    //输入框
     const inputFieldArray = useFieldArray({
         control: form.control,
         name: "inputs"
     });
 
+    //高级输入框
     const advancedFieldArray = useFieldArray({
         control: form.control,
         name: "advancedInputs"
     });
 
-
+    //重置表单
     useEffect(() => {
         if (viewComfyJSON) {
             form.reset({
@@ -47,7 +52,7 @@ export default function PlaygroundForm(props: {
         }
     }, [viewComfyJSON, form]);
 
-
+    //渲染表单  
     return (
         <>
             <ViewComfyForm form={form} onSubmit={onSubmit} inputFieldArray={inputFieldArray} advancedFieldArray={advancedFieldArray} isLoading={loading}>

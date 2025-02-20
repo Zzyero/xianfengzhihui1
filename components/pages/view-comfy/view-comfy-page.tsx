@@ -15,19 +15,23 @@ import WorkflowSwitcher from '@/components/workflow-switchter';
 // import { BentoGridThirdDemo } from '@/components/images-preview';
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+//工作流JSON错误
 class WorkflowJSONError extends Error {
     constructor() {
         super("Workflow.json file is not supported, please use workflow_api.json");
     }
 }
 
-
-
+//视图配置页面
 export default function ViewComfyPage() {
 
+    //文件
     const [file, setFile] = useState<File | null>(null);
+    //视图配置
     const { viewComfyState, viewComfyStateDispatcher } = useViewComfy();
+    //错误对话框
     const [errorDialog, setErrorDialog] = useState<{ open: boolean, error: Error | undefined }>({ open: false, error: undefined });
+    //视图JSON
     const [viewJSON, setViewJSON] = useState<boolean>(false);
 
     // add back this functionality with a button at one point
@@ -35,6 +39,7 @@ export default function ViewComfyPage() {
         setViewJSON(false);
     }
 
+    //当文件变化时
     useEffect(() => {
         if (file) {
             const reader = new FileReader();
@@ -42,6 +47,7 @@ export default function ViewComfyPage() {
                 try {
                     const content = e.target?.result as string;
                     const parsed = JSON.parse(content);
+                    //处理不同的类型文件
                     if (parsed.file_type === "view_comfy") {
                         viewComfyStateDispatcher({
                             type: ActionType.INIT_VIEW_COMFY,
@@ -71,22 +77,24 @@ export default function ViewComfyPage() {
         }
     }, [file, viewComfyStateDispatcher]);
 
-
+    //获取拖拽区域文本
     const getDropZoneText = () => {
         if (viewComfyState.viewComfyDraft?.viewComfyJSON) {
             return <div className="text-muted-foreground text-lg">
-                Drag and drop your <b>workflow_api.json</b> to start
+                拖拽你的 <b>workflow_api.json</b> 开始
             </div>
         }
         return <div className="text-muted-foreground text-lg">
-            Drag and drop your <b>workflow_api.json</b> or <b>view_comfy.json</b> to start
+            拖拽你的 <b>workflow_api.json</b> 或 <b>view_comfy.json</b> 开始
         </div>
     }
 
+    //显示删除工作流按钮
     const showDeleteWorkflowButton = () => {
         return viewComfyState.currentViewComfy;
     }
 
+    //删除工作流JSON
     const deleteViewComfyJSON = () => {
         if (viewComfyState.currentViewComfy) {
             viewComfyStateDispatcher({
@@ -96,10 +104,12 @@ export default function ViewComfyPage() {
         }
     }
 
+    //显示拖拽区域
     const showDropZone = () => {
         return !viewComfyState.viewComfyDraft
     }
 
+    //提交表单
     const getOnSubmit = (data: IViewComfyBase) => {
         if (viewComfyState.currentViewComfy) {
             viewComfyStateDispatcher({
@@ -132,6 +142,7 @@ export default function ViewComfyPage() {
         }
     }
 
+    //选择视图配置
     const onSelectChange = (data: IViewComfy) => {
         return viewComfyStateDispatcher({
             type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
@@ -139,6 +150,7 @@ export default function ViewComfyPage() {
         });
     }
 
+    //添加工作流
     const addWorkflowOnClick = () => {
         return viewComfyStateDispatcher({
             type: ActionType.RESET_CURRENT_AND_DRAFT_VIEW_COMFY,
@@ -146,6 +158,7 @@ export default function ViewComfyPage() {
         });
     }
 
+    //渲染页面
     return (
         <div className="flex flex-col h-full overflow-hidden">
             <Header title="Editor">
@@ -209,6 +222,7 @@ export default function ViewComfyPage() {
     )
 }
 
+//获取错误文本
 function getErrorText(error: Error | undefined) {
     if (!error) {
         return <> </>
@@ -224,7 +238,7 @@ function getErrorText(error: Error | undefined) {
 
 }
 
-
+//JSON预览  
 function JSONPreview() {
     const { viewComfyState, viewComfyStateDispatcher } = useViewComfy();
     const getFileInfo = () => {
