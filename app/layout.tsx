@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ViewComfy",
-  description: "From ComfyUI to beatiful web apps",
+  title: "先锋·智绘",
+  description: "政治讽刺漫画生成",
 };
 
 import { ThemeProvider } from "@/components/theme-provider"
@@ -11,7 +11,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="zh-CN" suppressHydrationWarning>
         <head />
         <body>
           <ThemeProvider
