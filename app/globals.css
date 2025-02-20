@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 全局样式 */
 @layer base {
   :root {
     --background: 0 0% 100%;

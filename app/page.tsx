@@ -11,27 +11,41 @@ import { Button } from "@/components/ui/button";
 // export const description =
 //     "An AI playground with a sidebar navigation and a main content area. The playground has a header with a settings drawer and a share button. The sidebar has navigation links and a user menu. The main content area shows a form to configure the model and messages."
 
+// 主页
 export default function Page() {
+    // 是否启用视图模式
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
+    // 当前标签 
     const [currentTab, setCurrentTab] = useState(viewMode ? TabValue.Playground : TabValue.WorkflowApi);
+    // 部署窗口显示状态
     const [deployWindow, setDeployWindow] = useState<boolean>(false);
     return (
+        // 主布局
         <ViewComfyProvider>
             <div className="flex flex-col h-screen w-full overflow-x-auto overflow-y-hidden">
+                {/* 顶部导航 */}
                 <TopNav />
+                {/* 主内容区域 */}
                 <div className="flex flex-1 overflow-x-auto overflow-y-hidden">
+                    {/* 侧边栏 */}
                     <Sidebar currentTab={currentTab} onTabChange={setCurrentTab} deployWindow={deployWindow} onDeployWindow={setDeployWindow}/>
+                    {/* 主内容区域 */}
                     <main className="flex-1 overflow-x-auto overflow-y-hidden">
+                        {/* 视图页面 */}
                         {currentTab === TabValue.Playground && <PlaygroundPage />}
+                        {/* 工作流页面 */}
                         {currentTab === TabValue.WorkflowApi && <ViewComfyPage />}
                     </main>
                 </div>
             </div>
+            {/* 部署窗口 */}
             {deployWindow &&
             <>
+                {/* 遮罩层 */}
                 <div className="absolute inset-0 bg-black/50 z-10" 
                     onClick={() => setDeployWindow(false)}
                 />
+                {/* 按钮 */}
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 z-20">
                     <h2 className="text-xl font-bold mb-4 text-center">Deploy your app to the cloud</h2>
                     <p className="text-sm mb-4 text-center">Want to run your app on the hardware of your choice and give other people access via the internet? ViewComfy&apos;s deployment service is the easiest way to host your app.</p>
@@ -56,8 +70,9 @@ export default function Page() {
                         </Button>
                     </div>
                 </div>
-            </>
+                </>
             }
+            {/* 提示 */}
             <Toaster />
         </ViewComfyProvider>
     )
