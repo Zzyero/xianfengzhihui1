@@ -36,12 +36,16 @@ import { useEffect } from "react"
 type PopoverTriggerProps = React.ComponentPropsWithoutRef<typeof PopoverTrigger>
 
 interface WorkflowSwitcherProps extends PopoverTriggerProps {
-    viewComfys: IViewComfy[];
-    currentViewComfy: IViewComfy;
-    onSelectChange: (data: IViewComfy) => void;
+    viewComfys: IViewComfy[];                      // 所有工作流列表
+    currentViewComfy: IViewComfy;                 // 当前选中的工作流
+    onSelectChange: (data: IViewComfy) => void;    // 选择变更回调
 
 }
 
+/**
+ * 工作流切换器组件
+ * 提供工作流列表的下拉选择功能
+ */
 export default function WorkflowSwitcher({ className, currentViewComfy, viewComfys, onSelectChange }: WorkflowSwitcherProps) {
     const [open, setOpen] = React.useState(false);
     const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
@@ -61,12 +65,13 @@ export default function WorkflowSwitcher({ className, currentViewComfy, viewComf
     return (
         <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
             <Popover open={open} onOpenChange={setOpen}>
+                {/* 触发按钮 */}
                 <PopoverTrigger asChild>
                     <Button
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        aria-label="Select a team"
+                        aria-label="请选择一个功能"
                         className={cn("w-full max-w-[300px] justify-between", className)}
                     >
                         {currentWorkflow.viewComfyJSON.title}
@@ -75,9 +80,10 @@ export default function WorkflowSwitcher({ className, currentViewComfy, viewComf
                 </PopoverTrigger>
                 <PopoverContent className="w-full p-0">
                     <Command>
-                        <CommandInput placeholder="Search team..." />
+                        <CommandInput placeholder="请输入功能名称..." />
+                        {/* 搜索输入框 */}
                         <CommandList>
-                            <CommandEmpty>No team found.</CommandEmpty>
+                            <CommandEmpty>未找到功能</CommandEmpty>
                             {groups.map((group) => (
                                 <CommandGroup key={group.label} heading={group.label}>
                                     {group.viewComfys.map((viewComfy) => (
@@ -124,18 +130,18 @@ export default function WorkflowSwitcher({ className, currentViewComfy, viewComf
             </Popover>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Create team</DialogTitle>
+                    <DialogTitle>创建功能</DialogTitle>
                     <DialogDescription>
-                        Add a new team to manage products and customers.
+                        添加一个新功能
                     </DialogDescription>
                 </DialogHeader>
                 <div>
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setShowNewTeamDialog(false)}>
-                        Cancel
+                        取消
                     </Button>
-                    <Button type="submit">Continue</Button>
+                    <Button type="submit">继续</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

@@ -28,13 +28,15 @@ export interface WorkflowApiJSON {
     };
 }
 
-
+// 将工作流 API 转换为 ViewComfy 格式
 export function workflowAPItoViewComfy(source: WorkflowApiJSON): IViewComfyBase {
     let basicInputs: IMultiValueInput[] = [];
     let advancedInputs: IMultiValueInput[] = [];
 
+    // 遍历源数据   
     for (const [key, value] of Object.entries(source)) {
         const inputs: IInputField[] = [];
+        // 遍历输入配置
         for (const node of Object.entries(value.inputs)) {
             const input = parseInputField({ node: { key: node[0], value: node[1] }, path: [key, "inputs"] });
             if (input) {
@@ -42,9 +44,9 @@ export function workflowAPItoViewComfy(source: WorkflowApiJSON): IViewComfyBase 
             }
         }
         try {
-
+            // 根据不同的类型处理输入
             switch (value.class_type) {
-
+                // 处理文本编码输入
                 case 'CLIPTextEncode':
                     if (inputs.length > 0) {
                         const input = inputs[0];
@@ -59,6 +61,7 @@ export function workflowAPItoViewComfy(source: WorkflowApiJSON): IViewComfyBase 
                     }
                     break;
 
+                // 处理图片和图片遮罩加载
                 case "LoadImage":
                 case "LoadImageMask":
                     const uploadInput = inputs.find(input => input.title === "Upload");
@@ -76,6 +79,7 @@ export function workflowAPItoViewComfy(source: WorkflowApiJSON): IViewComfyBase 
                     }
                     break;
 
+                // 处理视频加载
                 case "VHS_LoadVideo":
                     const uploadInputIndex = inputs.findIndex(input => input.title === "Video");
                     if (typeof uploadInputIndex !== "undefined") {
@@ -89,14 +93,15 @@ export function workflowAPItoViewComfy(source: WorkflowApiJSON): IViewComfyBase 
                     });
                     break;
 
+                // 处理其他类型
                 default:
-
+                    // 处理种子值
                     for (const input of inputs) {
                         if (SEED_LIKE_INPUT_VALUES.includes(input.title.toLowerCase())) {
                             input.valueType = "seed";
                         }
                     }
-
+                    // 如果输入有值，则添加到高级输入中 
                     if (inputs.length > 0) {
                         advancedInputs.push({
                             title: getTitleFromValue(value.class_type, value),
@@ -112,6 +117,7 @@ export function workflowAPItoViewComfy(source: WorkflowApiJSON): IViewComfyBase 
         }
     }
 
+    // 如果基础输入为空，则将高级输入赋值给基础输入 
     if (basicInputs.length === 0) {
         basicInputs = [...advancedInputs];
         advancedInputs = [];

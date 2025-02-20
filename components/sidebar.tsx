@@ -4,6 +4,9 @@ import { TooltipButton } from "@/components/ui/tooltip-button"
 import Link from "next/link";
 import { useMediaQuery } from "@/hooks/use-media-query"
 
+/**
+ * 定义侧边栏标签
+ */
 export enum TabValue {
     Playground = 'playground',
     Models = 'models',
@@ -15,6 +18,7 @@ export enum TabValue {
     WorkflowApi = 'workflow_api'
 }
 
+//侧边栏属性接口
 interface SidebarProps {
     currentTab: TabValue;
     onTabChange: (tab: TabValue) => void;
@@ -22,6 +26,7 @@ interface SidebarProps {
     onDeployWindow: (deployWindow: boolean) => void;
 }
 
+//侧边栏按钮组件，根据屏幕大小显示不同样式的按钮
 const SidebarButton = ({ icon, label, isActive, onClick, isSmallScreen }: { icon: React.ReactNode, label: string, isActive: boolean, onClick: () => void, isSmallScreen: boolean }) => {
     if (isSmallScreen) {
         return (
@@ -46,6 +51,7 @@ const SidebarButton = ({ icon, label, isActive, onClick, isSmallScreen }: { icon
     )
 }
 
+//侧边栏主组件
 export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow }: SidebarProps) {
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     const isSmallScreen = useMediaQuery("(max-width: 1024px)");
@@ -53,6 +59,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
     return (
         <aside className={`flex flex-col h-full overflow-y-auto border-r bg-background transition-all duration-300 ${isSmallScreen ? 'w-12' : 'w-48'}`}>
             <nav className="flex-grow space-y-2 p-2">
+                {/* 查看模式只显示生图按钮 */}
                 {viewMode ? (
                     <SidebarButton
                         icon={<SquareTerminal className="size-5" />}
@@ -62,6 +69,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                         isSmallScreen={isSmallScreen}
                     />
                 ) : (
+                    //编辑模式显示完整导航
                     <>
                         <SidebarButton
                             icon={<FileJson className="size-5" />}
@@ -88,8 +96,9 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                     </>
                 )}
             </nav>
+            {/* 底部帮助链接 */}
             <nav className="sticky bottom-0 p-2 bg-background border-t">
-                <Link href="https://github.com/ViewComfy/ViewComfy" target="_blank" rel="noopener noreferrer">
+                <Link href="https://baike.baidu.com/item/%E4%B8%AD%E5%9B%BD%E4%BA%BA%E6%B0%91%E8%A7%A3%E6%94%BE%E5%86%9B%E7%BD%91%E7%BB%9C%E7%A9%BA%E9%97%B4%E9%83%A8%E9%98%9F%E4%BF%A1%E6%81%AF%E5%B7%A5%E7%A8%8B%E5%A4%A7%E5%AD%A6/65164733" target="_blank" rel="noopener noreferrer">
                     {isSmallScreen ? (
                         <TooltipButton
                             icon={<LifeBuoy className="size-5" />}

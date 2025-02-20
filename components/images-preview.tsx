@@ -5,12 +5,16 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import type { IViewComfyWorkflow } from "@/app/providers/view-comfy-provider";
 
+/**
+ * 预览图片画廊组件
+ * 用于展示最多3张预览图片，带有动画效果
+ */
 export function PreviewOutputsImageGallery({
     viewComfyJSON
 }: {
     viewComfyJSON: IViewComfyWorkflow
 }) {
-
+    // 初始化三张预览图片的状态
     const [image1, setImage1] = useState<string | null>(
         (viewComfyJSON.previewImages && viewComfyJSON.previewImages[0]) ? viewComfyJSON.previewImages[0] : null
     );
@@ -21,6 +25,7 @@ export function PreviewOutputsImageGallery({
         (viewComfyJSON.previewImages && viewComfyJSON.previewImages[2]) ? viewComfyJSON.previewImages[2] : null
     );
 
+    // 定义第一张图片的动画变体
     const first = {
         initial: {
             x: 20,
@@ -31,6 +36,8 @@ export function PreviewOutputsImageGallery({
             rotate: 0,
         },
     };
+
+    // 定义第二张图片的动画变体
     const second = {
         initial: {
             x: -20,
@@ -41,8 +48,11 @@ export function PreviewOutputsImageGallery({
             rotate: 0,
         },
     };
+
+    // 返回图片画廊组件
     return (
         <>
+            {/* 图片画廊容器 */}
             <motion.div
                 initial="initial"
                 animate="animate"
@@ -94,10 +104,11 @@ export function PreviewOutputsImageGallery({
                     </motion.div>
                 )}
             </motion.div>
+        {/* 当没有图片时显示提示信息 */}
         {!(image1 ?? image2 ?? image3) && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full text-center">
                 <span className="text-lg">
-                    Click the Generate button to start.
+                    点击生成按钮开始生图
                 </span>
             </div>
         )}
