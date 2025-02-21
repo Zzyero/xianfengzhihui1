@@ -161,7 +161,7 @@ export default function ViewComfyPage() {
     //渲染页面
     return (
         <div className="flex flex-col h-full overflow-hidden">
-            <Header title="Editor">
+            <Header title="功能编辑">
             </Header>
             <main className="flex-1 overflow-hidden p-2">
                 {showDropZone() && (

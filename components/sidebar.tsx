@@ -73,7 +73,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                     <>
                         <SidebarButton
                             icon={<FileJson className="size-5" />}
-                            label="Editor"
+                            label="功能编辑"
                             isActive={currentTab === TabValue.WorkflowApi}
                             onClick={() => onTabChange(TabValue.WorkflowApi)}
                             isSmallScreen={isSmallScreen}
@@ -81,16 +81,9 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                         {/* <PlaygroundButton currentTab={currentTab} onTabChange={onTabChange} /> */}
                         <SidebarButton
                             icon={<SquareTerminal className="size-5" />}
-                            label="Playground"
+                            label="生图"
                             isActive={currentTab === TabValue.Playground}
                             onClick={() => onTabChange(TabValue.Playground)}
-                            isSmallScreen={isSmallScreen}
-                        />
-                        <SidebarButton
-                            icon={<Cloud className="size-5" />}
-                            label="Deploy"
-                            isActive={deployWindow === true}
-                            onClick={() => onDeployWindow(!deployWindow)}
                             isSmallScreen={isSmallScreen}
                         />
                     </>
@@ -109,7 +102,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                     ) : (
                         <Button variant="outline" className="w-full justify-start">
                             <LifeBuoy className="size-5 mr-2" />
-                            Help
+                            帮助
                         </Button>
                     )}
                 </Link>
