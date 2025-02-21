@@ -132,7 +132,7 @@ export default function ViewComfyPage() {
             });
         } else {
             if (data.title === "") {
-                data.title = `My Awesome Workflow ${viewComfyState.viewComfys.length + 1}`;
+                data.title = `工作流 ${viewComfyState.viewComfys.length + 1}`;
             }
 
             viewComfyStateDispatcher({
@@ -193,10 +193,10 @@ export default function ViewComfyPage() {
                                                 variant="destructive"
                                                 onClick={deleteViewComfyJSON}
                                             >
-                                                Delete Workflow
+                                                删除工作流
                                             </Button>
                                             <Button onClick={addWorkflowOnClick}>
-                                                Add Workflow
+                                                添加工作流
                                             </Button>
                                         </div>
                                     )}

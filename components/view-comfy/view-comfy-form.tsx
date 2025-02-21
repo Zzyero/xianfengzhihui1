@@ -67,9 +67,9 @@ export function ViewComfyForm(args: {
                                             name="title"
                                             render={({ field }) => (
                                                 <FormItem key="title" className="ml-0.5">
-                                                    <FormLabel>Title</FormLabel>
+                                                    <FormLabel>标题</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="The name of your workflow" {...field} />
+                                                        <Input placeholder="工作流的名称" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -81,9 +81,9 @@ export function ViewComfyForm(args: {
                                             name="description"
                                             render={({ field }) => (
                                                 <FormItem key="description" className="ml-0.5">
-                                                    <FormLabel>Description</FormLabel>
+                                                    <FormLabel>描述</FormLabel>
                                                     <FormControl>
-                                                        <Textarea placeholder="The description of your workflow" {...field} />
+                                                        <Textarea placeholder="描述工作流的功能" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -99,7 +99,7 @@ export function ViewComfyForm(args: {
                                                         <div className={cn(`flex ml-0.5 space-x-2 pt-2`,
                                                             (field.value) ? "mb-[-5px]" : "pb-2"
                                                         )}>
-                                                            <FormLabel>Enable text output</FormLabel>
+                                                            <FormLabel>允许文本生成</FormLabel>
                                                             <Checkbox
                                                                 checked={field.value}
                                                                 onCheckedChange={field.onChange}
@@ -131,7 +131,7 @@ export function ViewComfyForm(args: {
                                     {/* 编辑模式下显示的标题 */}
                                     {editMode && (
                                         <legend className="-ml-1 px-1 text-sm font-medium">
-                                            Basic Inputs
+                                            基础输入
                                         </legend>
                                     )}
                                     {/* 渲染输入字段数组 */}
@@ -332,7 +332,7 @@ function AdvancedInputSection(args: { advancedFieldArray: UseFieldArrayReturn<an
             {!editMode && (<div className="flex items-center space-x-4 px-4">
                 <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="default" className="w-full">
-                        Advanced Inputs
+                        高级设置
                         <ChevronsUpDown className="size-5" />
                     </Button>
                 </CollapsibleTrigger>
@@ -343,7 +343,7 @@ function AdvancedInputSection(args: { advancedFieldArray: UseFieldArrayReturn<an
                     {/* 编辑模式下显示标题 */}
                     {editMode && (
                         <legend className="-ml-1 px-1 text-sm font-medium">
-                            Advanced Inputs
+                            高级设置
                         </legend>
                     )}
                     {/* 渲染高级输入字段 */}

@@ -164,7 +164,7 @@ function PlaygroundPageContent() {
     return (
         <>
             <div className="flex flex-col h-full">
-                <Header title="Playground" />
+                <Header title="生图区" />
                 <div className="md:hidden w-full flex pl-4 gap-x-2">
                     <WorkflowSwitcher viewComfys={viewComfyState.viewComfys} currentViewComfy={viewComfyState.currentViewComfy} onSelectChange={onSelectChange} />
                     <Drawer>
@@ -196,7 +196,7 @@ function PlaygroundPageContent() {
                                     <PreviewOutputsImageGallery viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON} />
                                 </div>
                                     <Badge variant="outline" className="absolute right-3 top-3">
-                                        Output
+                                        输出
                                     </Badge>
                                 </>
                             )}
