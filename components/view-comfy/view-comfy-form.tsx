@@ -201,12 +201,12 @@ export function ViewComfyForm(args: {
                     <div className={cn("sticky bottom-0 p-4 bg-background w-full flex flex-row gap-x-4 rounded-md")}>
                         {/* 保存更改按钮 */}
                         <Button type="submit" className="w-full mb-2" onClick={form.handleSubmit(onSubmit)}>
-                            Save Changes
+                            保存更改
                         </Button>
                         {/* 下载JSON按钮 */}
                         {downloadViewComfyJSON && (
                             <Button variant="secondary" className="w-full" onClick={form.handleSubmit(downloadViewComfyJSON)}>
-                                Download as ViewComfy JSON
+                                下载ViewComfy.json文件
                             </Button>
                         )}
                     </div>
