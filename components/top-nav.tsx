@@ -25,7 +25,7 @@ export function TopNav() {
                         />
                     </Link>
                 </Button>
-                <span className="ml-2 text-lg font-semibold">智绘·先锋</span>
+                <span className="ml-2 text-lg font-semibold">先锋·智绘</span>
             </div>
             
             <ModeToggle />
