@@ -38,9 +38,6 @@ export default function Page() {
                     </main>
                 </div>
             </div>
-            {/* 部署窗口 */}
-
-            {/* 提示 */}
             <Toaster />
         </ViewComfyProvider>
     )
