@@ -1,6 +1,6 @@
 # 先锋·智绘
 
-先锋·智绘是基于ViewComfy、ComfyUI的智能绘画生图工具。666
+先锋·智绘是基于ViewComfy、ComfyUI的智能绘画生图工具。6666
 
 ## 安装和演示
 
