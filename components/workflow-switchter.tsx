@@ -57,7 +57,7 @@ export default function WorkflowSwitcher({ className, currentViewComfy, viewComf
 
     const groups = [
         {
-            label: "Workflows",
+            label: "功能",
             viewComfys
         },
     ];
