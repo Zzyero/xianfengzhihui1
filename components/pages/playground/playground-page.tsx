@@ -24,11 +24,12 @@ import { cn } from "@/lib/utils";
 import WorkflowSwitcher from "@/components/workflow-switchter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PreviewOutputsImageGallery } from "@/components/images-preview"
+import { QueueManager } from "@/components/queue-manager";
 
 const apiErrorHandler = new ApiErrorHandler();
 
 //页面内容组件
-function PlaygroundPageContent() {
+function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setLoading: (loading: boolean) => void }) {
     const [results, SetResults] = useState<{ [key: string]: { outputs: Blob, url: string }[] }>({});
     const { viewComfyState, viewComfyStateDispatcher } = useViewComfy();
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
@@ -73,7 +74,7 @@ function PlaygroundPageContent() {
         }
     }, [viewMode, viewComfyStateDispatcher]);
 
-    const { doPost, loading } = usePostPlayground();
+    const { doPost } = usePostPlayground();
 
     // useEffect(() => {
     //     if (viewComfyState?.viewComfyJSON) {
@@ -107,12 +108,16 @@ function PlaygroundPageContent() {
         };
 
         //提交表单
+        setLoading(true); // 开始加载
         doPost({
             viewComfy: generationData,
             workflow: viewComfyState.currentViewComfy?.workflowApiJSON,
             onSuccess: (data) => {
                 onSetResults(data);
-            }, onError: (error) => {
+                setLoading(false); // 成功后结束加载
+            }, 
+            onError: (error) => {
+                setLoading(false); // 错误时结束加载
                 const errorDialog = apiErrorHandler.apiErrorToDialog(error);
                 setErrorAlertDialog({
                     open: true,
@@ -274,8 +279,27 @@ function PlaygroundPageContent() {
 }
 
 export default function PlaygroundPage() {
-    return (
+    const [loading, setLoading] = useState(false);
 
-        <PlaygroundPageContent />
+    // 处理中断和清除队列
+    const handleInterrupt = () => {
+        setLoading(false);
+    };
+
+    const handleClearQueue = () => {
+        setLoading(false);
+    };
+
+    return (
+        <div className="flex flex-col h-full">
+            <div className="flex justify-between items-center p-4 border-b">
+                <h1 className="text-2xl font-bold">生图区</h1>
+                <QueueManager 
+                    onInterrupt={handleInterrupt}
+                    onClear={handleClearQueue}
+                />
+            </div>
+            <PlaygroundPageContent loading={loading} setLoading={setLoading} />
+        </div>
     );
 }
