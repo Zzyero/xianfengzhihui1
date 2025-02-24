@@ -50,7 +50,7 @@ export function ViewComfyForm(args: {
     isLoading?: boolean//加载状态
 
 }) {
-    const { form, onSubmit, inputFieldArray, advancedFieldArray, editMode = false, isLoading = false, downloadViewComfyJSON } = args;
+    const { form, onSubmit, inputFieldArray, advancedFieldArray, editMode = false, downloadViewComfyJSON, children } = args;
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full w-full">
@@ -127,7 +127,7 @@ export function ViewComfyForm(args: {
                                 )}
 
                                 {/* 基础输入字段区域 */}
-                                <fieldset disabled={isLoading} className="grid gap-2 rounded-lg p-1">
+                                <fieldset className="grid gap-2 rounded-lg p-1">
                                     {/* 编辑模式下显示的标题 */}
                                     {editMode && (
                                         <legend className="-ml-1 px-1 text-sm font-medium">
@@ -143,7 +143,7 @@ export function ViewComfyForm(args: {
                                             if (editMode) {
                                                 return (
                                                     // 编辑模式下的输入字段组
-                                                    <fieldset disabled={isLoading} key={field.id} className="grid gap-4 rounded-lg border p-4">
+                                                    <fieldset className="grid gap-4 rounded-lg border p-4">
                                                         <legend className="-ml-1 px-1 text-sm font-medium">
                                                             {
                                                                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -168,7 +168,7 @@ export function ViewComfyForm(args: {
 
                                             return (
                                                 // 非编辑模式下的输入字段组
-                                                <fieldset disabled={isLoading} key={field.id} className="grid gap-4">
+                                                <fieldset className="grid gap-4">
                                                     <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
                                                 </fieldset>
                                             )
@@ -176,14 +176,14 @@ export function ViewComfyForm(args: {
                                         return undefined;
                                     })}
                                     {/* 非编辑模式下的子组件 */}
-                                    {!editMode && (args.children)}
+                                    {!editMode && (children)}
                                 </fieldset>
                                 {/* 如果存在高级输入字段，显示高级输入区域 */}
                                 {advancedFieldArray.fields.length > 0 && (
-                                    <AdvancedInputSection advancedFieldArray={advancedFieldArray} form={form} editMode={editMode} isLoading={isLoading} />
+                                    <AdvancedInputSection advancedFieldArray={advancedFieldArray} form={form} editMode={editMode} />
                                 )}
                                 {/* 编辑模式下显示子组件 */}
-                                {editMode && (args.children)}
+                                {editMode && (children)}
                             </ScrollArea >
                         </div>
                     </div>
@@ -312,13 +312,12 @@ function PreviewImagesInput({ form }: { form: UseFormReturn<IViewComfyBase> }) {
     );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
  * 高级输入区域组件
  * 可折叠显示的高级配置选项
  */
-function AdvancedInputSection(args: { advancedFieldArray: UseFieldArrayReturn<any>, form: UseFormReturn<IViewComfyBase, any, undefined>, editMode: boolean, isLoading: boolean }) {
-    const { advancedFieldArray, form, editMode, isLoading } = args;
+function AdvancedInputSection(args: { advancedFieldArray: UseFieldArrayReturn<any>, form: UseFormReturn<IViewComfyBase, any, undefined>, editMode: boolean }) {
+    const { advancedFieldArray, form, editMode } = args;
     // 控制折叠状态，编辑模式下默认展开
     const [isOpen, setIsOpen] = useState(editMode);
     
@@ -348,7 +347,7 @@ function AdvancedInputSection(args: { advancedFieldArray: UseFieldArrayReturn<an
                     )}
                     {/* 渲染高级输入字段 */}
                     {advancedFieldArray.fields.map((advancedField, index) => (
-                        <fieldset disabled={isLoading} key={advancedField.id} className="grid gap-4 rounded-lg border p-4">
+                        <fieldset className="grid gap-4 rounded-lg border p-4">
                             <legend className="-ml-1 px-1 text-sm font-medium">
                                 {
                                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -377,7 +376,6 @@ function AdvancedInputSection(args: { advancedFieldArray: UseFieldArrayReturn<an
     </>)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
  * 嵌套输入字段组件
  * 处理表单中的嵌套字段结构
@@ -416,7 +414,6 @@ function NestedInputField(args: { form: UseFormReturn<IViewComfyBase, any, undef
     )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
  * 输入字段类型转换组件
  * 根据输入字段类型返回对应的UI组件
@@ -459,7 +456,6 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
     )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
  * 随机种子输入组件
  * 支持手动输入和随机生成种子值
@@ -542,7 +538,6 @@ function FormSeedInput(args: { input: IInputForm, field: any, editMode?: boolean
     );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
  * 媒体文件(图片/视频)输入组件
  * 支持文件上传和预览功能
@@ -660,7 +655,6 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
     )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
  * 文本区域输入组件
  * 用于长文本内容的输入
@@ -701,7 +695,6 @@ function FormTextAreaInput(args: { input: IInputForm, field: any, editMode?: boo
     )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
  * 复选框输入组件
  * 用于布尔值的输入
@@ -741,7 +734,6 @@ function FormCheckboxInput(args: { input: IInputForm, field: any, editMode?: boo
     )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
  * 基础输入组件
  * 用于处理常规文本和数字输入
