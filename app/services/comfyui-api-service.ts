@@ -35,6 +35,12 @@ export class ComfyImageOutputFile {
     }
 }
 
+// 添加队列相关接口
+export interface IComfyQueue {
+    queue_running: string[];
+    queue_pending: string[];
+}
+
 // ComfyUI API 服务类
 export class ComfyUIAPIService {
     private baseUrl: string;             // ComfyUI API 基础 URL                                    
@@ -286,6 +292,60 @@ export class ComfyUIAPIService {
                     this.outputFiles.push(dict)
                 }
             }
+        }
+    }
+
+    // 获取队列状态
+    public async getQueue(): Promise<IComfyQueue> {
+        try {
+            const response = await fetch(`${this.getUrl("http")}/queue`);
+            if (!response.ok) {
+                throw new Error("获取队列状态失败");
+            }
+            return await response.json();
+        } catch (error: any) {
+            console.error(error);
+            if (error?.cause?.code === "ECONNREFUSED") {
+                throw new ComfyWorkflowError({
+                    message: "无法连接到 ComfyUI",
+                    errors: [ComfyUIConnRefusedError(this.getUrl("http"))]
+                });
+            }
+            throw error;
+        }
+    }
+
+    // 清除所有队列
+    public async clearQueue(): Promise<void> {
+        try {
+            const response = await fetch(`${this.getUrl("http")}/queue`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ clear: true })
+            });
+            if (!response.ok) {
+                throw new Error("清除队列失败");
+            }
+        } catch (error: any) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    // 中断当前任务
+    public async interruptQueue(): Promise<void> {
+        try {
+            const response = await fetch(`${this.getUrl("http")}/interrupt`, {
+                method: 'POST'
+            });
+            if (!response.ok) {
+                throw new Error("中断任务失败");
+            }
+        } catch (error: any) {
+            console.error(error);
+            throw error;
         }
     }
 }
