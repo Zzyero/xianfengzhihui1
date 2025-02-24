@@ -6,6 +6,7 @@ import { ViewComfyForm } from "@/components/view-comfy/view-comfy-form";
 import { WandSparkles } from "lucide-react";
 import "./PlaygroundForm.css";
 import { useEffect } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 //表单组件
 export default function PlaygroundForm(props: {
@@ -55,9 +56,17 @@ export default function PlaygroundForm(props: {
     //渲染表单  
     return (
         <>
-            <ViewComfyForm form={form} onSubmit={onSubmit} inputFieldArray={inputFieldArray} advancedFieldArray={advancedFieldArray} isLoading={loading}>
+            <ViewComfyForm form={form} onSubmit={(data) => {
+                onSubmit(data);
+                // 添加提交提示
+                toast({
+                    title: "生成请求已提交",
+                    description: "请等待生成结果",
+                    duration: 3000,
+                });
+            }} inputFieldArray={inputFieldArray} advancedFieldArray={advancedFieldArray} isLoading={loading}>
                 <div className={cn("sticky bottom-0 p-4 bg-background w-full  rounded-md")}>
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button type="submit" className="w-full">
                         生成 <WandSparkles className={cn("size-5 ml-2")} />
                     </Button>
                 </div>
