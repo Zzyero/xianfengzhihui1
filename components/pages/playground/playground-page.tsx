@@ -83,6 +83,14 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
     //     }
     // }, [viewComfyState?.viewComfyJSON]);
 
+    // 处理中断和清除队列
+    const handleInterrupt = () => {
+        setLoading(false);
+    };
+
+    const handleClearQueue = () => {
+        setLoading(false);
+    };
 
     function onSubmit(data: IViewComfyWorkflow) {
         // setFormState(data);
@@ -169,7 +177,13 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
     return (
         <>
             <div className="flex flex-col h-full">
-                <Header title="生图区" />
+                <div className="flex justify-between items-center p-4 border-b">
+                    <h1 className="text-2xl font-bold">生图区</h1>
+                    <QueueManager 
+                        onInterrupt={handleInterrupt}
+                        onClear={handleClearQueue}
+                    />
+                </div>
                 <div className="md:hidden w-full flex pl-4 gap-x-2">
                     <WorkflowSwitcher viewComfys={viewComfyState.viewComfys} currentViewComfy={viewComfyState.currentViewComfy} onSelectChange={onSelectChange} />
                     <Drawer>
@@ -280,26 +294,5 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
 
 export default function PlaygroundPage() {
     const [loading, setLoading] = useState(false);
-
-    // 处理中断和清除队列
-    const handleInterrupt = () => {
-        setLoading(false);
-    };
-
-    const handleClearQueue = () => {
-        setLoading(false);
-    };
-
-    return (
-        <div className="flex flex-col h-full">
-            <div className="flex justify-between items-center p-4 border-b">
-                <h1 className="text-2xl font-bold">生图区</h1>
-                <QueueManager 
-                    onInterrupt={handleInterrupt}
-                    onClear={handleClearQueue}
-                />
-            </div>
-            <PlaygroundPageContent loading={loading} setLoading={setLoading} />
-        </div>
-    );
+    return <PlaygroundPageContent loading={loading} setLoading={setLoading} />;
 }
