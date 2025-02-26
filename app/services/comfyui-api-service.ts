@@ -136,7 +136,11 @@ export class ComfyUIAPIService {
                 this.workflowStatus = event.type;
                 break;
             case "progress":
-                // console.log("Progress:", event.data);
+                // 添加进度输出
+                // console.log("Progress 事件:", event.data);
+                if ("value" in event.data && "max" in event.data) {
+                    console.log(`当前进度: ${event.data.value}/${event.data.max}`);
+                }
                 // 处理进度事件
                 this.workflowStatus = event.type;
                 break;
