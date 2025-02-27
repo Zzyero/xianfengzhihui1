@@ -1,5 +1,6 @@
 import { ComfyWorkflowError } from '@/app/models/errors';
 import { ComfyUIConnRefusedError } from '@/app/constants';
+import { addLog } from '@/app/api/comfy/logs/route';
 
 // ComfyUI WebSocket 事件类型定义
 type ComfyUIWSEventType = "status" | "executing" | "execution_cached" | "progress" | "executed" | "execution_error" | "execution_success";
@@ -137,9 +138,16 @@ export class ComfyUIAPIService {
                 break;
             case "progress":
                 // 添加进度输出
-                // console.log("Progress 事件:", event.data);
                 if ("value" in event.data && "max" in event.data) {
-                    console.log(`当前进度: ${event.data.value}/${event.data.max}`);
+                    const progressValue = event.data.value as number;
+                    const progressMax = event.data.max as number;
+                    const percentage = Math.round((progressValue / progressMax) * 100);
+                    const progressLog = `当前进度: ${progressValue}/${progressMax} (${percentage}%)`;
+                    
+                    console.log(progressLog);
+                    
+                    // 添加到日志存储
+                    addLog(progressLog);
                 }
                 // 处理进度事件
                 this.workflowStatus = event.type;

@@ -15,22 +15,36 @@ export function QueueManager({ onInterrupt, onClear }: QueueManagerProps) {
     const [queue, setQueue] = useState<IComfyQueue>({ queue_running: [], queue_pending: [] });
     const [loading, setLoading] = useState(false);
     const { toast } = useToast();
+    // 添加进度信息状态
+    const [progressInfo, setProgressInfo] = useState<string | null>(null);
 
-    // 定期获取队列状态
+    // 定期获取队列状态和进度信息
     useEffect(() => {
-        const fetchQueue = async () => {
+        const fetchQueueAndProgress = async () => {
             try {
-                const response = await fetch('/api/comfy/queue');
-                if (!response.ok) throw new Error('获取队列状态失败');
-                const data = await response.json();
-                setQueue(data);
+                // 获取队列状态
+                const queueResponse = await fetch('/api/comfy/queue');
+                if (queueResponse.ok) {
+                    const queueData = await queueResponse.json();
+                    setQueue(queueData);
+                }
+
+                // 获取最新日志
+                const logsResponse = await fetch('/api/comfy/logs');
+                if (logsResponse.ok) {
+                    const logs = await logsResponse.json();
+                    // 查找包含进度信息的最新日志
+                    const progressLog = logs.find((log: string) => log.includes('当前进度:'));
+                    setProgressInfo(progressLog || null);
+                }
             } catch (error) {
-                console.error('获取队列状态失败:', error);
+                console.error('获取数据失败:', error);
             }
         };
 
-        // 每3秒更新一次队列状态
-        const interval = setInterval(fetchQueue, 3000);
+        // 每2秒更新一次
+        fetchQueueAndProgress(); // 立即执行一次
+        const interval = setInterval(fetchQueueAndProgress, 2000);
         return () => clearInterval(interval);
     }, []);
 
@@ -98,6 +112,13 @@ export function QueueManager({ onInterrupt, onClear }: QueueManagerProps) {
 
     return (
         <div className="flex items-center gap-2">
+            {/* 显示进度信息 */}
+            {progressInfo && (
+                <div className="text-sm text-muted-foreground mr-2">
+                    {progressInfo}
+                </div>
+            )}
+            
             {totalTasks > 0 && (
                 <div className="text-sm text-muted-foreground">
                     队列中: {totalTasks} 个任务
