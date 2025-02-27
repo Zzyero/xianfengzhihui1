@@ -637,7 +637,7 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                             className="border-2 text-muted-foreground"
                             onClick={onDelete}
                         >
-                            <Trash2 className="size-5 mr-2" /> Remove {input.valueType}
+                            <Trash2 className="size-5 mr-2" /> 删除图片
                         </Button>
                     </div>
                 ) : (
