@@ -190,7 +190,7 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                         <DrawerTrigger asChild>
                             <Button variant="ghost" size="icon" className="md:hidden self-bottom w-[85px] gap-1">
                                 <Settings className="size-4" />
-                                Settings
+                                设置
                             </Button>
                         </DrawerTrigger>
                         <DrawerContent className="max-h-[80vh] gap-4 px-4 h-full">

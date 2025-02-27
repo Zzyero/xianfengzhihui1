@@ -289,7 +289,7 @@ function PreviewImagesInput({ form }: { form: UseFormReturn<IViewComfyBase> }) {
                                                     field.onChange("")
                                                 }}
                                             >
-                                                <Trash2 className="size-5 mr-2" /> Remove image
+                                                <Trash2 className="size-5 mr-2" /> 删除图片
                                             </Button>
                                         </div>
                                     ) : (
