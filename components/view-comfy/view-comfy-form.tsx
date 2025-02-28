@@ -39,6 +39,9 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Eraser } from "lucide-react"
+import { MaskEditor } from "@/components/ui/mask-editor";
+import { Loader2, Save } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface IInputForm extends IInputField {
     id: string;
@@ -557,7 +560,6 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
         src: "",
         name: ""
     });
-    // 添加蒙版编辑器显示状态
     const [showMaskEditor, setShowMaskEditor] = useState(false);
 
     // 根据输入类型设置允许的文件扩展名
@@ -646,7 +648,6 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                             >
                                 <Trash2 className="size-5 mr-2" /> 删除图片
                             </Button>
-                            {/* 添加蒙版编辑按钮 */}
                             <Button
                                 type="button"
                                 variant="secondary"
@@ -677,26 +678,20 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                             在图片上绘制需要重绘的区域
                         </DialogDescription>
                     </DialogHeader>
-                    {/* 这里将在第二部分添加蒙版编辑器组件 */}
-                    <div className="h-[500px] flex items-center justify-center border rounded-md">
-                        <span className="text-muted-foreground">蒙版编辑器将在下一步实现</span>
-                    </div>
+                    <MaskEditor 
+                        imageUrl={media.src}
+                        onSave={(blob) => {
+                            console.log('蒙版已保存，等待上传功能实现');
+                            setShowMaskEditor(false);
+                        }}
+                    />
                     <DialogFooter>
-                        <Button 
+                        <Button
                             type="button"
-                            variant="secondary" 
+                            variant="secondary"
                             onClick={() => setShowMaskEditor(false)}
                         >
                             取消
-                        </Button>
-                        <Button 
-                            type="button"
-                            onClick={() => {
-                                // 这里将在第二部分添加保存蒙版的逻辑
-                                setShowMaskEditor(false);
-                            }}
-                        >
-                            保存
                         </Button>
                     </DialogFooter>
                 </DialogContent>
