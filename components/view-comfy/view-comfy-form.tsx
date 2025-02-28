@@ -695,6 +695,12 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                                 name: newFile.name
                             });
                             
+                            // 添加成功提示
+                            toast({
+                                title: "蒙版已保存",
+                                description: "图片已成功更新",
+                            });
+                            
                             setShowMaskEditor(false);
                         }}
                     />
