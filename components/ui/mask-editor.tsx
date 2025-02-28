@@ -138,10 +138,44 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
 
     // 保存蒙版
     const handleSave = () => {
-        if (!maskCanvasRef.current) return;
-        maskCanvasRef.current.toBlob((blob) => {
-            if (blob) {
-                onSave(blob);
+        if (!maskCanvasRef.current || !bgCanvasRef.current) return;
+
+        // 创建一个新的 canvas 用于合成最终图像
+        const outputCanvas = document.createElement('canvas');
+        outputCanvas.width = canvasSize.width;
+        outputCanvas.height = canvasSize.height;
+        const outputCtx = outputCanvas.getContext('2d');
+        
+        if (!outputCtx) return;
+
+        // 首先绘制原图
+        outputCtx.drawImage(bgCanvasRef.current, 0, 0);
+
+        // 应用蒙版
+        outputCtx.globalCompositeOperation = 'destination-out';
+        outputCtx.drawImage(maskCanvasRef.current, 0, 0);
+
+        // 将结果转换为 blob
+        outputCanvas.toBlob(async (blob) => {
+            if (!blob) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('mask', blob);
+
+                const response = await fetch('/api/save-mask', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    console.log('蒙版已成功保存到本地');
+                    onSave(blob);
+                } else {
+                    console.error('保存蒙版失败');
+                }
+            } catch (error) {
+                console.error('Error saving mask:', error);
             }
         }, 'image/png');
     };
