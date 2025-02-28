@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
-const MASKS_DIR = path.join(process.cwd(), 'masks');
+// 使用相对路径，保存到项目根目录下的 public/masks 目录
+const MASKS_DIR = path.join(process.cwd(), 'public', 'masks');
 
 export async function POST(request: Request) {
     try {
@@ -23,16 +24,15 @@ export async function POST(request: Request) {
         const fileName = `mask_${Date.now()}.png`;
         const filePath = path.join(MASKS_DIR, fileName);
 
-        // 将文件内容转换为 Buffer
+        // 将文件内容转换为 Buffer 并写入文件
         const arrayBuffer = await maskFile.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+        await writeFile(filePath, new Uint8Array(arrayBuffer));
 
-        // 写入文件
-        await writeFile(filePath, buffer);
-
+        // 返回相对路径的URL
+        const relativePath = `/masks/${fileName}`;
         return NextResponse.json({
             success: true,
-            filePath: filePath
+            filePath: relativePath
         });
 
     } catch (error) {
