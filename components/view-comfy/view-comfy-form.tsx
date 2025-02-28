@@ -30,6 +30,15 @@ import {
 } from "@/components/ui/collapsible"
 import { useState, useEffect } from "react";
 import { getComfyUIRandomSeed, cn } from "@/lib/utils";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { Eraser } from "lucide-react"
 
 interface IInputForm extends IInputField {
     id: string;
@@ -544,11 +553,12 @@ function FormSeedInput(args: { input: IInputForm, field: any, editMode?: boolean
  */
 function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolean, remove?: UseFieldArrayRemove, index: number }) {
     const { input, field, editMode, remove, index } = args;
-    // 媒体文件状态管理
-    const [media, setMedia] = useState({
+    const [media, setMedia] = useState<{ src: string, name: string }>({
         src: "",
-        name: "",
+        name: ""
     });
+    // 添加蒙版编辑器显示状态
+    const [showMaskEditor, setShowMaskEditor] = useState(false);
 
     // 根据输入类型设置允许的文件扩展名
     let fileExtensions: string[] = []
@@ -594,7 +604,6 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
     return (
         <FormItem key={input.id}>
             <FormLabel className={FORM_STYLE.label}>{input.title}
-                {/* 编辑模式下显示删除按钮 */}
                 {editMode && (
                     <Button
                         size="icon"
@@ -607,11 +616,9 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                 )}
             </FormLabel>
             <FormControl>
-                {/* 如果有媒体文件则显示预览 */}
                 {media.src ? (
                     <div key={input.id} className="flex flex-col items-center gap-2">
                         <div className="max-w-full h-48 flex items-center justify-center overflow-hidden border rounded-md">
-                            {/* 图片预览 */}
                             {(input.valueType === "image") && (
                                 <img
                                     src={media.src}
@@ -631,17 +638,26 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                                 </video>
                             )}
                         </div>
-                        {/* 删除媒体按钮 */}
-                        <Button
-                            variant="secondary"
-                            className="border-2 text-muted-foreground"
-                            onClick={onDelete}
-                        >
-                            <Trash2 className="size-5 mr-2" /> 删除图片
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="secondary"
+                                className="border-2 text-muted-foreground"
+                                onClick={onDelete}
+                            >
+                                <Trash2 className="size-5 mr-2" /> 删除图片
+                            </Button>
+                            {/* 添加蒙版编辑按钮 */}
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                className="border-2 text-muted-foreground"
+                                onClick={() => setShowMaskEditor(true)}
+                            >
+                                <Eraser className="size-5 mr-2" /> 绘制蒙版
+                            </Button>
+                        </div>
                     </div>
                 ) : (
-                    // 如果没有媒体文件则显示上传区域
                     <Dropzone
                         key={input.id}
                         onChange={field.onChange}
@@ -651,6 +667,40 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                     />
                 )}
             </FormControl>
+
+            {/* 蒙版编辑器对话框 */}
+            <Dialog open={showMaskEditor} onOpenChange={setShowMaskEditor}>
+                <DialogContent className="sm:max-w-[800px]">
+                    <DialogHeader>
+                        <DialogTitle>蒙版编辑器</DialogTitle>
+                        <DialogDescription>
+                            在图片上绘制需要重绘的区域
+                        </DialogDescription>
+                    </DialogHeader>
+                    {/* 这里将在第二部分添加蒙版编辑器组件 */}
+                    <div className="h-[500px] flex items-center justify-center border rounded-md">
+                        <span className="text-muted-foreground">蒙版编辑器将在下一步实现</span>
+                    </div>
+                    <DialogFooter>
+                        <Button 
+                            type="button"
+                            variant="secondary" 
+                            onClick={() => setShowMaskEditor(false)}
+                        >
+                            取消
+                        </Button>
+                        <Button 
+                            type="button"
+                            onClick={() => {
+                                // 这里将在第二部分添加保存蒙版的逻辑
+                                setShowMaskEditor(false);
+                            }}
+                        >
+                            保存
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </FormItem>
     )
 }
