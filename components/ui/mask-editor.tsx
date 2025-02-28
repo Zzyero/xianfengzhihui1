@@ -7,7 +7,7 @@ import { Eraser, Paintbrush, Save, Trash } from 'lucide-react';
 
 interface MaskEditorProps {
     imageUrl: string;
-    onSave: (maskData: Blob) => void;
+    onSave: (maskData: Blob, maskUrl: string) => void;
 }
 
 export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
@@ -169,8 +169,9 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
                 });
 
                 if (response.ok) {
+                    const data = await response.json();
                     console.log('蒙版已成功保存到本地');
-                    onSave(blob);
+                    onSave(blob, data.filePath);
                 } else {
                     console.error('保存蒙版失败');
                 }

@@ -680,8 +680,21 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                     </DialogHeader>
                     <MaskEditor 
                         imageUrl={media.src}
-                        onSave={(blob) => {
-                            console.log('蒙版已保存，等待上传功能实现');
+                        onSave={(blob, maskUrl) => {
+                            // 创建新的 File 对象
+                            const newFile = new File([blob], `masked_${Date.now()}.png`, {
+                                type: 'image/png'
+                            });
+                            
+                            // 更新表单字段值
+                            field.onChange(newFile);
+                            
+                            // 更新预览
+                            setMedia({
+                                src: maskUrl,  // 使用保存的蒙版图片URL
+                                name: newFile.name
+                            });
+                            
                             setShowMaskEditor(false);
                         }}
                     />
