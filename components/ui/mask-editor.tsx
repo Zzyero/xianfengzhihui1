@@ -79,28 +79,72 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
         };
     }, [imageUrl]);
 
-    // 获取画布上的坐标
-    const getCanvasCoordinates = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    // 获取画布上的坐标和光标显示位置
+    const getCanvasAndCursorPosition = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const canvas = maskCanvasRef.current;
-        if (!canvas) return { x: 0, y: 0 };
+        if (!canvas) return { canvasX: 0, canvasY: 0, cursorX: 0, cursorY: 0 };
 
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+        
+        // 计算画布在容器中的实际位置（考虑objectFit: contain的情况）
+        const canvasRatio = canvas.width / canvas.height;
+        const containerRatio = rect.width / rect.height;
+        
+        let renderWidth = rect.width;
+        let renderHeight = rect.height;
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        // 如果画布比例与容器比例不同，计算实际渲染区域和偏移量
+        if (canvasRatio > containerRatio) {
+            // 宽度适应，高度居中
+            renderHeight = rect.width / canvasRatio;
+            offsetY = (rect.height - renderHeight) / 2;
+        } else {
+            // 高度适应，宽度居中
+            renderWidth = rect.height * canvasRatio;
+            offsetX = (rect.width - renderWidth) / 2;
+        }
+        
+        // 计算鼠标在实际渲染区域内的相对位置
+        const relativeX = e.clientX - rect.left - offsetX;
+        const relativeY = e.clientY - rect.top - offsetY;
+        
+        // 检查鼠标是否在实际渲染区域内
+        const isInRenderArea = 
+            relativeX >= 0 && 
+            relativeX <= renderWidth && 
+            relativeY >= 0 && 
+            relativeY <= renderHeight;
+        
+        // 将相对位置转换为画布坐标
+        const scaleX = canvas.width / renderWidth;
+        const scaleY = canvas.height / renderHeight;
+        
+        const canvasX = isInRenderArea ? relativeX * scaleX : -1;
+        const canvasY = isInRenderArea ? relativeY * scaleY : -1;
+        
+        // 光标位置应该是相对于容器的，但需要考虑偏移
+        const cursorX = e.clientX - rect.left;
+        const cursorY = e.clientY - rect.top;
+        
+        return { canvasX, canvasY, cursorX, cursorY, isInRenderArea };
+    };
 
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-
-        return { x, y };
+    // 获取画布上的坐标
+    const getCanvasCoordinates = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        const { canvasX, canvasY } = getCanvasAndCursorPosition(e);
+        return { x: canvasX, y: canvasY };
     };
 
     // 开始绘制
     const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
         if (!maskCtx) return;
         
-        setIsDrawing(true);
         const { x, y } = getCanvasCoordinates(e);
+        if (x < 0 || y < 0) return; // 如果鼠标不在渲染区域内，不开始绘制
         
+        setIsDrawing(true);
         maskCtx.beginPath();
         maskCtx.moveTo(x, y);
     };
@@ -110,6 +154,8 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
         if (!isDrawing || !maskCtx) return;
         
         const { x, y } = getCanvasCoordinates(e);
+        if (x < 0 || y < 0) return; // 如果鼠标不在渲染区域内，不继续绘制
+        
         maskCtx.globalCompositeOperation = isEraser ? 'destination-out' : 'source-over';
         maskCtx.lineTo(x, y);
         maskCtx.stroke();
@@ -187,11 +233,18 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
         const cursor = cursorRef.current;
         if (!canvas || !cursor) return;
 
-        const rect = canvas.getBoundingClientRect();
-        setCursorPos({
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        });
+        const { cursorX, cursorY, isInRenderArea } = getCanvasAndCursorPosition(e);
+        
+        // 只在渲染区域内显示光标
+        if (isInRenderArea) {
+            cursor.style.display = 'block';
+            setCursorPos({
+                x: cursorX,
+                y: cursorY
+            });
+        } else {
+            cursor.style.display = 'none';
+        }
     };
 
     // 处理鼠标移动
@@ -204,9 +257,6 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
 
     // 处理鼠标进入/离开画布
     const handleMouseEnter = (e: React.MouseEvent<HTMLCanvasElement>) => {
-        if (cursorRef.current) {
-            cursorRef.current.style.display = 'block';
-        }
         updateCursor(e);
     };
 
