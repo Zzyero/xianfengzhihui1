@@ -4,13 +4,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import ChatWindow from './ChatInterface/ChatWindow';
 import MessageInput from './ChatInterface/MessageInput';
-import TemplateBar from './TemplateBar/TemplateBar';
+import TemplateBar from './TemplateManagement/TemplateBar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ChangeModel from "./ModelManagement/ChangeModel";
+
 
 /**
  * 提示词增强页面组件
@@ -97,12 +100,18 @@ const PromptEnhancementPage = () => {
     setInputHeight(height);
   };
 
+  // 渲染页面内容
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
-      <div className="flex-1 flex overflow-hidden relative">
+    <div className="flex flex-col h-screen">
+      {/* 页面头部 */}
+      {/* 页面主体内容 */}
+      <div className="flex-1 flex overflow-hidden">
         <Card className="flex-1 flex flex-col overflow-hidden">
           <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-
+            <ChangeModel 
+              selectedModel={selectedModel} 
+              setSelectedModel={setSelectedModel} 
+            />
             {/* 聊天窗口 */}
             <div className="flex-1 overflow-hidden">
               <ChatWindow 
@@ -116,36 +125,24 @@ const PromptEnhancementPage = () => {
               />
             </div>
 
-            {/* 底部输入区域 */}
-            <div 
-              className={cn(
-                "w-full transition-all duration-200 ease-in-out",
-                "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75"
-              )}
-              style={{
-                transform: `translateY(-${Math.max(0, inputHeight - 56)}px)`
-              }}
-            >
 
               {/* 输入框 */}
-              <div className="px-4 pb-4">
+              <div>
                 <Card className="overflow-hidden">
-                  <CardContent className="p-0">
                     <MessageInput
                       onSend={handleSendMessage}
                       onStop={handleStopGeneration}
                       isGenerating={isGenerating}
                       onResize={handleInputResize}
                     />
-                  </CardContent>
                 </Card>
               </div>
 
               {/* 模板栏 */}
-              <div className="px-4 py-2 border-t">
+              <div style={{ padding: '0px 0px 40px 0px' }}>
                 <TemplateBar onAddTemplate={() => setIsAddTemplateDialogOpen(true)} />
               </div>
-            </div>
+
           </CardContent>
         </Card>
       </div>

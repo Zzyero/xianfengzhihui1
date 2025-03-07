@@ -63,8 +63,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div className="relative">
-      
       <div className="relative">
         <Textarea
           ref={textareaRef}
@@ -101,7 +99,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
           )}
         </div>
       </div>
-    </div>
   );
 };
 
