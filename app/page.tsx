@@ -4,7 +4,7 @@ import { TopNav } from "@/components/top-nav"
 import { useState } from "react"
 import PlaygroundPage from "@/components/pages/playground/playground-page";
 import ViewComfyPage from "@/components/pages/view-comfy/view-comfy-page";
-import PromptEnhancementPage from "@/components/PromptEnhancement/PromptEnhancementPage";
+import PromptEnhancementPage from "@/components/pages/PromptEnhancement/PromptEnhancementPage";
 import { ViewComfyProvider } from "@/app/providers/view-comfy-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";

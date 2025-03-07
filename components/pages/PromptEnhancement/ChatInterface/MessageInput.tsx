@@ -64,21 +64,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
   return (
     <div className="relative">
-      <div className="flex gap-2 p-2">
-        <Select
-          value={selectedModel}
-          onValueChange={setSelectedModel}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="选择模型" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="gpt-4">GPT-4</SelectItem>
-            <SelectItem value="gpt-3.5-turbo">GPT-3.5</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
+      
       <div className="relative">
         <Textarea
           ref={textareaRef}

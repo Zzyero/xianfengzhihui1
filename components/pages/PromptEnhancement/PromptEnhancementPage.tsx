@@ -102,22 +102,6 @@ const PromptEnhancementPage = () => {
       <div className="flex-1 flex overflow-hidden relative">
         <Card className="flex-1 flex flex-col overflow-hidden">
           <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-            {/* 模型选择 */}
-            <div className="px-4 py-2 border-b">
-              <Select
-                value={selectedModel}
-                onValueChange={setSelectedModel}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="选择模型" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gpt-4">GPT-4</SelectItem>
-                  <SelectItem value="gpt-3.5-turbo">GPT-3.5</SelectItem>
-                  <SelectItem value="claude-3">Claude 3</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
             {/* 聊天窗口 */}
             <div className="flex-1 overflow-hidden">
@@ -142,10 +126,6 @@ const PromptEnhancementPage = () => {
                 transform: `translateY(-${Math.max(0, inputHeight - 56)}px)`
               }}
             >
-              {/* 模板栏 */}
-              <div className="px-4 py-2 border-t">
-                <TemplateBar onAddTemplate={() => setIsAddTemplateDialogOpen(true)} />
-              </div>
 
               {/* 输入框 */}
               <div className="px-4 pb-4">
@@ -160,49 +140,16 @@ const PromptEnhancementPage = () => {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* 模板栏 */}
+              <div className="px-4 py-2 border-t">
+                <TemplateBar onAddTemplate={() => setIsAddTemplateDialogOpen(true)} />
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* 添加模板对话框 */}
-      <Dialog open={isAddTemplateDialogOpen} onOpenChange={setIsAddTemplateDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>添加新模板</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">模板名称</label>
-              <Input
-                value={newTemplate.name}
-                onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
-                placeholder="输入模板名称"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">模板内容</label>
-              <Textarea
-                value={newTemplate.content}
-                onChange={(e) => setNewTemplate({ ...newTemplate, content: e.target.value })}
-                placeholder="输入模板内容"
-                rows={4}
-              />
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsAddTemplateDialogOpen(false)}>
-                取消
-              </Button>
-              <Button onClick={() => {
-                // TODO: 实现保存模板逻辑
-                setIsAddTemplateDialogOpen(false);
-              }}>
-                保存
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
