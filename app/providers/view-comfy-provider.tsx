@@ -9,6 +9,7 @@ export interface IViewComfyBase {
     previewImages: string[];
     inputs: IMultiValueInput[];
     advancedInputs: IMultiValueInput[];
+    type?: 'image_generation' | 'smart_ps';
 }
 
 // 视图模式草稿接口
@@ -33,6 +34,7 @@ export interface IViewComfyJSON {
 
 // ViewComfy 配置接口
 export interface IViewComfy {
+    type?: 'image_generation' | 'smart_ps';
     viewComfyJSON: IViewComfyWorkflow;
     workflowApiJSON?: object | undefined;
     file?: File | undefined;
