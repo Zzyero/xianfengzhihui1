@@ -48,7 +48,16 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                         throw responseError;
                     }
                     const data = await response.json();
-                    viewComfyStateDispatcher({ type: ActionType.INIT_VIEW_COMFY, payload: data.viewComfyJSON });
+                    
+                    // 过滤只获取 image_generation 类型的工作流
+                    const imageGenerationWorkflows = {
+                        ...data.viewComfyJSON,
+                        workflows: data.viewComfyJSON.workflows.filter(
+                            (workflow: any) => workflow.type === 'image_generation'
+                        )
+                    };
+                    
+                    viewComfyStateDispatcher({ type: ActionType.INIT_VIEW_COMFY, payload: imageGenerationWorkflows });
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
                     if (error.errorType) {
@@ -73,6 +82,27 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
             fetchViewComfy();
         }
     }, [viewMode, viewComfyStateDispatcher]);
+
+    // 自动切换到 image_generation 类型的工作流
+    useEffect(() => {
+        // 如果有工作流且当前工作流类型不是 image_generation
+        if (viewComfyState.viewComfys.length > 0 && 
+            (!viewComfyState.currentViewComfy || viewComfyState.currentViewComfy.type !== 'image_generation')) {
+            
+            // 查找第一个 image_generation 类型的工作流
+            const imageGenerationWorkflow = viewComfyState.viewComfys.find(
+                workflow => workflow.type === 'image_generation'
+            );
+            
+            // 如果找到了匹配的工作流，自动选择它
+            if (imageGenerationWorkflow) {
+                viewComfyStateDispatcher({
+                    type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
+                    payload: imageGenerationWorkflow
+                });
+            }
+        }
+    }, [viewComfyState.viewComfys, viewComfyState.currentViewComfy, viewComfyStateDispatcher]);
 
     const { doPost } = usePostPlayground();
 
@@ -160,6 +190,10 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
     }, []);
 
     const onSelectChange = (data: IViewComfy) => {
+        // 确保只选择 image_generation 类型的工作流
+        if (data.type !== 'image_generation') {
+            return;
+        }
         return viewComfyStateDispatcher({
             type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
             payload: { ...data }
@@ -202,7 +236,11 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                     <div className="relative hidden flex-col items-start gap-8 md:flex overflow-hidden">
                         {viewComfyState.viewComfys.length > 0 && viewComfyState.currentViewComfy && (
                             <div className="px-3 w-full">
-                                <WorkflowSwitcher viewComfys={viewComfyState.viewComfys} currentViewComfy={viewComfyState.currentViewComfy} onSelectChange={onSelectChange} />
+                                <WorkflowSwitcher 
+                                    viewComfys={viewComfyState.viewComfys.filter(workflow => workflow.type === 'image_generation')} 
+                                    currentViewComfy={viewComfyState.currentViewComfy} 
+                                    onSelectChange={onSelectChange} 
+                                />
                             </div>
                         )}
                         {viewComfyState.currentViewComfy && <PlaygroundForm viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON} onSubmit={onSubmit} loading={loading} />}
