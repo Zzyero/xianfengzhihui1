@@ -36,24 +36,24 @@ export function PreviewOutputsImageGallery({
     // 定义第一张图片的动画变体
     const first = {
         initial: {
-            x: 20,
-            rotate: -5,
+            //x: 20,
+            //rotate: -5,
         },
         hover: {
-            x: 0,
-            rotate: 0,
+            //x: 0,
+            //rotate: 0,
         },
     };
 
     // 定义第二张图片的动画变体
     const second = {
         initial: {
-            x: -20,
-            rotate: 5,
+            //x: -20,
+            //rotate: 5,
         },
         hover: {
-            x: 0,
-            rotate: 0,
+            //x: 0,
+            // rotate: 0,
         },
     };
 
