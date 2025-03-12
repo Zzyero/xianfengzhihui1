@@ -33,27 +33,27 @@ export function PreviewOutputsImageGallery({
         setImage3((viewComfyJSON.previewImages && viewComfyJSON.previewImages[2]) ? viewComfyJSON.previewImages[2] : null);
     }, [viewComfyJSON]); // 依赖项包含 viewComfyJSON，当它变化时执行 effect
 
-    // 定义第一张图片的动画变体（去掉旋转效果）
+    // 定义第一张图片的动画变体
     const first = {
         initial: {
             x: 20,
-            // 移除 rotate: -5
+            rotate: -5,
         },
         hover: {
             x: 0,
-            // 移除 rotate: 0
+            rotate: 0,
         },
     };
 
-    // 定义第二张图片的动画变体（去掉旋转效果）
+    // 定义第二张图片的动画变体
     const second = {
         initial: {
             x: -20,
-            // 移除 rotate: 5
+            rotate: 5,
         },
         hover: {
             x: 0,
-            // 移除 rotate: 0
+            rotate: 0,
         },
     };
 
