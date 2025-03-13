@@ -1,0 +1,348 @@
+/* 模板管理样式 */
+
+/* ===== 模板栏容器 ===== */
+.template-bar {
+  /* 基础样式 */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  background-color: var(--background);
+}
+
+/* ===== 模板列表容器 ===== */
+.template-list {
+  /* 基础样式 */
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: hidden;
+}
+
+/* ===== 模板项 ===== */
+.template-item {
+  /* 基础样式 */
+  position: relative;
+  flex-shrink: 0;
+
+  /* 模板按钮 */
+  .template-button {
+    height: 2rem;
+    padding: 0 0.75rem;
+    width: 5.625rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s ease;
+    color: var(--foreground);
+
+    &:hover {
+      background-color: var(--hover-background);
+      border-color: var(--hover-border-color);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* 删除模式样式 */
+    &.delete-mode {
+      &:hover {
+        border-width: 2px;
+        border-color: var(--destructive-color);
+        color: var(--destructive-color);
+      }
+
+      &.selected {
+        border-width: 2px;
+        border-color: var(--destructive-color);
+        background-color: var(--destructive-light);
+        color: var(--destructive-color);
+      }
+    }
+
+    /* 编辑模式样式 */
+    &.edit-mode {
+      border-width: 2px; 
+      border-style: dotted;
+      border-color: var(--primary-color);
+      
+      &:hover {
+        border-width: 2px;
+        border-style: solid;
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background-color: var(--primary-light);
+      }
+    }
+  }
+
+  /* 删除按钮 */
+  .delete-button {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    background-color: var(--destructive-color);
+    color: var(--destructive-foreground);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      background-color: var(--destructive-hover);
+    }
+
+    .delete-icon {
+      width: 0.75rem;
+      height: 0.75rem;
+    }
+  }
+
+  /* 显示删除按钮 */
+  &:hover .delete-button {
+    opacity: 1;
+  }
+}
+
+/* ===== 更多模板按钮 ===== */
+.more-button {
+  /* 基础样式 */
+  height: 2rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--background);
+  transition: all 0.2s ease;
+  color: var(--foreground);
+
+  &:hover {
+    background-color: var(--hover-background);
+    border-color: var(--hover-border-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  /* 图标样式 */
+  .more-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+/* ===== 更多模板下拉菜单 ===== */
+.template-dropdown {
+  width: 7.5rem;
+  padding: 0.5rem;
+  background-color: var(--background);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  box-shadow: var(--dropdown-shadow);
+}
+
+/* ===== 控制按钮组 ===== */
+.control-buttons {
+  /* 基础样式 */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+
+  /* 控制按钮 */
+  .control-button {
+    height: 2rem;
+    width: 2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    color: var(--foreground);
+
+    &:hover {
+      background-color: var(--hover-background);
+      border-color: var(--hover-border-color);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* 新建按钮悬停效果 */
+    &:first-child:hover {
+      border-color: var(--success-color);
+      color: var(--success-color);
+
+      .control-icon {
+        color: var(--success-color);
+      }
+    }
+
+    /* 创建模式激活状态 */
+    &.create-active {
+      border-width: 2px;
+      border-color: var(--success-color);
+      color: var(--success-color);
+      background-color: var(--success-light);
+
+      .control-icon {
+        color: var(--success-color);
+      }
+    }
+
+    /* 删除模式激活状态 */
+    &.delete-active {
+      border-width: 2px;
+      border-color: var(--destructive-color);
+      color: var(--destructive-color);
+
+      .control-icon {
+        color: var(--destructive-color);
+      }
+    }
+
+    /* 编辑模式激活状态 */
+    &.edit-active {
+      border-width: 2px;
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      background-color: var(--primary-light);
+
+      .control-icon {
+        color: var(--primary-color);
+      }
+    }
+
+    /* 图标样式 */
+    .control-icon {
+      width: 1rem;
+      height: 1rem;
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+/* ===== 模板编辑对话框 ===== */
+.template-dialog {
+  /* 对话框容器 */
+  max-width: 32rem;
+  padding: 1.5rem;
+  background-color: var(--background);
+  border-radius: 0.5rem;
+  box-shadow: var(--dialog-shadow);
+
+  /* 表单容器 */
+  .template-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+
+    /* 表单字段 */
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--foreground);
+      }
+
+      input, textarea {
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        border: 1px solid var(--input-border-color);
+        background-color: var(--input-background);
+        color: var(--foreground) !important;
+        transition: all 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 2px var(--primary-color-alpha);
+        }
+
+        &::placeholder {
+          color: var(--muted-foreground);
+        }
+      }
+
+      textarea {
+        min-height: 8rem;
+        resize: vertical;
+      }
+    }
+  }
+}
+
+/* ===== 主题变量 ===== */
+:root {
+  /* 颜色 */
+  --border-color: #e5e7eb;
+  --hover-border-color: #d1d5db;
+  --background: #ffffff;
+  --hover-background: #f9fafb;
+  --foreground: #111827;
+  --muted-foreground: #6b7280;
+  --destructive-color: #dc2626;
+  --destructive-light: #fee2e2;
+  --primary-color: #2563eb;
+  --primary-light: #dbeafe;
+  --primary-foreground: #ffffff;
+  --primary-color-alpha: rgba(37, 99, 235, 0.2);
+  --success-color: #10b981;
+  --success-light: #d1fae5;
+  --input-background: #ffffff;
+  --input-border-color: #d1d5db;
+
+  /* 阴影 */
+  --dropdown-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                     0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --dialog-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                   0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* 深色主题 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --border-color: #374151;
+    --hover-border-color: #4b5563;
+    --background: #1f2937;
+    --hover-background: #374151;
+    --foreground: #f3f4f6;
+    --muted-foreground: #9ca3af;
+    --destructive-color: #ef4444;
+    --destructive-light: #471818;
+    --primary-color: #3b82f6;
+    --primary-light: #1e3a8a;
+    --primary-foreground: #ffffff;
+    --primary-color-alpha: rgba(59, 130, 246, 0.2);
+    --success-color: #10b981;
+    --success-light: #064e3b;
+    --input-background: #111827;
+    --input-border-color: #4b5563;
+  }
+}

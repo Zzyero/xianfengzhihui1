@@ -13,25 +13,46 @@ import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChangeModel from "./ModelManagement/ChangeModel";
+import './styles/PromptEnhancement.css';
 
+// 定义类型接口
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+interface ChatSession {
+  id: string;
+  title: string;
+  lastMessage: string;
+  timestamp: Date;
+  messageCount: number;
+}
+
+interface Template {
+  name: string;
+  content: string;
+}
 
 /**
  * 提示词增强页面组件
- * 包含聊天界面、模板管理、历史记录等功能
+ * 该组件整合了聊天界面、模板管理、模型选择等功能
+ * 用于提供一个完整的AI对话和提示词管理体验
  */
-const PromptEnhancementPage = () => {
+const PromptEnhancementPage: React.FC = () => {
   // ===== 状态管理 =====
-  const [messages, setMessages] = useState<any[]>([]);              // 聊天消息列表
-  const [isGenerating, setIsGenerating] = useState(false);         // 是否正在生成回复
-  const [activeSessionId, setActiveSessionId] = useState<string | undefined>();  // 当前会话ID
-  const [isAddTemplateDialogOpen, setIsAddTemplateDialogOpen] = useState(false); // 添加模板对话框状态
-  const [newTemplate, setNewTemplate] = useState({ name: '', content: '' });     // 新模板数据
-  const [inputHeight, setInputHeight] = useState(56); // 输入框默认高度
-  const [selectedModel, setSelectedModel] = useState('gpt-4');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [activeSessionId, setActiveSessionId] = useState<string | undefined>();
+  const [isAddTemplateDialogOpen, setIsAddTemplateDialogOpen] = useState<boolean>(false);
+  const [newTemplate, setNewTemplate] = useState<Template>({ name: '', content: '' });
+  const [inputHeight, setInputHeight] = useState<number>(56);
+  const [selectedModel, setSelectedModel] = useState<string>('gpt-4');
 
   // ===== 示例数据 =====
-  // 历史会话数据
-  const chatSessions = [
+  const chatSessions: ChatSession[] = [
     {
       id: '1',
       title: '创意写作讨论',
@@ -49,14 +70,15 @@ const PromptEnhancementPage = () => {
   ];
 
   // ===== 事件处理函数 =====
+  
   /**
-   * 处理消息发送
-   * @param message 消息内容
+   * 处理发送消息
+   * @param message 要发送的消息内容
    */
-  const handleSendMessage = (message: string) => {
-    const newMessage = {
+  const handleSendMessage = (message: string): void => {
+    const newMessage: Message = {
       id: Date.now().toString(),
-      role: 'user' as const,
+      role: 'user',
       content: message,
       timestamp: new Date()
     };
@@ -65,9 +87,9 @@ const PromptEnhancementPage = () => {
 
     // 模拟AI响应
     setTimeout(() => {
-      const aiResponse = {
+      const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant' as const,
+        role: 'assistant',
         content: `使用 ${selectedModel} 的模拟响应...`,
         timestamp: new Date()
       };
@@ -77,43 +99,45 @@ const PromptEnhancementPage = () => {
   };
 
   /**
-   * 处理停止生成
+   * 停止生成回复
    */
-  const handleStopGeneration = () => {
+  const handleStopGeneration = (): void => {
     setIsGenerating(false);
-    // TODO: 实现停止生成逻辑
   };
 
   /**
    * 处理添加模板
    */
-  const handleAddTemplate = () => {
+  const handleAddTemplate = (): void => {
     setIsAddTemplateDialogOpen(true);
   };
 
-  const handleNewChat = () => {
+  /**
+   * 开始新的对话
+   */
+  const handleNewChat = (): void => {
     setMessages([]);
     setActiveSessionId(undefined);
   };
 
-  const handleInputResize = (height: number) => {
+  /**
+   * 处理输入框大小调整
+   * @param height 新的高度值
+   */
+  const handleInputResize = (height: number): void => {
     setInputHeight(height);
   };
 
-  // 渲染页面内容
   return (
-    <div className="flex flex-col h-screen">
-      {/* 页面头部 */}
-      {/* 页面主体内容 */}
-      <div className="flex-1 flex overflow-hidden">
-        <Card className="flex-1 flex flex-col overflow-hidden">
-          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+    <div className="prompt-enhancement-container">
+      <div className="main-content">
+        <Card className="chat-card">
+          <CardContent className="chat-card-content">
             <ChangeModel 
               selectedModel={selectedModel} 
               setSelectedModel={setSelectedModel} 
             />
-            {/* 聊天窗口 */}
-            <div className="flex-1 overflow-hidden">
+            <div className="chat-window-container">
               <ChatWindow 
                 messages={messages}
                 isTyping={isGenerating}
@@ -121,32 +145,27 @@ const PromptEnhancementPage = () => {
                 onSelectSession={setActiveSessionId}
                 activeSessionId={activeSessionId}
                 onNewChat={handleNewChat}
-                className="h-[calc(100vh-16rem)]"
+                className="chat-window"
               />
             </div>
 
+            <div className="input-container">
+              <Card>
+                <MessageInput
+                  onSend={handleSendMessage}
+                  onStop={handleStopGeneration}
+                  isGenerating={isGenerating}
+                  onResize={handleInputResize}
+                />
+              </Card>
+            </div>
 
-              {/* 输入框 */}
-              <div>
-                <Card className="overflow-hidden">
-                    <MessageInput
-                      onSend={handleSendMessage}
-                      onStop={handleStopGeneration}
-                      isGenerating={isGenerating}
-                      onResize={handleInputResize}
-                    />
-                </Card>
-              </div>
-
-              {/* 模板栏 */}
-              <div style={{ padding: '0px 0px 40px 0px' }}>
-                <TemplateBar onAddTemplate={() => setIsAddTemplateDialogOpen(true)} />
-              </div>
-
+            <div className="template-bar-container">
+              <TemplateBar onAddTemplate={handleAddTemplate} />
+            </div>
           </CardContent>
         </Card>
       </div>
-
     </div>
   );
 };

@@ -4,58 +4,74 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, StopCircle } from 'lucide-react';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import '../styles/ChatInterface.css';
 
+/**
+ * 消息输入组件属性接口
+ */
 interface MessageInputProps {
-  onSend: (message: string, model: string) => void;
-  onStop: () => void;
-  isGenerating: boolean;
-  onResize: (height: number) => void;
+  onSend: (message: string) => void;  // 发送消息回调
+  onStop: () => void;                 // 停止生成回调
+  isGenerating: boolean;              // 是否正在生成回复
+  onResize: (height: number) => void; // 输入框大小调整回调
 }
 
+/**
+ * 消息输入组件
+ * 处理用户消息输入、发送，以及输入框大小自适应
+ */
 const MessageInput: React.FC<MessageInputProps> = ({
   onSend,
   onStop,
   isGenerating,
   onResize
 }) => {
-  const [message, setMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState('gpt-4');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // ===== 状态管理 =====
+  const [message, setMessage] = useState<string>('');  // 输入的消息内容
+  
+  // ===== Refs =====
+  const textareaRef = useRef<HTMLTextAreaElement>(null);  // 文本输入框引用
 
+  /**
+   * 处理输入框高度自适应
+   */
   useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    const adjustHeight = () => {
+    const adjustHeight = (): void => {
       textarea.style.height = 'auto';
+      // 限制高度在56px到200px之间
       const newHeight = Math.min(200, Math.max(56, textarea.scrollHeight));
       textarea.style.height = `${newHeight}px`;
       onResize(newHeight);
     };
 
+    // 监听输入事件以调整高度
     textarea.addEventListener('input', adjustHeight);
     return () => textarea.removeEventListener('input', adjustHeight);
   }, [onResize]);
 
-  const handleSubmit = () => {
+  /**
+   * 处理消息提交
+   */
+  const handleSubmit = (): void => {
     if (!message.trim()) return;
-    onSend(message, selectedModel);
+    onSend(message);
     setMessage('');
+    // 重置输入框高度
     if (textareaRef.current) {
       textareaRef.current.style.height = '56px';
       onResize(56);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  /**
+   * 处理键盘事件
+   * Enter键发送消息，Shift+Enter换行
+   */
+  const handleKeyDown = (e: React.KeyboardEvent): void => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
@@ -63,42 +79,44 @@ const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-      <div className="relative">
+    <div className="message-input-container">
+      <div className="input-area">
+        {/* 消息输入框 */}
         <Textarea
           ref={textareaRef}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="输入消息..."
-          className={cn(
-            "min-h-[56px] max-h-[200px] pr-20 resize-none",
-            "rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0",
-            "border-0 focus-visible:border-0"
-          )}
+          className="text-input"
         />
-        <div className="absolute right-4 bottom-3">
+        {/* 操作按钮 */}
+        <div className="button-container">
           {isGenerating ? (
+            // 停止生成按钮
             <Button
               variant="ghost"
               size="icon"
               onClick={onStop}
-              className="h-8 w-8 rounded-lg"
+              className="stop-button"
             >
               <StopCircle className="h-5 w-5" />
             </Button>
           ) : (
+            // 发送消息按钮
             <Button
               variant="ghost"
               size="icon"
               onClick={handleSubmit}
               disabled={!message.trim()}
-              className="h-8 w-8 rounded-lg"
+              className="send-button"
             >
               <Send className="h-5 w-5" />
             </Button>
           )}
         </div>
       </div>
+    </div>
   );
 };
 

@@ -6,10 +6,11 @@ import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { History, ChevronRight, ArrowLeft, Search, MessageSquare, Trash2, PlusCircle } from "lucide-react";
+import { History, Search, MessageSquare, PlusCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import '../styles/ChatInterface.css';
 
-// 消息接口定义
+// 类型定义
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -17,7 +18,6 @@ interface Message {
   timestamp: Date;
 }
 
-// 历史会话接口
 interface ChatSession {
   id: string;
   title: string;
@@ -26,19 +26,18 @@ interface ChatSession {
   messageCount: number;
 }
 
-// 组件属性接口
 interface ChatWindowProps {
-  messages: Message[];        // 消息列表
-  isTyping?: boolean;        // 是否正在输入
-  className?: string;        // 自定义样式类
-  sessions: ChatSession[];   // 历史会话列表
-  onSelectSession: (id: string) => void;  // 选择会话的回调
-  activeSessionId?: string;  // 当前激活的会话ID
-  onNewChat: () => void;  // 新增：创建新对话的回调
+  messages: Message[];
+  isTyping?: boolean;
+  className?: string;
+  sessions: ChatSession[];
+  onSelectSession: (id: string) => void;
+  activeSessionId?: string;
+  onNewChat: () => void;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ 
-  messages, 
+const ChatWindow: React.FC<ChatWindowProps> = ({
+  messages,
   isTyping = false,
   className,
   sessions,
@@ -46,33 +45,30 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   activeSessionId,
   onNewChat
 }) => {
-  // 侧边栏状态
-  const [isOpen, setIsOpen] = useState(false);
-  const [isPinned, setIsPinned] = useState(false);
-  const [width, setWidth] = useState(320);
-  const [isDragging, setIsDragging] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isPinned, setIsPinned] = useState<boolean>(false);
+  const [width, setWidth] = useState<number>(320);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
   const dragStartX = useRef<number>(0);
   const dragStartWidth = useRef<number>(0);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // 处理鼠标拖拽开始
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent): void => {
     e.preventDefault();
     setIsDragging(true);
     dragStartX.current = e.clientX;
     dragStartWidth.current = width;
   };
 
-  // 处理鼠标拖拽过程
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent): void => {
       if (!isDragging) return;
       const delta = dragStartX.current - e.clientX;
       const newWidth = Math.min(Math.max(280, dragStartWidth.current + delta), 800);
       setWidth(newWidth);
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (): void => {
       setIsDragging(false);
     };
 
@@ -87,19 +83,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     };
   }, [isDragging]);
 
-  // 处理鼠标悬停
-  const handleMouseEnter = () => {
+  const handleMouseEnter = (): void => {
     setIsOpen(true);
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (): void => {
     if (!isPinned) {
       setIsOpen(false);
     }
   };
 
-  // 处理侧边栏切换
-  const toggleSidebar = () => {
+  const toggleSidebar = (): void => {
     setIsPinned(!isPinned);
     if (!isOpen) {
       setIsOpen(true);
@@ -107,13 +101,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   };
 
   return (
-    <div className="relative h-full flex flex-col">
-      {/* 顶部按钮区域 */}
-      <div className="absolute top-2 right-2 z-20 flex items-center gap-2">
+    <div className="chat-window">
+      <div className="chat-controls">
         <Button
           variant="ghost"
           size="icon"
-          className="w-10 h-10 bg-background/50 backdrop-blur-sm hover:bg-background/80"
+          className="new-chat-button"
           onClick={onNewChat}
         >
           <PlusCircle className="h-6 w-6" />
@@ -125,10 +118,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className={cn(
-              "w-10 h-10 bg-background/50 backdrop-blur-sm hover:bg-background/80",
-              isPinned ? 'bg-muted' : ''
-            )}
+            className={cn("history-button", isPinned && 'pinned')}
             onClick={toggleSidebar}
           >
             <History className="h-6 w-6" />
@@ -136,25 +126,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
       </div>
 
-      {/* 聊天消息区域 */}
       <ScrollArea className={cn(
-        "flex-1 px-4 mb-4",
+        "message-list",
         className,
-        isOpen ? 'mr-[320px]' : ''
+        isOpen && 'with-sidebar'
       )}>
-        <div className="flex flex-col-reverse justify-end min-h-full py-4 space-y-reverse space-y-4">
+        <div className="messages-container">
           {isTyping && (
-            <div className="flex gap-3">
-              <Avatar className="w-8 h-8 shrink-0">
-                <div className="bg-primary text-primary-foreground w-full h-full flex items-center justify-center text-sm font-semibold">
-                  AI
-                </div>
+            <div className="message-item assistant-message">
+              <Avatar className="avatar">
+                <div className="avatar-content">AI</div>
               </Avatar>
-              <div className="bg-muted rounded-lg p-4">
-                <div className="flex gap-1">
-                  <span className="animate-bounce">.</span>
-                  <span className="animate-bounce delay-100">.</span>
-                  <span className="animate-bounce delay-200">.</span>
+              <div className="message-content typing">
+                <div className="typing-indicator">
+                  <span>.</span>
+                  <span>.</span>
+                  <span>.</span>
                 </div>
               </div>
             </div>
@@ -164,39 +151,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             <div
               key={message.id}
               className={cn(
-                "flex gap-3",
-                message.role === 'user' 
-                  ? "w-[calc(100%-3rem)] ml-auto"
-                  : "w-full"
+                "message-item",
+                message.role === 'user' ? 'user-message' : 'assistant-message'
               )}
             >
               {message.role === 'assistant' && (
-                <Avatar className="w-8 h-8 shrink-0">
-                  <div className="bg-primary text-primary-foreground w-full h-full flex items-center justify-center text-sm font-semibold">
-                    AI
-                  </div>
+                <Avatar className="avatar">
+                  <div className="avatar-content">AI</div>
                 </Avatar>
               )}
               
-              <div
-                className={cn(
-                  "rounded-lg p-4 max-w-[80%]",
-                  message.role === 'user'
-                    ? "bg-primary text-primary-foreground ml-auto"
-                    : "bg-muted"
-                )}
-              >
-                <div className="whitespace-pre-wrap">{message.content}</div>
-                <div className="text-xs mt-2 opacity-70">
+              <div className="message-content">
+                <div className="message-text">{message.content}</div>
+                <div className="message-timestamp">
                   {new Date(message.timestamp).toLocaleTimeString()}
                 </div>
               </div>
 
               {message.role === 'user' && (
-                <Avatar className="w-8 h-8 shrink-0">
-                  <div className="bg-secondary text-secondary-foreground w-full h-full flex items-center justify-center text-sm font-semibold">
-                    你
-                  </div>
+                <Avatar className="avatar">
+                  <div className="avatar-content user">你</div>
                 </Avatar>
               )}
             </div>
@@ -204,73 +178,54 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
       </ScrollArea>
 
-      {/* 历史记录侧边栏 */}
       <div
         ref={sidebarRef}
         className={cn(
-          "absolute right-0 top-14 h-[calc(100%-3.5rem)] transition-all duration-300 ease-in-out",
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          "sidebar",
+          isOpen && 'open'
         )}
         style={{ width }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <Card className="h-full relative">
-          {/* 拖拽调节宽度的把手 */}
-          <div
-            className="absolute left-0 top-0 h-full w-1 cursor-ew-resize hover:bg-border"
-            onMouseDown={handleMouseDown}
-          />
+        <Card className="sidebar-content">
+          <div className="resize-handle" onMouseDown={handleMouseDown} />
           
-          <CardContent className="h-full p-4 overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">历史记录</h3>
+          <CardContent className="sidebar-inner">
+            <div className="sidebar-header">
+              <h3>历史记录</h3>
             </div>
 
-            {/* 搜索框 */}
-            <div className="relative mb-4">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <div className="search-container">
+              <Search className="search-icon" />
               <Input
                 placeholder="搜索历史记录..."
-                className="pl-8"
+                className="search-input"
               />
             </div>
 
-            {/* 历史记录列表 */}
-            <div className="space-y-2">
+            <div className="sessions-list">
               {sessions.map((session) => (
                 <div
                   key={session.id}
                   className={cn(
-                    "p-3 rounded-lg cursor-pointer group hover:bg-accent",
-                    activeSessionId === session.id ? 'bg-accent' : ''
+                    "session-item",
+                    activeSessionId === session.id && 'active'
                   )}
                   onClick={() => onSelectSession(session.id)}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
+                  <div className="session-content">
+                    <div className="session-title">
                       <MessageSquare className="h-4 w-4" />
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-medium leading-none">
-                          {session.title}
-                        </h4>
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          {session.lastMessage}
-                        </p>
-                      </div>
+                      <span>{session.title}</span>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 group-hover:opacity-100"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // TODO: 实现删除会话逻辑
-                        console.log('删除会话:', session.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="session-info">
+                      <span className="message-count">{session.messageCount} 条消息</span>
+                      <span className="session-time">
+                        {new Date(session.timestamp).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="session-preview">{session.lastMessage}</p>
                   </div>
                 </div>
               ))}
