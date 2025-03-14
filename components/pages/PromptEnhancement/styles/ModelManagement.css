@@ -2,149 +2,140 @@
 
 /* ===== 模型选择按钮 ===== */
 .model-select-button {
-  /* 基础样式 */
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  border: 1px solid var(--border-color);
-  background-color: var(--background);
-  transition: all 0.2s ease;
+  margin: 0.5rem 1rem;
+  color: #000;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  /* 悬停效果 */
-  &:hover {
-    background-color: var(--hover-background);
-    border-color: var(--hover-border-color);
-  }
-
-  /* 图标样式 */
-  .model-icon {
-    width: 1rem;
-    height: 1rem;
-    color: var(--icon-color);
-  }
+.model-icon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #000;
 }
 
 /* ===== 模型选择对话框 ===== */
 .model-dialog {
-  /* 对话框容器 */
-  max-width: 32rem;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--dialog-background);
-  box-shadow: var(--dialog-shadow);
+  max-width: 500px;
+  width: 95vw;
+}
 
-  /* 标题样式 */
-  .dialog-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--title-color);
-    margin-bottom: 1rem;
-  }
+.dialog-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
 }
 
 /* ===== 模型列表项 ===== */
 .model-item {
-  /* 基础样式 */
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem;
-  border-radius: 0.375rem;
-  border: 1px solid var(--border-color);
-  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s;
+  color: #000;
+}
 
-  /* 悬停效果 */
-  &:hover {
-    background-color: var(--hover-background);
-  }
+.model-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
 
-  /* 选中状态 */
-  &.selected {
-    border-color: var(--primary-color);
-    background-color: var(--selected-background);
-  }
+.model-item.selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
 
-  /* 模型信息 */
-  .model-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.model-item.default-model {
+  border-left: 3px solid var(--primary);
+}
 
-    .model-name {
-      font-weight: 500;
-      color: var(--text-primary);
-    }
+/* 模型信息 */
+.model-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
 
-    .model-provider {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-    }
-  }
+.model-name {
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
 
-  /* 操作按钮 */
-  .model-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
+.model-provider {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.default-badge {
+  font-size: 0.75rem;
+  background-color: var(--primary);
+  color: #000;
+  padding: 0.125rem 0.375rem;
+  border-radius: 1rem;
+  margin-left: 0.5rem;
+}
+
+/* 模型操作按钮 */
+.model-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.set-default-button {
+  font-size: 0.75rem;
+  padding: 0 0.5rem;
+  height: 1.75rem;
 }
 
 /* ===== 模型表单 ===== */
 .model-form {
-  /* 表单容器 */
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
 
-  /* 表单字段 */
-  .form-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-    /* 标签样式 */
-    label {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--label-color);
-    }
+.error {
+  border-color: red !important;
+}
 
-    /* 输入框样式 */
-    input {
-      padding: 0.5rem;
-      border-radius: 0.375rem;
-      border: 1px solid var(--input-border-color);
-      background-color: var(--input-background);
-      transition: all 0.2s ease;
+.error-message {
+  color: red;
+  font-size: 0.75rem;
+}
 
-      &:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px var(--primary-color-alpha);
-      }
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
 
-      &.error {
-        border-color: var(--error-color);
-      }
-    }
+/* ===== 加载和空状态 ===== */
+.loading-models,
+.no-models {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}
 
-    /* 错误提示 */
-    .error-message {
-      font-size: 0.75rem;
-      color: var(--error-color);
-    }
-  }
-
-  /* 操作按钮容器 */
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
+.checkbox {
+  width: 1rem;
+  height: 1rem;
 }
 
 /* ===== 响应式设计 ===== */
