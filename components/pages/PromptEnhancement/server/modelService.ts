@@ -29,6 +29,7 @@ interface ApiModelOptions {
   messages: Message[];
   callbacks: ModelResponseCallbacks;
   signal?: AbortSignal; // 添加AbortSignal用于取消请求
+  customPrompt?: string; // 添加自定义提示词参数
 }
 
 /**
@@ -39,6 +40,7 @@ interface LocalModelOptions {
   prompt: string;
   callbacks: ModelResponseCallbacks;
   signal?: AbortSignal; // 添加AbortSignal用于取消请求
+  customPrompt?: string; // 添加自定义提示词参数
 }
 
 /**
@@ -94,7 +96,7 @@ class ModelService {
    * @param options 调用选项
    */
   static async callApiModel(options: ApiModelOptions): Promise<void> {
-    const { model, messages, callbacks, signal } = options;
+    const { model, messages, callbacks, signal, customPrompt } = options;
 
     try {
       // 调用开始回调
@@ -112,6 +114,28 @@ class ModelService {
         role: msg.role as any,
         content: msg.content
       }));
+
+      // 如果存在自定义提示词，将其添加到系统消息中
+      if (customPrompt) {
+        // 检查是否已有系统消息
+        const hasSystemMessage = apiMessages.some(msg => msg.role === 'system');
+        
+        if (hasSystemMessage) {
+          // 更新现有的系统消息
+          for (let i = 0; i < apiMessages.length; i++) {
+            if (apiMessages[i].role === 'system') {
+              apiMessages[i].content = customPrompt;
+              break;
+            }
+          }
+        } else {
+          // 添加新的系统消息作为第一条消息
+          apiMessages.unshift({
+            role: 'system',
+            content: customPrompt
+          });
+        }
+      }
 
       // 设置默认参数
       let modelName = model.name;
@@ -198,7 +222,7 @@ class ModelService {
    * @param options 调用选项
    */
   static async callLocalModel(options: LocalModelOptions): Promise<void> {
-    const { model, prompt, callbacks, signal } = options;
+    const { model, prompt, callbacks, signal, customPrompt } = options;
 
     try {
       // 调用开始回调
@@ -206,7 +230,8 @@ class ModelService {
 
       // 设置默认参数
       let modelPath = model.path || '';
-      let promptContent = prompt;
+      // 使用自定义提示词或原始提示
+      let promptContent = customPrompt ? `${customPrompt}\n\n${prompt}` : prompt;
       let stream = true; // 默认使用流式输出
       let ollamaParams: Record<string, any> = {};
 

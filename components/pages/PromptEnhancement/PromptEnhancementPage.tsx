@@ -36,6 +36,9 @@ const PromptEnhancementPage: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<string>('gpt-4');
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  // 添加选中模板状态
+  const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
+  const [customPrompt, setCustomPrompt] = useState<string>('');
 
   /**
    * 处理发送消息
@@ -95,7 +98,9 @@ const PromptEnhancementPage: React.FC = () => {
           toast.error(error.message || '发送消息失败');
           setIsGenerating(false);
         }
-      }
+      },
+      // 传递自定义提示词（如果有选中的模板）
+      customPrompt
     ).catch(error => {
       console.error('发送消息失败:', error);
       toast.error('发送消息失败');
@@ -200,11 +205,21 @@ const PromptEnhancementPage: React.FC = () => {
   };
   
   /**
-   * 使用模板
+   * 处理使用模板
    * @param template 要使用的模板
    */
   const handleUseTemplate = (template: Template): void => {
-    handleSendMessage(template.content);
+    // 如果当前模板已经被选中，就取消选中并重置自定义提示词
+    if (activeTemplateId === template.id) {
+      setActiveTemplateId(null);
+      setCustomPrompt('');
+      toast.info(`已取消模板: ${template.name}`);
+    } else {
+      // 选中新模板，设置自定义提示词
+      setActiveTemplateId(template.id);
+      setCustomPrompt(template.content);
+      toast.success(`已应用模板: ${template.name}`);
+    }
   };
   
   /**
@@ -364,6 +379,7 @@ const PromptEnhancementPage: React.FC = () => {
                 onAddTemplate={handleAddTemplate} 
                 templates={templates}
                 onUseTemplate={handleUseTemplate}
+                activeTemplateId={activeTemplateId}
               />
             </div>
           </CardContent>

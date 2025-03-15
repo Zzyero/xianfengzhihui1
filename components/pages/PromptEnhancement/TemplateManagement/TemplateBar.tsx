@@ -34,6 +34,7 @@ interface TemplateBarProps {
   onAddTemplate: () => void;  // 添加模板回调函数
   templates?: Template[];     // 模板列表，可选
   onUseTemplate?: (template: Template) => void; // 使用模板回调函数，可选
+  activeTemplateId?: string | null; // 当前激活的模板ID，可选
 }
 
 /**
@@ -43,7 +44,8 @@ interface TemplateBarProps {
 const TemplateBar: React.FC<TemplateBarProps> = ({ 
   onAddTemplate,
   templates: externalTemplates, 
-  onUseTemplate 
+  onUseTemplate,
+  activeTemplateId
 }) => {
   // ===== 状态管理 =====
   const [isDeleteMode, setIsDeleteMode] = useState<boolean>(false);  // 删除模式状态
@@ -302,17 +304,19 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
    */
   const TemplateBox = ({ template }: { template: Template }) => {
     const isSelected = selectedTemplates.has(template.id);
+    const isActive = activeTemplateId === template.id;
     
     return (
       <div className="template-item">
         <Button
-          variant="outline"
+          variant={isActive ? "default" : "outline"}
           className={cn(
             "template-button",
             isDeleteMode && "delete-mode",
             isEditMode && "edit-mode",
             isCreateMode && "create-mode",
-            isSelected && "selected"
+            isSelected && "selected",
+            isActive && "active"
           )}
           onClick={() => handleTemplateClick(template)}
         >
@@ -349,7 +353,10 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
                     {hiddenTemplates.map(template => (
                       <div
                         key={template.id}
-                        className="template-dropdown-item"
+                        className={cn(
+                          "template-dropdown-item",
+                          activeTemplateId === template.id && "active"
+                        )}
                         onClick={() => handleTemplateClick(template)}
                       >
                         {template.name}

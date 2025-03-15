@@ -50,12 +50,14 @@ class MessageService {
    * @param sessionId 会话ID
    * @param modelId 模型ID
    * @param callbacks 回调函数
+   * @param customPrompt 自定义提示词，用于定制模型行为
    */
   static async sendMessage(
     content: string,
     sessionId: string | undefined,
     modelId: string,
-    callbacks: MessageServiceCallbacks
+    callbacks: MessageServiceCallbacks,
+    customPrompt?: string
   ): Promise<void> {
     try {
       // 如果没有会话ID，创建新会话
@@ -161,7 +163,8 @@ class MessageService {
           model,
           messages: historyMessages,
           callbacks: modelCallbacks,
-          signal: controller.signal
+          signal: controller.signal,
+          customPrompt // 传递自定义提示词
         });
       } else if (model.type === 'local') {
         // 调用本地模型
@@ -169,7 +172,8 @@ class MessageService {
           model,
           prompt: content,
           callbacks: modelCallbacks,
-          signal: controller.signal
+          signal: controller.signal,
+          customPrompt // 传递自定义提示词
         });
       } else {
         throw new Error(`不支持的模型类型: ${model.type}`);

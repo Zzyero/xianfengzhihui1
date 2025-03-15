@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
@@ -8,6 +8,10 @@ import { Message } from '../server/db';
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import '../styles/MessageDisplay.css';
+import { Copy } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Components } from 'react-markdown';
 
 interface MessageDisplayProps {
   message: Message;
@@ -45,6 +49,69 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
   
   // 是否包含可能的Markdown格式
   const hasMarkdown = containsMarkdown(message.content);
+
+  // 处理代码复制
+  const handleCopyCode = useCallback((code: string) => {
+    navigator.clipboard.writeText(code)
+      .then(() => {
+        toast.success("代码已复制到剪贴板");
+      })
+      .catch((error) => {
+        console.error("复制失败:", error);
+        toast.error("复制失败，请手动复制");
+      });
+  }, []);
+
+  // 自定义组件配置
+  const customComponents: Components = {
+    // 自定义pre标签渲染
+    pre: (props) => {
+      const { children, className, ...rest } = props;
+      // 检测语言类型
+      const match = /language-(\w+)/.exec(className || '');
+      const language = match ? match[1] : '代码';
+      // 获取代码内容
+      const codeElement = React.Children.toArray(children).find(
+        child => React.isValidElement(child) && child.type === 'code'
+      );
+      
+      let code = '';
+      if (React.isValidElement(codeElement)) {
+        code = React.Children.toArray(codeElement.props.children)
+          .join('')
+          .replace(/\n$/, '');
+      }
+      
+      // 创建带导航栏的代码块
+      return (
+        <div className="code-block-container">
+          <div className="code-block-header">
+            <div className="code-language">{language}</div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="copy-button"
+              onClick={() => handleCopyCode(code)}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+          <pre className={className} {...rest}>
+            {children}
+          </pre>
+        </div>
+      );
+    },
+    // 正常渲染code标签
+    code: (props) => {
+      const { children, className, ...rest } = props;
+      return (
+        <code className={className} {...rest}>
+          {children}
+        </code>
+      );
+    }
+  };
   
   return (
     <div className={cn(
@@ -65,6 +132,7 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
             <ReactMarkdown 
               rehypePlugins={[rehypeRaw]} 
               remarkPlugins={[remarkGfm]}
+              components={customComponents}
             >
               {message.content}
             </ReactMarkdown>

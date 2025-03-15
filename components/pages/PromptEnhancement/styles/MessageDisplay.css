@@ -7,10 +7,10 @@
   transition: background-color 0.2s;
   width: 100%;
 }
-
+/* 
 .message:hover {
   background-color: rgba(0, 0, 0, 0.05);
-}
+} */
 
 .user-message {
   flex-direction: row-reverse;
@@ -38,7 +38,6 @@
 }
 
 .message-content {
-  flex: 1;
   max-width: calc(100% - 5rem);
   overflow-wrap: break-word;
   word-break: break-word;
@@ -146,11 +145,55 @@
   border-radius: 3px;
 }
 
-.markdown-content pre {
+/* 代码块容器样式 */
+.code-block-container {
   margin: 0.75em 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+/* 代码块头部导航栏 */
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #f1f3f5;
+  border-bottom: 1px solid #e0e0e0;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.8rem;
+}
+
+/* 代码语言标签 */
+.code-language {
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+/* 复制按钮 */
+.copy-button {
+  padding: 0.25rem;
+  height: auto;
+  width: auto;
+  color: #666;
+  background: none;
+  transition: color 0.2s;
+}
+
+.copy-button:hover {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.markdown-content pre {
+  margin: 0;
   padding: 1em;
   background-color: #f6f8fa;
-  border-radius: 3px;
+  border-radius: 0 0 3px 3px;
   overflow: auto;
 }
 
