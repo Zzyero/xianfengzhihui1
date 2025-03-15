@@ -179,7 +179,7 @@
 
 /* 聊天窗口 */
 .chat-window {
-  height: calc(100vh - 16rem);
+  height: 100%;
 }
 
 /* 消息列表 */

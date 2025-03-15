@@ -35,29 +35,65 @@ const MessageInput: React.FC<MessageInputProps> = ({
   
   // ===== Refs =====
   const textareaRef = useRef<HTMLTextAreaElement>(null);  // 文本输入框引用
+  const dummyTextareaRef = useRef<HTMLDivElement>(null);  // 用于计算高度的隐藏div
 
   /**
-   * 处理输入框高度自适应
+   * 更准确的自动调整高度实现
+   * 使用隐藏的div计算实际内容高度
    */
-  useEffect(() => {
+  const adjustTextareaHeight = () => {
     const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const adjustHeight = (): void => {
-      textarea.style.height = 'auto';
-      // 限制高度在40px到150px之间
-      const newHeight = Math.min(150, Math.max(40, textarea.scrollHeight));
-      textarea.style.height = `${newHeight}px`;
-      onResize(newHeight);
-    };
-
-    // 初始化高度
-    adjustHeight();
+    const dummyTextarea = dummyTextareaRef.current;
     
-    // 监听输入事件以调整高度
-    textarea.addEventListener('input', adjustHeight);
-    return () => textarea.removeEventListener('input', adjustHeight);
-  }, [onResize]);
+    if (!textarea || !dummyTextarea) return;
+    
+    // 将内容复制到隐藏div用于计算高度
+    // 替换换行符为<br>以保持正确的换行表现
+    dummyTextarea.innerHTML = message.replace(/\n/g, '<br>&nbsp;');
+    
+    // 如果内容为空，添加一个空格占位以获取最小高度
+    if (!message) {
+      dummyTextarea.innerHTML = '&nbsp;';
+    }
+    
+    // 计算新高度（在40px-250px之间）- 增加最大高度到250px
+    // 添加适当的内边距以匹配textarea
+    const paddingHeight = 24; // 顶部和底部的内边距和边框总高度
+    const maxHeight = 250; // 增加最大高度
+    const newHeight = Math.min(maxHeight, Math.max(40, dummyTextarea.scrollHeight + paddingHeight));
+    
+    // 设置新高度
+    textarea.style.height = `${newHeight}px`;
+    
+    // 设置溢出处理 - 当内容实际需要的高度超过最大高度时启用滚动条
+    if (dummyTextarea.scrollHeight + paddingHeight > maxHeight) {
+      textarea.style.overflowY = 'auto';
+    } else {
+      textarea.style.overflowY = 'hidden';
+    }
+    
+    // 通知父组件高度变化
+    onResize(newHeight);
+  };
+
+  // 监听消息内容变化，调整高度
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [message]);
+
+  // 组件挂载时初始化
+  useEffect(() => {
+    // 初始调整一次高度
+    adjustTextareaHeight();
+    
+    // 监听窗口大小变化
+    window.addEventListener('resize', adjustTextareaHeight);
+    
+    // 清理函数
+    return () => {
+      window.removeEventListener('resize', adjustTextareaHeight);
+    };
+  }, []);
 
   // 从IndexedDB加载输入历史记录
   useEffect(() => {
@@ -105,13 +141,18 @@ const MessageInput: React.FC<MessageInputProps> = ({
     
     // 发送消息
     onSend(message);
+    
+    // 清空输入框并重置高度
     setMessage('');
     
-    // 重置输入框高度
-    if (textareaRef.current) {
-      textareaRef.current.style.height = '40px';
-      onResize(40);
-    }
+    // 使用setTimeout确保在下一个渲染周期调整高度
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.style.height = '40px';
+        textareaRef.current.style.overflowY = 'hidden'; // 重置滚动条状态
+        onResize(40);
+      }
+    }, 0);
   };
 
   /**
@@ -142,24 +183,40 @@ const MessageInput: React.FC<MessageInputProps> = ({
     }
   };
 
+  /**
+   * 处理输入变化
+   */
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+    setMessage(e.target.value);
+    // 高度调整在useEffect中处理
+  };
+
   return (
     <div className="message-input-container">
       <div className="input-area">
+        {/* 隐藏的div用于计算文本高度 */}
+        <div 
+          ref={dummyTextareaRef}
+          className="dummy-textarea"
+          aria-hidden="true"
+        ></div>
+        
         {/* 消息输入框 */}
         <Textarea
           ref={textareaRef}
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="输入消息..."
           className="text-input"
+          rows={1}
           style={{ 
-            resize: 'none',
-            overflow: 'auto',
-            minHeight: '40px',
-            maxHeight: '150px'
+            height: '40px', // 初始高度
+            overflow: 'hidden', // 初始状态隐藏滚动条，会在adjustTextareaHeight中动态改变
+            maxHeight: '250px' // 设置最大高度
           }}
         />
+        
         {/* 操作按钮 */}
         <div className="button-container">
           {isGenerating ? (
