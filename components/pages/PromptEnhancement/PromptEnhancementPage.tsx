@@ -14,8 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChangeModel from "./ModelManagement/ChangeModel";
 import './styles/PromptEnhancement.css';
-// 导入数据库工具类
+// 导入数据库和服务类
 import db, { Message, ChatSession, Template } from './server/db';
+import MessageService from './server/messageService';
 import { Toaster, toast } from "sonner";
 
 /**
@@ -30,19 +31,84 @@ const PromptEnhancementPage: React.FC = () => {
   const [activeSessionId, setActiveSessionId] = useState<string | undefined>();
   const [isAddTemplateDialogOpen, setIsAddTemplateDialogOpen] = useState<boolean>(false);
   const [newTemplate, setNewTemplate] = useState<Template>({ id: '', name: '', content: '' });
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [inputHeight, setInputHeight] = useState<number>(56);
   const [selectedModel, setSelectedModel] = useState<string>('gpt-4');
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // ===== 数据加载 =====
-  
+  /**
+   * 处理发送消息
+   * @param content 要发送的消息内容
+   */
+  const handleSendMessage = async (content: string): Promise<void> => {
+    // 设置生成状态
+    setIsGenerating(true);
+
+    // 调用消息服务发送消息
+    MessageService.sendMessage(
+      content,
+      activeSessionId,
+      selectedModel,
+      {
+        // 当用户消息保存完成
+        onUserMessageSaved: (userMessage) => {
+          setMessages(prev => [...prev, userMessage]);
+        },
+        // 当AI回复内容更新（流式输出）
+        onAiMessageUpdate: (partialMessage) => {
+          setMessages(prev => {
+            // 检查是否已存在此ID的消息
+            const existingIndex = prev.findIndex(m => m.id === partialMessage.id);
+            
+            if (existingIndex >= 0) {
+              // 更新现有消息
+              const newMessages = [...prev];
+              newMessages[existingIndex] = {
+                ...newMessages[existingIndex],
+                content: partialMessage.content
+              };
+              return newMessages;
+            } else {
+              // 添加新消息
+              return [...prev, {
+                id: partialMessage.id || Date.now().toString(), // 确保ID不为undefined
+                sessionId: partialMessage.sessionId || activeSessionId || '',
+                role: 'assistant' as const,
+                content: partialMessage.content || '',
+                timestamp: new Date()
+              }];
+            }
+          });
+        },
+        // 当AI回复完成
+        onAiMessageComplete: () => {
+          setIsGenerating(false);
+        },
+        // 当会话更新
+        onSessionUpdated: () => {
+          loadSessions();
+        },
+        // 当发生错误
+        onError: (error) => {
+          console.error('消息服务错误:', error);
+          toast.error(error.message || '发送消息失败');
+          setIsGenerating(false);
+        }
+      }
+    ).catch(error => {
+      console.error('发送消息失败:', error);
+      toast.error('发送消息失败');
+      setIsGenerating(false);
+    });
+  };
+
   /**
    * 加载聊天会话列表
    */
   const loadSessions = async () => {
     try {
-      const sessions = await db.getAllSessions();
+      const sessions = await MessageService.loadSessions();
       setChatSessions(sessions);
       return sessions;
     } catch (error) {
@@ -58,7 +124,7 @@ const PromptEnhancementPage: React.FC = () => {
    */
   const loadSessionMessages = async (sessionId: string) => {
     try {
-      const messages = await db.getMessagesBySession(sessionId);
+      const messages = await MessageService.loadSessionMessages(sessionId);
       setMessages(messages);
     } catch (error) {
       console.error('加载消息失败:', error);
@@ -69,36 +135,15 @@ const PromptEnhancementPage: React.FC = () => {
   /**
    * 创建新会话
    * @param title 会话标题，可选
-   * @param firstMessage 首条消息内容（用于设置默认会话名称），可选
+   * @param firstMessage 首条消息内容，可选
    */
   const createNewSession = async (title?: string, firstMessage?: string): Promise<string | undefined> => {
     try {
-      // 生成会话标题
-      let sessionTitle: string = '新对话'; // 默认值
-      
-      if (title) {
-        // 如果提供了标题，直接使用
-        sessionTitle = title;
-      } else if (firstMessage) {
-        // 如果没有提供标题但有首条消息，使用首条消息的前15个字符作为标题
-        sessionTitle = firstMessage.length > 15 
-          ? `${firstMessage.substring(0, 15)}...` 
-          : firstMessage;
-      }
-
-      const newSession: ChatSession = {
-        id: Date.now().toString(),
-        title: sessionTitle,
-        lastMessage: firstMessage || '',
-        timestamp: new Date(),
-        messageCount: firstMessage ? 1 : 0
-      };
-
-      await db.saveSession(newSession);
-      setActiveSessionId(newSession.id);
+      const sessionId = await MessageService.createNewSession(firstMessage, title);
+      setActiveSessionId(sessionId);
       setMessages([]);
       await loadSessions();
-      return newSession.id;
+      return sessionId;
     } catch (error) {
       console.error('创建会话失败:', error);
       toast.error('创建新对话失败');
@@ -107,91 +152,12 @@ const PromptEnhancementPage: React.FC = () => {
   };
 
   /**
-   * 更新会话信息
-   * @param sessionId 会话ID
-   * @param lastMessage 最新消息内容
-   */
-  const updateSessionInfo = async (sessionId: string, lastMessage: string) => {
-    try {
-      // 获取现有会话
-      const session = await db.getSession(sessionId);
-      if (!session) return;
-
-      // 更新会话信息
-      const updatedSession: ChatSession = {
-        ...session,
-        lastMessage,
-        timestamp: new Date(),
-        messageCount: session.messageCount + 1
-      };
-
-      await db.saveSession(updatedSession);
-      await loadSessions();
-    } catch (error) {
-      console.error('更新会话信息失败:', error);
-    }
-  };
-
-  /**
-   * 处理发送消息
-   * @param message 要发送的消息内容
-   */
-  const handleSendMessage = async (content: string): Promise<void> => {
-    // 确保有活动会话，如果没有则创建一个
-    let currentSessionId = activeSessionId;
-    if (!currentSessionId) {
-      // 创建新会话并传入首条消息内容作为会话标题
-      currentSessionId = await createNewSession(undefined, content);
-      if (!currentSessionId) return; // 创建会话失败
-    }
-
-    // 创建用户消息
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      sessionId: currentSessionId,
-      role: 'user',
-      content,
-      timestamp: new Date()
-    };
-
-    try {
-      // 保存用户消息到数据库
-      await db.addMessage(userMessage);
-      // 更新状态
-      setMessages(prev => [...prev, userMessage]);
-      setIsGenerating(true);
-      // 更新会话信息
-      await updateSessionInfo(currentSessionId, content);
-
-      // 模拟AI响应
-      setTimeout(async () => {
-        const aiResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          sessionId: currentSessionId,
-          role: 'assistant',
-          content: `使用 ${selectedModel} 的模拟响应...`,
-          timestamp: new Date()
-        };
-
-        // 保存AI回复到数据库
-        await db.addMessage(aiResponse);
-        setMessages(prev => [...prev, aiResponse]);
-        setIsGenerating(false);
-        // 更新会话信息
-        await updateSessionInfo(currentSessionId, aiResponse.content);
-      }, 1000);
-    } catch (error) {
-      console.error('发送消息失败:', error);
-      toast.error('发送消息失败');
-      setIsGenerating(false);
-    }
-  };
-
-  /**
    * 停止生成回复
    */
   const handleStopGeneration = (): void => {
     setIsGenerating(false);
+    // 注意：目前还没有实现真正的取消流式输出的功能
+    toast.info('已停止生成回复');
   };
 
   /**
@@ -202,13 +168,62 @@ const PromptEnhancementPage: React.FC = () => {
   };
 
   /**
+   * 保存新模板
+   */
+  const handleSaveTemplate = async (): Promise<void> => {
+    try {
+      // 生成ID
+      const templateToSave: Template = {
+        ...newTemplate,
+        id: newTemplate.id || Date.now().toString()
+      };
+      
+      // 保存模板到数据库
+      await db.saveTemplate(templateToSave);
+      
+      // 重新加载模板列表
+      loadTemplates();
+      
+      // 关闭对话框并重置状态
+      setIsAddTemplateDialogOpen(false);
+      setNewTemplate({ id: '', name: '', content: '' });
+      
+      toast.success('模板保存成功');
+    } catch (error) {
+      console.error('保存模板失败:', error);
+      toast.error('保存模板失败');
+    }
+  };
+  
+  /**
+   * 使用模板
+   * @param template 要使用的模板
+   */
+  const handleUseTemplate = (template: Template): void => {
+    handleSendMessage(template.content);
+  };
+  
+  /**
+   * 加载模板列表
+   */
+  const loadTemplates = async (): Promise<void> => {
+    try {
+      const loadedTemplates = await db.getAllTemplates();
+      setTemplates(loadedTemplates);
+    } catch (error) {
+      console.error('加载模板失败:', error);
+      toast.error('加载模板失败');
+    }
+  };
+
+  /**
    * 开始新的对话
    */
   const handleNewChat = async (): Promise<void> => {
     // 检查当前会话是否有消息
     if (activeSessionId) {
       try {
-        const currentMessages = await db.getMessagesBySession(activeSessionId);
+        const currentMessages = await MessageService.loadSessionMessages(activeSessionId);
         
         // 如果当前会话没有消息，直接使用当前会话
         if (currentMessages.length === 0) {
@@ -252,14 +267,24 @@ const PromptEnhancementPage: React.FC = () => {
         // 确保数据库初始化
         await db.initDefaultModels();
         
-        // 获取默认模型
-        const defaultModel = await db.getDefaultModel();
-        if (defaultModel) {
-          setSelectedModel(defaultModel.id);
+        // 加载API模型列表
+        const apiModels = await db.getAllModels('api');
+        if (apiModels.length > 0) {
+          // 使用第一个API模型作为默认
+          setSelectedModel(apiModels[0].id);
+        } else {
+          // 尝试加载本地模型
+          const localModels = await db.getAllModels('local');
+          if (localModels.length > 0) {
+            setSelectedModel(localModels[0].id);
+          }
         }
         
         // 加载会话列表
         const sessions = await loadSessions();
+        
+        // 加载模板列表
+        await loadTemplates();
         
         // 如果有会话，加载最近的一个会话
         if (sessions.length > 0) {
@@ -331,11 +356,57 @@ const PromptEnhancementPage: React.FC = () => {
             </div>
 
             <div className="template-bar-container">
-              <TemplateBar onAddTemplate={handleAddTemplate} />
+              <TemplateBar 
+                onAddTemplate={handleAddTemplate} 
+                templates={templates}
+                onUseTemplate={handleUseTemplate}
+              />
             </div>
           </CardContent>
         </Card>
       </div>
+      
+      {/* 添加模板对话框 */}
+      <Dialog open={isAddTemplateDialogOpen} onOpenChange={setIsAddTemplateDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>添加提示词模板</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="name" className="text-right">
+                模板名称
+              </label>
+              <Input
+                id="name"
+                value={newTemplate.name}
+                onChange={(e) => setNewTemplate({...newTemplate, name: e.target.value})}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="content" className="text-right">
+                模板内容
+              </label>
+              <Textarea
+                id="content"
+                value={newTemplate.content}
+                onChange={(e) => setNewTemplate({...newTemplate, content: e.target.value})}
+                className="col-span-3"
+                rows={5}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setIsAddTemplateDialogOpen(false)}>
+              取消
+            </Button>
+            <Button type="submit" onClick={handleSaveTemplate}>
+              保存
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

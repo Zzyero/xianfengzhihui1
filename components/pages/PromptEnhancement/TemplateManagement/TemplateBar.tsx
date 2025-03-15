@@ -32,13 +32,19 @@ import "../styles/TemplateManagement.css";
  */
 interface TemplateBarProps {
   onAddTemplate: () => void;  // 添加模板回调函数
+  templates?: Template[];     // 模板列表，可选
+  onUseTemplate?: (template: Template) => void; // 使用模板回调函数，可选
 }
 
 /**
  * 模板栏组件
  * 用于显示和管理提示词模板，支持模板的添加、删除、编辑和使用
  */
-const TemplateBar: React.FC<TemplateBarProps> = ({ onAddTemplate }) => {
+const TemplateBar: React.FC<TemplateBarProps> = ({ 
+  onAddTemplate,
+  templates: externalTemplates, 
+  onUseTemplate 
+}) => {
   // ===== 状态管理 =====
   const [isDeleteMode, setIsDeleteMode] = useState<boolean>(false);  // 删除模式状态
   const [isEditMode, setIsEditMode] = useState<boolean>(false);      // 编辑模式状态
@@ -97,8 +103,15 @@ const TemplateBar: React.FC<TemplateBarProps> = ({ onAddTemplate }) => {
 
   // 组件初始化时加载模板
   useEffect(() => {
-    loadTemplates();
-  }, []);
+    // 如果外部提供了模板，直接使用外部模板
+    if (externalTemplates) {
+      setTemplates(externalTemplates);
+      setIsLoading(false);
+    } else {
+      // 否则从数据库加载
+      loadTemplates();
+    }
+  }, [externalTemplates]);
 
   // 对话框关闭时重置状态
   useEffect(() => {
@@ -186,14 +199,20 @@ const TemplateBar: React.FC<TemplateBarProps> = ({ onAddTemplate }) => {
       // 创建模式下不执行操作
       return;
     } else {
-      // 普通模式：复制模板内容到剪贴板
-      navigator.clipboard.writeText(template.content)
-        .then(() => {
-          toast.success("模板内容已复制到剪贴板");
-        })
-        .catch(() => {
-          toast.error("复制失败，请手动复制");
-        });
+      // 普通模式：使用模板或复制到剪贴板
+      if (onUseTemplate) {
+        // 如果提供了使用模板回调，则调用它
+        onUseTemplate(template);
+      } else {
+        // 否则复制模板内容到剪贴板
+        navigator.clipboard.writeText(template.content)
+          .then(() => {
+            toast.success("模板内容已复制到剪贴板");
+          })
+          .catch(() => {
+            toast.error("复制失败，请手动复制");
+          });
+      }
     }
   };
 

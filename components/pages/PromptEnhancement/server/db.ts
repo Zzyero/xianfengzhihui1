@@ -1,6 +1,7 @@
 /**
  * IndexedDB数据库工具类
  * 用于管理聊天记录、会话、模板数据和模型配置的存储与检索
+ * 支持OpenAI API调用的模型配置存储
  */
 
 // 数据库名称和版本
@@ -47,11 +48,10 @@ export interface Model {
   id: string;               // 模型ID
   name: string;             // 模型名称
   type: 'api' | 'local';    // 模型类型：API或本地
-  provider?: string;        // 服务提供商（API模型）
+  url?: string;             // API URL（API模型）
   apiKey?: string;          // API密钥（API模型）
   path?: string;            // 模型路径（本地模型）
   parameters?: string;      // 其他参数
-  isDefault?: boolean;      // 是否为默认模型
   timestamp: Date;          // 创建/更新时间
 }
 
@@ -103,7 +103,6 @@ const initDB = (): Promise<IDBDatabase> => {
         // 创建索引
         modelStore.createIndex('name', 'name', { unique: false });
         modelStore.createIndex('type', 'type', { unique: false });
-        modelStore.createIndex('isDefault', 'isDefault', { unique: false });
       }
       
       // 创建输入历史记录对象仓库
@@ -436,47 +435,7 @@ const db = {
       timestamp: model.timestamp || new Date()
     };
     
-    // 如果设置为默认模型，需要将其他同类型模型的默认标志取消
-    if (model.isDefault) {
-      return new Promise((resolve, reject) => {
-        initDB().then(async (db) => {
-          try {
-            // 开启事务
-            const tx = db.transaction(STORES.MODELS, 'readwrite');
-            const store = tx.objectStore(STORES.MODELS);
-            const typeIndex = store.index('type');
-            
-            // 获取同类型的所有模型
-            const request = typeIndex.getAll(model.type);
-            
-            request.onsuccess = () => {
-              const models = request.result;
-              
-              // 将其他同类型模型的默认标志取消
-              models.forEach(existingModel => {
-                if (existingModel.id !== model.id && existingModel.isDefault) {
-                  existingModel.isDefault = false;
-                  store.put(existingModel);
-                }
-              });
-              
-              // 保存当前模型
-              const saveRequest = store.put(modelWithTimestamp);
-              saveRequest.onsuccess = () => resolve(saveRequest.result);
-              saveRequest.onerror = () => reject(saveRequest.error);
-            };
-            
-            request.onerror = () => reject(request.error);
-            
-            tx.oncomplete = () => db.close();
-          } catch (error) {
-            reject(error);
-          }
-        }).catch(reject);
-      });
-    }
-    
-    // 非默认模型直接保存
+    // 保存模型
     return runTransaction<IDBValidKey>(
       STORES.MODELS,
       'readwrite',
@@ -528,43 +487,6 @@ const db = {
   },
   
   /**
-   * 获取默认模型
-   * @param type 可选，模型类型
-   */
-  getDefaultModel: (type?: 'api' | 'local'): Promise<Model | undefined> => {
-    return new Promise((resolve, reject) => {
-      initDB().then(db => {
-        const transaction = db.transaction(STORES.MODELS, 'readonly');
-        const store = transaction.objectStore(STORES.MODELS);
-        const index = store.index('isDefault');
-        
-        // 获取所有isDefault为true的模型，需要将布尔值转换为IDBValidKey
-        const request = index.getAll(IDBKeyRange.only(1));
-        
-        request.onsuccess = () => {
-          const defaultModels = request.result;
-          
-          // 如果指定了类型，筛选出该类型的默认模型
-          if (type) {
-            const typedModel = defaultModels.find(model => model.type === type);
-            resolve(typedModel);
-          } else if (defaultModels.length > 0) {
-            // 没有指定类型，返回第一个默认模型
-            resolve(defaultModels[0]);
-          } else {
-            // 没有默认模型
-            resolve(undefined);
-          }
-        };
-        
-        request.onerror = () => reject(request.error);
-        
-        transaction.oncomplete = () => db.close();
-      }).catch(reject);
-    });
-  },
-  
-  /**
    * 删除模型
    * @param modelId 模型ID
    */
@@ -598,40 +520,36 @@ const db = {
                 id: 'gpt-4',
                 name: 'GPT-4',
                 type: 'api',
-                provider: 'OpenAI',
-                isDefault: true,
+                url: 'https://api.openai.com/v1',
                 timestamp: new Date()
               },
               {
                 id: 'gpt-3.5-turbo',
                 name: 'GPT-3.5 Turbo',
                 type: 'api',
-                provider: 'OpenAI',
-                isDefault: false,
+                url: 'https://api.openai.com/v1',
                 timestamp: new Date()
               },
               {
-                id: 'claude-3',
-                name: 'Claude 3',
+                id: 'qwen-plus',
+                name: '通义千问 Plus',
                 type: 'api',
-                provider: 'Anthropic',
-                isDefault: false,
+                url: 'https://dashscope.aliyuncs.com/api/v1',
+                parameters: '{"model":"qwen-plus"}',
                 timestamp: new Date()
               },
               {
-                id: 'llama-7b',
-                name: 'Llama 2 7B',
+                id: 'llama2',
+                name: 'Llama 2',
                 type: 'local',
-                path: '/models/llama-7b',
-                isDefault: true,
+                path: 'llama2:latest',
                 timestamp: new Date()
               },
               {
-                id: 'mistral-7b',
-                name: 'Mistral 7B',
+                id: 'mistral',
+                name: 'Mistral',
                 type: 'local',
-                path: '/models/mistral-7b',
-                isDefault: false,
+                path: 'mistral:latest',
                 timestamp: new Date()
               }
             ];

@@ -35,11 +35,10 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
   const [modelType, setModelType] = useState<'api' | 'local'>(initialData?.type || "api");  // 模型类型
   const [formData, setFormData] = useState({                               // 表单数据
     name: initialData?.name || "",
-    provider: initialData?.provider || "",
+    url: initialData?.url || "",
     apiKey: initialData?.apiKey || "",
     path: initialData?.path || "",
     parameters: initialData?.parameters || "",
-    isDefault: initialData?.isDefault || false
   });
   const [errors, setErrors] = useState<Record<string, string | null>>({});                               // 表单错误信息
 
@@ -76,8 +75,8 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
 
     // API模型特定验证
     if (modelType === "api") {
-      if (!formData.provider.trim()) {
-        newErrors.provider = "请输入服务提供商";
+      if (!formData.url.trim()) {
+        newErrors.url = "请输入API URL";
       }
       if (!formData.apiKey.trim()) {
         newErrors.apiKey = "API密钥不能为空";
@@ -104,11 +103,10 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
       onAdd({
         type: modelType,
         name: formData.name,
-        provider: modelType === 'api' ? formData.provider : undefined,
+        url: modelType === 'api' ? formData.url : undefined,
         apiKey: modelType === 'api' ? formData.apiKey : undefined,
         path: modelType === 'local' ? formData.path : undefined,
         parameters: formData.parameters || undefined,
-        isDefault: formData.isDefault
       });
     }
   };
@@ -141,18 +139,19 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
             </div>
 
             <div className="form-field">
-              <Label htmlFor="provider">服务提供商</Label>
+              <Label htmlFor="url">API URL</Label>
               <Input
                 type="text"
-                value={formData.provider}
-                onChange={(e) => handleInputChange('provider', e.target.value)}
+                value={formData.url}
+                onChange={(e) => handleInputChange('url', e.target.value)}
                 required
-                id="model-provider"
-                placeholder="例如: OpenAI, Anthropic"
-                className={errors.provider ? "error" : ""}
+                id="model-url"
+                placeholder="例如: https://api.openai.com/v1"
+                className={errors.url ? "error" : ""}
                 style={{color: '#111827', backgroundColor: 'white'}}
               />
-              {errors.provider && <span className="error-message">{errors.provider}</span>}
+              {errors.url && <span className="error-message">{errors.url}</span>}
+              <p className="text-xs text-gray-500 mt-1">请输入API完整URL，如OpenAI: https://api.openai.com/v1，或阿里云通义千问API地址</p>
             </div>
 
             <div className="form-field">
@@ -181,19 +180,9 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
                 placeholder="可选: 附加参数 (JSON格式)"
                 style={{color: '#111827', backgroundColor: 'white'}}
               />
-            </div>
-
-            <div className="form-field">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="isDefault"
-                  checked={formData.isDefault}
-                  onChange={(e) => handleInputChange("isDefault", e.target.checked)}
-                  className="checkbox"
-                />
-                <Label htmlFor="isDefault">设为默认API模型</Label>
-              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                JSON格式，例如: {"\"model\":\"gpt-4\",\"temperature\":0.7,\"max_tokens\":2000"}
+              </p>
             </div>
           </div>
         </TabsContent>
@@ -202,7 +191,7 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
         <TabsContent value="local" className="mt-0">
           <div className="space-y-4">
             <div className="form-field">
-              <Label htmlFor="localName">模型名称</Label>
+              <Label htmlFor="local-name">模型名称</Label>
               <Input
                 type="text"
                 value={formData.name}
@@ -217,22 +206,23 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
             </div>
 
             <div className="form-field">
-              <Label htmlFor="path">模型路径</Label>
+              <Label htmlFor="local-path">模型路径</Label>
               <Input
                 type="text"
                 value={formData.path}
                 onChange={(e) => handleInputChange('path', e.target.value)}
                 required
-                id="model-path"
-                placeholder="例如: /models/llama-7b"
+                id="local-model-path"
+                placeholder="例如: llama2:latest (Ollama模型)"
                 className={errors.path ? "error" : ""}
                 style={{color: '#111827', backgroundColor: 'white'}}
               />
               {errors.path && <span className="error-message">{errors.path}</span>}
+              <p className="text-xs text-gray-500 mt-1">对于Ollama模型，请输入模型名称和标签，例如: llama2:latest</p>
             </div>
 
             <div className="form-field">
-              <Label htmlFor="localParameters">其他参数 (可选)</Label>
+              <Label htmlFor="local-parameters">其他参数 (可选)</Label>
               <Input
                 type="text"
                 value={formData.parameters}
@@ -241,31 +231,21 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
                 placeholder="可选: 附加参数 (JSON格式)"
                 style={{color: '#111827', backgroundColor: 'white'}}
               />
-            </div>
-
-            <div className="form-field">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="isLocalDefault"
-                  checked={formData.isDefault}
-                  onChange={(e) => handleInputChange("isDefault", e.target.checked)}
-                  className="checkbox"
-                />
-                <Label htmlFor="isLocalDefault">设为默认本地模型</Label>
-              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                JSON格式，例如: {"\"temperature\":0.7,\"top_p\":0.9,\"repeat_penalty\":1.1"}
+              </p>
             </div>
           </div>
         </TabsContent>
       </Tabs>
 
-      {/* 操作按钮 */}
-      <div className="form-actions">
+      {/* 表单按钮 */}
+      <div className="form-actions mt-6">
         <Button type="button" variant="outline" onClick={onCancel}>
           取消
         </Button>
         <Button type="submit">
-          {initialData ? "保存修改" : "添加模型"}
+          保存
         </Button>
       </div>
     </form>
