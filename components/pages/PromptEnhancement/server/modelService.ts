@@ -116,7 +116,7 @@ class ModelService {
       }));
 
       // 如果存在自定义提示词，将其添加到系统消息中
-      if (customPrompt) {
+      if (customPrompt && customPrompt.trim()) {
         // 检查是否已有系统消息
         const hasSystemMessage = apiMessages.some(msg => msg.role === 'system');
         
@@ -135,6 +135,11 @@ class ModelService {
             content: customPrompt
           });
         }
+      } else {
+        // 如果没有自定义提示词，确保移除所有system消息
+        const filteredMessages = apiMessages.filter(msg => msg.role !== 'system');
+        apiMessages.length = 0; // 清空数组
+        apiMessages.push(...filteredMessages); // 重新填充
       }
 
       // 设置默认参数

@@ -38,11 +38,11 @@
 }
 
 .message-content {
-  max-width: calc(100% - 5rem);
-  overflow-wrap: break-word;
-  word-break: break-word;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow: hidden;
+  /* width: 100%;
+  max-width: 100%; */
+  box-sizing: border-box;
 }
 
 .user-message .message-content {
@@ -69,8 +69,14 @@
 
 /* Markdown 内容样式 */
 .markdown-content {
-  width: 100%;
   line-height: 1.6;
+  color: var(--text-primary);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .markdown-content h1,
@@ -147,11 +153,13 @@
 
 /* 代码块容器样式 */
 .code-block-container {
-  margin: 0.75em 0;
+  position: relative;
+  margin: 1rem 0;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid #e0e0e0;
-  background-color: #f8f9fa;
+  border: 1px solid var(--border-color);
+  background-color: var(--code-block-bg, rgba(0, 0, 0, 0.02));
+  max-width: 100%;
 }
 
 /* 代码块头部导航栏 */
@@ -160,50 +168,73 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1rem;
-  background-color: #f1f3f5;
-  border-bottom: 1px solid #e0e0e0;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid var(--border-color);
+  font-family: var(--font-mono, monospace);
   font-size: 0.8rem;
+  z-index: 10;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* 代码语言标签 */
 .code-language {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   font-weight: 600;
   color: #555;
   text-transform: uppercase;
   font-size: 0.75rem;
+  min-width: 40px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* 复制按钮 */
 .copy-button {
-  padding: 0.25rem;
-  height: auto;
-  width: auto;
-  color: #666;
-  background: none;
-  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  color: var(--text-secondary);
+  background: transparent;
+  border-radius: 4px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  font-size: 0.75rem;
 }
 
 .copy-button:hover {
-  color: #000;
   background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
 }
 
 .markdown-content pre {
   margin: 0;
-  padding: 1em;
-  background-color: #f6f8fa;
-  border-radius: 0 0 3px 3px;
-  overflow: auto;
+  padding: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
 }
 
 .markdown-content pre code {
-  padding: 0;
+  padding: 1rem;
   margin: 0;
-  font-size: 90%;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  display: block;
   background-color: transparent;
   border-radius: 0;
-  white-space: pre;
+  color: var(--code-text, #333);
+  font-family: var(--font-mono, monospace);
+  white-space: pre-wrap; /* 允许代码自动换行 */
+  word-break: break-word; /* 确保长词可以断行 */
+  overflow-wrap: break-word; /* 确保长词自动换行 */
+  width: 100%;
+  max-width: 100%;
 }
 
 .markdown-content table {

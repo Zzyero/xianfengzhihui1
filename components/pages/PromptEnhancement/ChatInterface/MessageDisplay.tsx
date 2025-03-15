@@ -12,6 +12,7 @@ import { Copy } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Components } from 'react-markdown';
+import { Code } from 'lucide-react';
 
 interface MessageDisplayProps {
   message: Message;
@@ -67,16 +68,21 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
     // 自定义pre标签渲染
     pre: (props) => {
       const { children, className, ...rest } = props;
-      // 检测语言类型
-      const match = /language-(\w+)/.exec(className || '');
-      const language = match ? match[1] : '代码';
-      // 获取代码内容
+      // 获取代码内容和语言类型
       const codeElement = React.Children.toArray(children).find(
         child => React.isValidElement(child) && child.type === 'code'
       );
       
       let code = '';
+      let language = 'code'; // 默认语言
+      
       if (React.isValidElement(codeElement)) {
+        // 从code元素的className中提取语言类型
+        const langMatch = /language-(\w+)/.exec(codeElement.props.className || '');
+        if (langMatch && langMatch[1]) {
+          language = langMatch[1];
+        }
+        
         code = React.Children.toArray(codeElement.props.children)
           .join('')
           .replace(/\n$/, '');
@@ -86,7 +92,9 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
       return (
         <div className="code-block-container">
           <div className="code-block-header">
-            <div className="code-language">{language}</div>
+            <div className="code-language">
+              <Code className="h-3.5 w-3.5 mr-1" /> {language}
+            </div>
             <Button 
               variant="ghost" 
               size="icon" 
@@ -105,8 +113,13 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
     // 正常渲染code标签
     code: (props) => {
       const { children, className, ...rest } = props;
+      // 如果是独立的代码块，由pre标签处理
+      if (className && className.includes('language-')) {
+        return <code className={className} {...rest}>{children}</code>;
+      }
+      // 如果是行内代码，添加内联样式
       return (
-        <code className={className} {...rest}>
+        <code className={cn("inline-code", className)} {...rest}>
           {children}
         </code>
       );

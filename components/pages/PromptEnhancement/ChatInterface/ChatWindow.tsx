@@ -6,7 +6,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { History, Search, MessageSquare, PlusCircle, Trash, Edit, Star, GripVertical } from "lucide-react";
+import { History, Search, MessageSquare, PlusCircle, Trash, Edit, Star, Save } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import '../styles/ChatInterface.css';
 // 导入数据库工具类和类型定义
@@ -48,10 +48,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   // 编辑状态相关
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editedTitle, setEditedTitle] = useState<string>('');
-  
-  // 拖拽相关
-  const [draggedSession, setDraggedSession] = useState<string | null>(null);
-  const [draggedOverSession, setDraggedOverSession] = useState<string | null>(null);
   
   const dragStartX = useRef<number>(0);
   const dragStartWidth = useRef<number>(0);
@@ -153,16 +149,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const handleDeleteSession = async (e: React.MouseEvent, sessionId: string) => {
     e.stopPropagation(); // 阻止事件冒泡
     
+    // 不允许删除当前活动对话
+    if (sessionId === activeSessionId) {
+      toast.error('不能删除当前正在使用的对话');
+      return;
+    }
+    
     try {
+      // 确保从数据库中彻底删除会话及其消息
       await db.deleteSession(sessionId);
       
-      // 本地状态更新，立即反映删除操作
+      // 本地状态更新
       setFilteredSessions(prev => prev.filter(s => s.id !== sessionId));
-      
-      // 如果删除的是当前会话，清空消息并重置activeSessionId
-      if (sessionId === activeSessionId) {
-        onNewChat();
-      }
       
       toast.success('会话已删除');
     } catch (error) {
@@ -172,14 +170,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   };
 
   /**
-   * 开始编辑会话标题
+   * 处理会话标题编辑
    * @param e 事件对象
    * @param session 会话对象
    */
-  const handleStartEdit = (e: React.MouseEvent, session: ChatSession) => {
+  const handleEditSession = (e: React.MouseEvent, session: ChatSession) => {
     e.stopPropagation(); // 阻止事件冒泡
-    setEditingSessionId(session.id);
-    setEditedTitle(session.title);
+    
+    // 如果当前正在编辑这个会话，则保存编辑
+    if (editingSessionId === session.id) {
+      handleSaveEdit(session);
+    } else {
+      // 否则开始编辑
+      setEditingSessionId(session.id);
+      setEditedTitle(session.title);
+    }
   };
 
   /**
@@ -240,92 +245,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
-  /**
-   * 拖拽开始处理
-   * @param e 拖拽事件
-   * @param sessionId 被拖拽的会话ID
-   */
-  const handleDragStart = (e: React.DragEvent, sessionId: string) => {
-    setDraggedSession(sessionId);
-    e.dataTransfer.effectAllowed = 'move';
-    // 设置拖拽时的透明图片
-    const img = new Image();
-    e.dataTransfer.setDragImage(img, 0, 0);
-    e.currentTarget.classList.add('dragging');
-  };
-
-  /**
-   * 拖拽结束处理
-   */
-  const handleDragEnd = (e: React.DragEvent) => {
-    e.currentTarget.classList.remove('dragging');
-    setDraggedSession(null);
-    setDraggedOverSession(null);
-  };
-
-  /**
-   * 拖拽进入区域处理
-   */
-  const handleDragOver = (e: React.DragEvent, sessionId: string) => {
-    e.preventDefault();
-    if (draggedSession === sessionId) return;
-    setDraggedOverSession(sessionId);
-  };
-
-  /**
-   * 拖拽放置处理
-   */
-  const handleDrop = async (e: React.DragEvent, targetSessionId: string) => {
-    e.preventDefault();
-    
-    if (!draggedSession || draggedSession === targetSessionId) {
-      return;
-    }
-    
-    try {
-      // 找到目标会话和源会话的索引
-      const sourceIndex = filteredSessions.findIndex(s => s.id === draggedSession);
-      const targetIndex = filteredSessions.findIndex(s => s.id === targetSessionId);
-      
-      if (sourceIndex === -1 || targetIndex === -1) return;
-      
-      // 计算新的顺序值
-      let newOrder: number;
-      
-      // 如果向上移动
-      if (sourceIndex > targetIndex) {
-        const prevSession = targetIndex > 0 ? filteredSessions[targetIndex - 1] : null;
-        const targetSession = filteredSessions[targetIndex];
-        
-        newOrder = prevSession 
-          ? (prevSession.order || 0) + ((targetSession.order || 0) - (prevSession.order || 0)) / 2
-          : (targetSession.order || 0) - 1000;
-      } 
-      // 如果向下移动
-      else {
-        const targetSession = filteredSessions[targetIndex];
-        const nextSession = targetIndex < filteredSessions.length - 1 ? filteredSessions[targetIndex + 1] : null;
-        
-        newOrder = nextSession
-          ? (targetSession.order || 0) + ((nextSession.order || 0) - (targetSession.order || 0)) / 2
-          : (targetSession.order || 0) + 1000;
-      }
-      
-      // 更新源会话的顺序
-      const sourceSession = filteredSessions[sourceIndex];
-      const updatedSession = {
-        ...sourceSession,
-        order: newOrder
-      };
-      
-      await db.saveSession(updatedSession);
-      toast.success('会话顺序已更新');
-    } catch (error) {
-      console.error('更新会话顺序失败:', error);
-      toast.error('更新会话顺序失败');
-    }
-  };
-
   return (
     <div className="chat-window">
       <Toaster position="top-center" />
@@ -359,31 +278,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         isOpen && 'with-sidebar'
       )}>
         <div className="messages-container">
-          {isTyping && (
-            <div className="message-item assistant-message">
-              <Avatar className="avatar">
-                <div className="avatar-content">AI</div>
-              </Avatar>
-              <div className="message-content typing">
-                <div className="typing-indicator">
-                  <span>.</span>
-                  <span>.</span>
-                  <span>.</span>
-                </div>
-              </div>
-            </div>
-          )}
-          
           {messages.map((message) => (
-            <div
+            <MessageDisplay 
               key={message.id}
-              className={cn(
-                "message-item",
-                message.role === 'user' ? 'user-message' : 'assistant-message'
-              )}
-            >
-              <MessageDisplay message={message} showTimestamp={true} />
-            </div>
+              message={message} 
+              showTimestamp={true} 
+            />
           ))}
         </div>
       </ScrollArea>
@@ -430,20 +330,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     className={cn(
                       "session-item",
                       activeSessionId === session.id && 'active',
-                      session.starred && 'starred',
-                      draggedSession === session.id && 'dragging',
-                      draggedOverSession === session.id && 'drag-over'
+                      session.starred && 'starred'
                     )}
                     onClick={() => onSelectSession(session.id)}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, session.id)}
-                    onDragEnd={handleDragEnd}
-                    onDragOver={(e) => handleDragOver(e, session.id)}
-                    onDrop={(e) => handleDrop(e, session.id)}
                   >
-                    <div className="session-drag-handle">
-                      <GripVertical className="h-4 w-4" />
-                    </div>
                     <div className="session-content">
                       <div className="session-title">
                         <div className="title-content">
@@ -485,20 +375,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                             variant="ghost"
                             size="icon"
                             className="edit-button"
-                            onClick={(e) => handleStartEdit(e, session)}
+                            onClick={(e) => handleEditSession(e, session)}
                           >
-                            <Edit className="h-3 w-3" />
+                            {editingSessionId === session.id ? (
+                              <Save className="h-3 w-3" />
+                            ) : (
+                              <Edit className="h-3 w-3" />
+                            )}
                           </Button>
                           
-                          {/* 删除按钮 */}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="delete-button"
-                            onClick={(e) => handleDeleteSession(e, session.id)}
-                          >
-                            <Trash className="h-3 w-3" />
-                          </Button>
+                          {/* 删除按钮 - 当前活动会话不显示删除按钮 */}
+                          {session.id !== activeSessionId && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="delete-button"
+                              onClick={(e) => handleDeleteSession(e, session.id)}
+                            >
+                              <Trash className="h-3 w-3" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                       <div className="session-info">

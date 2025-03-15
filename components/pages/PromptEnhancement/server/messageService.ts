@@ -60,9 +60,10 @@ class MessageService {
     customPrompt?: string
   ): Promise<void> {
     try {
-      // 如果没有会话ID，创建新会话
+      // 如果没有会话ID或是临时会话ID，创建新会话
       let currentSessionId = sessionId;
-      if (!currentSessionId) {
+      if (!currentSessionId || currentSessionId.startsWith('temp_')) {
+        // 使用当前内容作为会话标题
         currentSessionId = await this.createNewSession(content);
         if (!currentSessionId) {
           throw new Error('创建会话失败');

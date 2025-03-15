@@ -99,8 +99,8 @@ const PromptEnhancementPage: React.FC = () => {
           setIsGenerating(false);
         }
       },
-      // 传递自定义提示词（如果有选中的模板）
-      customPrompt
+      // 只有当存在激活的模板ID时才传递自定义提示词
+      activeTemplateId ? customPrompt : undefined
     ).catch(error => {
       console.error('发送消息失败:', error);
       toast.error('发送消息失败');
@@ -144,6 +144,15 @@ const PromptEnhancementPage: React.FC = () => {
    */
   const createNewSession = async (title?: string, firstMessage?: string): Promise<string | undefined> => {
     try {
+      // 如果没有首条消息或标题，则创建一个临时会话ID但不保存到数据库
+      // 只有当用户发送第一条消息时才真正创建会话
+      if (!firstMessage && !title) {
+        const tempSessionId = `temp_${Date.now().toString()}`;
+        setActiveSessionId(tempSessionId);
+        setMessages([]);
+        return tempSessionId;
+      }
+      
       const sessionId = await MessageService.createNewSession(firstMessage, title);
       setActiveSessionId(sessionId);
       setMessages([]);
@@ -239,26 +248,26 @@ const PromptEnhancementPage: React.FC = () => {
    * 开始新的对话
    */
   const handleNewChat = async (): Promise<void> => {
-    // 检查当前会话是否有消息
-    if (activeSessionId) {
-      try {
-        const currentMessages = await MessageService.loadSessionMessages(activeSessionId);
-        
-        // 如果当前会话没有消息，直接使用当前会话
-        if (currentMessages.length === 0) {
-          return;
-        }
-        
-        // 否则，创建新会话
-        await createNewSession();
-      } catch (error) {
-        console.error('检查会话消息失败:', error);
-        // 出错时尝试创建新会话
-        await createNewSession();
+    // 如果正在生成，先取消当前的生成
+    if (isGenerating && activeSessionId) {
+      MessageService.cancelGeneration(activeSessionId);
+      setIsGenerating(false);
+    }
+    
+    // 创建新会话
+    try {
+      const newSessionId = await createNewSession("新对话");
+      if (newSessionId) {
+        // 重置模板相关状态
+        setActiveTemplateId(null);
+        setCustomPrompt('');
+        // 设置新的活动会话ID并清空消息
+        setActiveSessionId(newSessionId);
+        setMessages([]);
       }
-    } else {
-      // 如果没有活动会话，直接创建新会话
-      await createNewSession();
+    } catch (error) {
+      console.error('创建新对话失败:', error);
+      toast.error('创建新对话失败');
     }
   };
 
@@ -274,8 +283,19 @@ const PromptEnhancementPage: React.FC = () => {
    * 处理会话选择
    * @param sessionId 会话ID
    */
-  const handleSelectSession = (sessionId: string): void => {
+  const handleSelectSession = async (sessionId: string): Promise<void> => {
+    // 如果正在生成，先取消当前的生成
+    if (isGenerating && activeSessionId) {
+      MessageService.cancelGeneration(activeSessionId);
+      setIsGenerating(false);
+    }
+    
+    // 设置新的活动会话ID
     setActiveSessionId(sessionId);
+    
+    // 重置模板状态
+    setActiveTemplateId(null);
+    setCustomPrompt('');
   };
 
   // 组件初始化时确保数据库已初始化和加载会话数据
@@ -317,7 +337,11 @@ const PromptEnhancementPage: React.FC = () => {
           await loadSessionMessages(latestSessionId);
         } else {
           // 如果没有会话，创建一个新会话
-          await createNewSession("新对话");
+          const newSessionId = await createNewSession("新对话");
+          if (newSessionId) {
+            setActiveSessionId(newSessionId);
+            setMessages([]);
+          }
         }
       } catch (error) {
         console.error('应用初始化失败:', error);
