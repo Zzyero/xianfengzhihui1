@@ -95,12 +95,7 @@
 }
 
 /* 新建模式样式 */
-.template-button.create-mode {
-  border-width: 2px;
-  border-style: dashed;
-  border-color: #22c55e;
-  color: #000;
-}
+
 
 .template-button.create-mode:hover {
   border-width: 2px;
