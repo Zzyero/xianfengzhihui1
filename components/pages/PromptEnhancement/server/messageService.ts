@@ -21,6 +21,29 @@ export interface MessageServiceCallbacks {
  * 消息服务类
  */
 class MessageService {
+  // 当前活动的会话请求ID
+  private static activeRequests: Map<string, string> = new Map(); // sessionId -> requestId
+
+  /**
+   * 取消指定会话的生成请求
+   * @param sessionId 会话ID
+   */
+  static cancelGeneration(sessionId: string): void {
+    const requestId = this.activeRequests.get(sessionId);
+    if (requestId) {
+      ModelService.abortRequest(requestId);
+      this.activeRequests.delete(sessionId);
+    }
+  }
+
+  /**
+   * 取消所有生成请求
+   */
+  static cancelAllGenerations(): void {
+    ModelService.abortAllRequests();
+    this.activeRequests.clear();
+  }
+
   /**
    * 发送用户消息并获取AI响应
    * @param content 消息内容
@@ -73,6 +96,15 @@ class MessageService {
       // AI响应ID
       const aiMessageId = (Date.now() + 1).toString();
       
+      // 创建请求ID（用于取消）
+      const requestId = `req_${currentSessionId}_${Date.now()}`;
+      
+      // 记录当前会话的请求ID
+      this.activeRequests.set(currentSessionId, requestId);
+      
+      // 创建取消控制器
+      const controller = ModelService.createController(requestId);
+      
       // 准备调用模型的回调函数
       const modelCallbacks: ModelResponseCallbacks = {
         onStart: () => {
@@ -106,10 +138,16 @@ class MessageService {
           // 完成回调
           callbacks.onAiMessageComplete?.(aiMessage);
           callbacks.onSessionUpdated?.();
+          
+          // 清理请求ID
+          this.activeRequests.delete(currentSessionId!);
         },
         onError: (error) => {
           // 处理错误
           callbacks.onError?.(error);
+          
+          // 清理请求ID
+          this.activeRequests.delete(currentSessionId!);
         }
       };
 
@@ -122,14 +160,16 @@ class MessageService {
         await ModelService.callApiModel({
           model,
           messages: historyMessages,
-          callbacks: modelCallbacks
+          callbacks: modelCallbacks,
+          signal: controller.signal
         });
       } else if (model.type === 'local') {
         // 调用本地模型
         await ModelService.callLocalModel({
           model,
           prompt: content,
-          callbacks: modelCallbacks
+          callbacks: modelCallbacks,
+          signal: controller.signal
         });
       } else {
         throw new Error(`不支持的模型类型: ${model.type}`);

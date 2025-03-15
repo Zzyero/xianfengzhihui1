@@ -155,8 +155,12 @@ const PromptEnhancementPage: React.FC = () => {
    * 停止生成回复
    */
   const handleStopGeneration = (): void => {
+    if (!activeSessionId) return;
+    
+    // 取消当前会话的生成
+    MessageService.cancelGeneration(activeSessionId);
+    
     setIsGenerating(false);
-    // 注意：目前还没有实现真正的取消流式输出的功能
     toast.info('已停止生成回复');
   };
 

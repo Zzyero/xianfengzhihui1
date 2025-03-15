@@ -28,6 +28,7 @@ interface ApiModelOptions {
   model: Model;
   messages: Message[];
   callbacks: ModelResponseCallbacks;
+  signal?: AbortSignal; // 添加AbortSignal用于取消请求
 }
 
 /**
@@ -37,18 +38,63 @@ interface LocalModelOptions {
   model: Model;
   prompt: string;
   callbacks: ModelResponseCallbacks;
+  signal?: AbortSignal; // 添加AbortSignal用于取消请求
 }
 
 /**
  * 模型服务类
  */
 class ModelService {
+  // 保存请求控制器的映射，用于取消请求
+  private static controllers: Map<string, AbortController> = new Map();
+  
+  /**
+   * 创建一个新的取消控制器
+   * @param id 请求ID
+   * @returns AbortController实例
+   */
+  static createController(id: string): AbortController {
+    // 如果已存在同ID的控制器，先中断之前的请求
+    if (this.controllers.has(id)) {
+      this.abortRequest(id);
+    }
+    
+    // 创建新控制器
+    const controller = new AbortController();
+    this.controllers.set(id, controller);
+    return controller;
+  }
+  
+  /**
+   * 中断请求
+   * @param id 请求ID
+   */
+  static abortRequest(id: string): void {
+    const controller = this.controllers.get(id);
+    if (controller) {
+      controller.abort();
+      this.controllers.delete(id);
+    }
+  }
+  
+  /**
+   * 中断所有请求
+   */
+  static abortAllRequests(): void {
+    // 使用Array.from转换为数组后迭代，避免类型错误
+    const controllerEntries = Array.from(this.controllers.entries());
+    for (const [id, controller] of controllerEntries) {
+      controller.abort();
+      this.controllers.delete(id);
+    }
+  }
+
   /**
    * 调用API模型（如OpenAI）
    * @param options 调用选项
    */
   static async callApiModel(options: ApiModelOptions): Promise<void> {
-    const { model, messages, callbacks } = options;
+    const { model, messages, callbacks, signal } = options;
 
     try {
       // 调用开始回调
@@ -90,15 +136,23 @@ class ModelService {
 
       // 流式调用
       if (stream) {
+        // 创建请求选项对象，正确处理signal
+        const requestOptions = signal ? { signal } : {};
+        
         const stream = await openai.chat.completions.create({
           model: modelName,
           messages: apiMessages,
           temperature: temperature,
           max_tokens: max_tokens,
           stream: true
-        });
+        }, requestOptions);
 
         for await (const chunk of stream) {
+          // 检查是否已取消
+          if (signal?.aborted) {
+            throw new Error('请求已取消');
+          }
+          
           const content = chunk.choices[0]?.delta?.content || '';
           fullContent += content;
           callbacks.onUpdate?.(fullContent);
@@ -108,20 +162,34 @@ class ModelService {
         callbacks.onComplete?.(fullContent);
       } else {
         // 非流式调用
+        // 创建请求选项对象，正确处理signal
+        const requestOptions = signal ? { signal } : {};
+        
         const completion = await openai.chat.completions.create({
           model: modelName,
           messages: apiMessages,
           temperature: temperature,
           max_tokens: max_tokens,
           stream: false
-        });
+        }, requestOptions);
 
         fullContent = completion.choices[0].message.content || '';
         callbacks.onComplete?.(fullContent);
       }
     } catch (error: any) {
+      // 检查是否是取消的错误
+      if (error.name === 'AbortError' || (signal && signal.aborted)) {
+        console.log('API调用已取消');
+        callbacks.onError?.(new Error('生成已停止'));
+        return;
+      }
+      
+      // 处理API错误
       console.error('API模型调用失败:', error);
-      callbacks.onError?.(new Error(`API调用失败: ${error.message || '未知错误'}`));
+      const errorMsg = error.status 
+        ? `API调用失败(${error.status}): ${error.message || '未知错误'}`
+        : `API调用失败: ${error.message || '未知错误'}`;
+      callbacks.onError?.(new Error(errorMsg));
     }
   }
 
@@ -130,7 +198,7 @@ class ModelService {
    * @param options 调用选项
    */
   static async callLocalModel(options: LocalModelOptions): Promise<void> {
-    const { model, prompt, callbacks } = options;
+    const { model, prompt, callbacks, signal } = options;
 
     try {
       // 调用开始回调
@@ -179,7 +247,8 @@ class ModelService {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(requestBody)
+          body: JSON.stringify(requestBody),
+          signal: signal, // 使用信号来支持取消
         });
 
         if (!response.ok) {
@@ -197,6 +266,11 @@ class ModelService {
         let done = false;
 
         while (!done) {
+          // 检查是否已取消
+          if (signal?.aborted) {
+            throw new Error('请求已取消');
+          }
+          
           const { value, done: readerDone } = await reader.read();
           done = readerDone;
           
@@ -238,7 +312,8 @@ class ModelService {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(requestBody)
+          body: JSON.stringify(requestBody),
+          signal: signal, // 使用信号来支持取消
         });
 
         if (!response.ok) {
@@ -250,6 +325,14 @@ class ModelService {
         callbacks.onComplete?.(fullContent);
       }
     } catch (error: any) {
+      // 检查是否是取消的错误
+      if (error.name === 'AbortError' || (signal && signal.aborted)) {
+        console.log('本地模型调用已取消');
+        callbacks.onError?.(new Error('生成已停止'));
+        return;
+      }
+      
+      // 处理API错误
       console.error('本地模型调用失败:', error);
       callbacks.onError?.(new Error(`Ollama调用失败: ${error.message || '未知错误'}`));
     }

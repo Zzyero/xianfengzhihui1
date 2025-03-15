@@ -12,6 +12,8 @@ import '../styles/ChatInterface.css';
 // 导入数据库工具类和类型定义
 import db, { Message, ChatSession } from '../server/db';
 import { Toaster, toast } from "sonner";
+// 导入消息显示组件
+import MessageDisplay from './MessageDisplay';
 
 // 从db.ts导入的类型
 // import type { Message, ChatSession } from '../server/db';
@@ -380,24 +382,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 message.role === 'user' ? 'user-message' : 'assistant-message'
               )}
             >
-              {message.role === 'assistant' && (
-                <Avatar className="avatar">
-                  <div className="avatar-content">AI</div>
-                </Avatar>
-              )}
-              
-              <div className="message-content">
-                <div className="message-text">{message.content}</div>
-                <div className="message-timestamp">
-                  {new Date(message.timestamp).toLocaleTimeString()}
-                </div>
-              </div>
-
-              {message.role === 'user' && (
-                <Avatar className="avatar">
-                  <div className="avatar-content user">你</div>
-                </Avatar>
-              )}
+              <MessageDisplay message={message} showTimestamp={true} />
             </div>
           ))}
         </div>
