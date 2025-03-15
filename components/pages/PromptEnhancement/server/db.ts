@@ -256,32 +256,48 @@ const db = {
     return new Promise((resolve, reject) => {
       initDB().then(async (db) => {
         try {
-          // 删除会话
-          const sessionTx = db.transaction(STORES.SESSIONS, 'readwrite');
-          const sessionStore = sessionTx.objectStore(STORES.SESSIONS);
-          sessionStore.delete(sessionId);
-          
-          // 获取会话的所有消息
-          const messagesTx = db.transaction(STORES.MESSAGES, 'readwrite');
-          const messagesStore = messagesTx.objectStore(STORES.MESSAGES);
+          // 使用一个事务处理整个删除过程，确保原子性
+          const tx = db.transaction([STORES.SESSIONS, STORES.MESSAGES], 'readwrite');
+          const sessionStore = tx.objectStore(STORES.SESSIONS);
+          const messagesStore = tx.objectStore(STORES.MESSAGES);
           const index = messagesStore.index('sessionId');
-          const request = index.getAllKeys(sessionId);
           
-          request.onsuccess = () => {
+          // 删除会话
+          const deleteSessionRequest = sessionStore.delete(sessionId);
+          
+          // 获取所有相关消息的键
+          const getKeysRequest = index.getAllKeys(sessionId);
+          
+          getKeysRequest.onsuccess = () => {
+            const keys = getKeysRequest.result;
+            console.log(`删除会话 ${sessionId} 的 ${keys.length} 条消息`);
+            
             // 删除所有相关消息
-            request.result.forEach((key) => {
+            keys.forEach(key => {
               messagesStore.delete(key);
             });
           };
           
-          messagesTx.oncomplete = () => {
+          // 处理事务完成
+          tx.oncomplete = () => {
+            console.log(`会话 ${sessionId} 及其消息已被删除`);
             db.close();
             resolve();
           };
+          
+          // 处理事务错误
+          tx.onerror = () => {
+            console.error(`删除会话 ${sessionId} 失败:`, tx.error);
+            reject(tx.error);
+          };
         } catch (error) {
+          console.error('删除会话时发生错误:', error);
           reject(error);
         }
-      }).catch(reject);
+      }).catch(error => {
+        console.error('初始化数据库失败:', error);
+        reject(error);
+      });
     });
   },
   

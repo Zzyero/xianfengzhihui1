@@ -14,6 +14,8 @@ import db, { Message, ChatSession } from '../server/db';
 import { Toaster, toast } from "sonner";
 // 导入消息显示组件
 import MessageDisplay from './MessageDisplay';
+// 导入模型选择组件
+import ChangeModel from '../ModelManagement/ChangeModel';
 
 // 从db.ts导入的类型
 // import type { Message, ChatSession } from '../server/db';
@@ -26,6 +28,8 @@ interface ChatWindowProps {
   onSelectSession: (id: string) => void;
   activeSessionId?: string;
   onNewChat: () => void;
+  selectedModel: string;
+  setSelectedModel: (modelId: string) => void;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -35,12 +39,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   sessions,
   onSelectSession,
   activeSessionId,
-  onNewChat
+  onNewChat,
+  selectedModel,
+  setSelectedModel
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isPinned, setIsPinned] = useState<boolean>(false);
   const [width, setWidth] = useState<number>(320);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredSessions, setFilteredSessions] = useState<ChatSession[]>(sessions);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -49,8 +54,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editedTitle, setEditedTitle] = useState<string>('');
   
-  const dragStartX = useRef<number>(0);
-  const dragStartWidth = useRef<number>(0);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -93,52 +96,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     };
   }, [searchQuery, sessions]);
 
-  // 调整宽度相关处理
-  const handleMouseDown = (e: React.MouseEvent): void => {
-    e.preventDefault();
-    setIsDragging(true);
-    dragStartX.current = e.clientX;
-    dragStartWidth.current = width;
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent): void => {
-      if (!isDragging) return;
-      const delta = dragStartX.current - e.clientX;
-      const newWidth = Math.min(Math.max(280, dragStartWidth.current + delta), 800);
-      setWidth(newWidth);
-    };
-
-    const handleMouseUp = (): void => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
-
-  const handleMouseEnter = (): void => {
-    setIsOpen(true);
-  };
-
-  const handleMouseLeave = (): void => {
-    if (!isPinned) {
-      setIsOpen(false);
-    }
-  };
-
+  /**
+   * 切换侧边栏显示状态
+   */
   const toggleSidebar = (): void => {
-    setIsPinned(!isPinned);
-    if (!isOpen) {
-      setIsOpen(true);
-    }
+    setIsOpen(!isOpen);
+    setIsPinned(!isOpen); // 当打开时设置为固定，关闭时取消固定
   };
 
   /**
@@ -192,16 +155,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
    */
   const handleSaveEdit = async (session: ChatSession) => {
     if (!editedTitle.trim()) {
+      // 如果标题为空，恢复原标题
       setEditingSessionId(null);
       return;
     }
 
     try {
+      // 更新会话对象
       const updatedSession = {
         ...session,
         title: editedTitle.trim()
       };
       
+      // 保存到数据库
       await db.saveSession(updatedSession);
       
       // 本地状态更新，立即反映编辑结果
@@ -209,11 +175,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         prev.map(s => s.id === session.id ? {...s, title: editedTitle.trim()} : s)
       );
       
+      // 结束编辑模式
       setEditingSessionId(null);
       toast.success('会话标题已更新');
     } catch (error) {
       console.error('更新会话标题失败:', error);
       toast.error('更新会话标题失败');
+      // 即使失败也退出编辑模式
+      setEditingSessionId(null);
     }
   };
 
@@ -244,29 +213,32 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       toast.error('更新会话星标失败');
     }
   };
-
+// 添加模型选择组件
   return (
     <div className="chat-window">
       <Toaster position="top-center" />
       <div className="chat-controls">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="new-chat-button"
-          onClick={onNewChat}
-        >
-          <PlusCircle className="h-6 w-6" />
-        </Button>
-        <div
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
+        <div className="model-controls">
+          <ChangeModel 
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+          />
+        </div>
+        <div className="history-controls">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="new-chat-button"
+            onClick={onNewChat}
+          >新建
+            <PlusCircle className="h-6 w-6" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
             className={cn("history-button", isPinned && 'pinned')}
             onClick={toggleSidebar}
-          >
+          >历史
             <History className="h-6 w-6" />
           </Button>
         </div>
@@ -295,12 +267,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           isOpen && 'open'
         )}
         style={{ width }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
       >
         <Card className="sidebar-content">
-          <div className="resize-handle" onMouseDown={handleMouseDown} />
-          
           <CardContent className="sidebar-inner">
             <div className="sidebar-header">
               <h3>历史记录</h3>

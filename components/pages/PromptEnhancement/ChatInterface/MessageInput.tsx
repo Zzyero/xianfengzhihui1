@@ -153,7 +153,12 @@ const MessageInput: React.FC<MessageInputProps> = ({
           onKeyDown={handleKeyDown}
           placeholder="输入消息..."
           className="text-input"
-          style={{ resize: 'none' }}
+          style={{ 
+            resize: 'none',
+            overflow: 'auto',
+            minHeight: '40px',
+            maxHeight: '150px'
+          }}
         />
         {/* 操作按钮 */}
         <div className="button-container">

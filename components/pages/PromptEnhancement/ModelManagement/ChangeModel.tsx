@@ -220,7 +220,6 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
         className="model-select-button"
         onClick={() => setIsModelDialogOpen(true)}
       >
-        <Cpu className="mr-2 h-4 w-4" />
         <span>模型: {isLoading ? "加载中..." : selectedModelName}</span>
       </Button>
 

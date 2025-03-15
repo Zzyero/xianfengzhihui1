@@ -48,10 +48,32 @@ const PromptEnhancementPage: React.FC = () => {
     // 设置生成状态
     setIsGenerating(true);
 
+    // 检查是否需要创建新会话（对临时会话ID的情况）
+    let currentSessionId = activeSessionId;
+    if (!currentSessionId || currentSessionId.startsWith('temp_')) {
+      try {
+        // 使用用户首次输入的内容作为会话名称
+        const sessionTitle = content.length > 20
+          ? `${content.substring(0, 20)}...`
+          : content;
+        
+        currentSessionId = await MessageService.createNewSession(content, sessionTitle);
+        if (!currentSessionId) {
+          throw new Error('创建会话失败');
+        }
+        setActiveSessionId(currentSessionId);
+      } catch (error) {
+        console.error('创建会话失败:', error);
+        toast.error('创建新对话失败');
+        setIsGenerating(false);
+        return;
+      }
+    }
+
     // 调用消息服务发送消息
     MessageService.sendMessage(
       content,
-      activeSessionId,
+      currentSessionId,
       selectedModel,
       {
         // 当用户消息保存完成
@@ -76,7 +98,7 @@ const PromptEnhancementPage: React.FC = () => {
               // 添加新消息
               return [...prev, {
                 id: partialMessage.id || Date.now().toString(), // 确保ID不为undefined
-                sessionId: partialMessage.sessionId || activeSessionId || '',
+                sessionId: partialMessage.sessionId || currentSessionId || '',
                 role: 'assistant' as const,
                 content: partialMessage.content || '',
                 timestamp: new Date()
@@ -144,20 +166,12 @@ const PromptEnhancementPage: React.FC = () => {
    */
   const createNewSession = async (title?: string, firstMessage?: string): Promise<string | undefined> => {
     try {
-      // 如果没有首条消息或标题，则创建一个临时会话ID但不保存到数据库
+      // 创建临时会话ID，不立即保存到数据库
       // 只有当用户发送第一条消息时才真正创建会话
-      if (!firstMessage && !title) {
-        const tempSessionId = `temp_${Date.now().toString()}`;
-        setActiveSessionId(tempSessionId);
-        setMessages([]);
-        return tempSessionId;
-      }
-      
-      const sessionId = await MessageService.createNewSession(firstMessage, title);
-      setActiveSessionId(sessionId);
+      const tempSessionId = `temp_${Date.now().toString()}`;
+      setActiveSessionId(tempSessionId);
       setMessages([]);
-      await loadSessions();
-      return sessionId;
+      return tempSessionId;
     } catch (error) {
       console.error('创建会话失败:', error);
       toast.error('创建新对话失败');
@@ -254,17 +268,17 @@ const PromptEnhancementPage: React.FC = () => {
       setIsGenerating(false);
     }
     
-    // 创建新会话
+    // 创建新的临时会话
     try {
-      const newSessionId = await createNewSession("新对话");
-      if (newSessionId) {
-        // 重置模板相关状态
-        setActiveTemplateId(null);
-        setCustomPrompt('');
-        // 设置新的活动会话ID并清空消息
-        setActiveSessionId(newSessionId);
-        setMessages([]);
-      }
+      const tempSessionId = `temp_${Date.now().toString()}`;
+      setActiveSessionId(tempSessionId);
+      setMessages([]);
+      
+      // 重置模板相关状态
+      setActiveTemplateId(null);
+      setCustomPrompt('');
+      
+      toast.info('请输入内容以开始新对话');
     } catch (error) {
       console.error('创建新对话失败:', error);
       toast.error('创建新对话失败');
@@ -367,10 +381,6 @@ const PromptEnhancementPage: React.FC = () => {
       <div className="main-content">
         <Card className="chat-card">
           <CardContent className="chat-card-content">
-            <ChangeModel 
-              selectedModel={selectedModel} 
-              setSelectedModel={setSelectedModel} 
-            />
             <div className="chat-window-container">
               {isLoading ? (
                 <div className="loading-indicator">加载中...</div>
@@ -383,6 +393,8 @@ const PromptEnhancementPage: React.FC = () => {
                   activeSessionId={activeSessionId}
                   onNewChat={handleNewChat}
                   className="chat-window"
+                  selectedModel={selectedModel}
+                  setSelectedModel={setSelectedModel}
                 />
               )}
             </div>

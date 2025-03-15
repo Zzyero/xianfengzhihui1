@@ -18,15 +18,24 @@
   gap: 0.5rem;
 }
 
+
+
 /* 新建聊天和历史记录按钮样式 */
 .chat-window .new-chat-button,
 .chat-window .history-button {
-  width: 2.5rem;
+  width: 4.5rem;
   height: 2.5rem;
   background-color: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(4px);
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  margin-left: 0.5rem;
 }
-
+.new-chat-button:hover,
+.history-button:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-color: #d1d5db;
+}
 /* 历史记录按钮固定状态 */
 .chat-window .history-button.pinned {
   background-color: #f3f4f6;
@@ -191,7 +200,7 @@
 /* 侧边栏内部容器 */
 .chat-window .sidebar-inner {
   height: 100%;
-  padding: 1rem;
+  padding: 0.5rem;
   overflow-y: auto;
 }
 
@@ -200,13 +209,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem;
+  border: 0px solid #e5e7eb;
 }
 
 .chat-window .sidebar-header h3 {
   font-size: 1.125rem;
   font-weight: 600;
   color: #000;
+  text-align: center;
+  margin: 0 auto;
 }
 
 /* 搜索框容器 */
@@ -415,6 +428,7 @@
   color: #111827 !important;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  overflow: auto;
 }
 
 /* 覆盖任何可能的全局样式或框架样式 */
