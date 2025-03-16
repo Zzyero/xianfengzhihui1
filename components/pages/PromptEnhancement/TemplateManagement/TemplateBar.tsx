@@ -22,7 +22,7 @@ import { Toaster, toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 // 导入数据库工具类和模板接口
-import db, { Template } from '../server/db';
+import db, { Template } from '../service/db';
 
 // 导入样式
 import "../styles/TemplateManagement.css";

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import AddModel from "./EditModel";
 import { Cpu, Trash, Edit } from "lucide-react";
 import "../styles/ModelManagement.css";
-import db, { Model } from "../server/db";
+import db, { Model } from "../service/db";
 import { Toaster, toast } from "sonner";
 
 /**
@@ -55,32 +55,32 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       const localModelsData = await db.getAllModels('local');
       setLocalModels(localModelsData);
 
-      // 如果没有选中的模型，或所选模型不在列表中，则设置为第一个API模型
-      if (!selectedModel || ![...apiModelsData, ...localModelsData].some(m => m.id === selectedModel)) {
-        if (apiModelsData.length > 0) {
-          setSelectedModel(apiModelsData[0].id);
-          setSelectedModelName(apiModelsData[0].name);
-        } else if (localModelsData.length > 0) {
-          // 如果没有API模型，则选择第一个本地模型
-          setSelectedModel(localModelsData[0].id);
-          setSelectedModelName(localModelsData[0].name);
+      // 获取所有模型列表
+      const allModels = [...apiModelsData, ...localModelsData];
+      
+      // 查找当前选中模型并更新名称
+      if (selectedModel) {
+        // 根据模型ID查找对应的模型对象
+        const currentModel = await allModels.find(m => m.id === selectedModel);
+        if (currentModel) {
+          // 使用模型的名称属性作为显示名称
+          setSelectedModelName(currentModel.name);
+        } else {
+          setSelectedModelName("未选择模型");
         }
       } else {
-        // 查找当前选中模型的名称
-        const currentModel = [...apiModelsData, ...localModelsData].find(m => m.id === selectedModel);
-        if (currentModel) {
-          setSelectedModelName(currentModel.name);
-        }
+        setSelectedModelName("未选择模型");
       }
     } catch (error) {
       console.error('加载模型失败:', error);
       toast.error('加载模型配置失败');
+      setSelectedModelName("加载失败");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 组件挂载时加载模型
+  // 组件挂载和selectedModel变化时加载模型
   useEffect(() => {
     loadModels();
   }, [selectedModel]); // 当selectedModel变化时重新加载
@@ -220,7 +220,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
         className="model-select-button"
         onClick={() => setIsModelDialogOpen(true)}
       >
-        <span>模型: {isLoading ? "加载中..." : selectedModelName}</span>
+        <span>模型: {isLoading ? "加载中..." : selectedModelName || "未选择"}</span>
       </Button>
 
       {/* 模型选择对话框 */}
@@ -249,9 +249,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
 
                 {/* API模型列表 */}
                 <TabsContent value="api" className="space-y-4">
-                  {isLoading ? (
-                    <div className="text-center py-4">加载中...</div>
-                  ) : apiModels.length === 0 ? (
+                  {apiModels.length === 0 ? (
                     <div className="text-center py-4">暂无API模型，请添加</div>
                   ) : (
                     <RadioGroup value={selectedModel} className="space-y-2">
@@ -305,9 +303,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
 
                 {/* 本地模型列表 */}
                 <TabsContent value="local" className="space-y-4">
-                  {isLoading ? (
-                    <div className="text-center py-4">加载中...</div>
-                  ) : localModels.length === 0 ? (
+                  {localModels.length === 0 ? (
                     <div className="text-center py-4">暂无本地模型，请添加</div>
                   ) : (
                     <RadioGroup value={selectedModel} className="space-y-2">

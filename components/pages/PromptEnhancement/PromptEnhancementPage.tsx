@@ -1,6 +1,10 @@
 "use client";
-
-import React, { useState, useRef, useEffect } from 'react';
+/**
+ * 提示词增强页面组件
+ * 该组件整合了聊天界面、模板管理、模型选择等功能
+ * 用于提供一个完整的AI对话和提示词管理体验
+ */
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import ChatWindow from './ChatInterface/ChatWindow';
 import MessageInput from './ChatInterface/MessageInput';
@@ -9,392 +13,104 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ChangeModel from "./ModelManagement/ChangeModel";
 import './styles/PromptEnhancement.css';
-// 导入数据库和服务类
-import db, { Message, ChatSession, Template } from './server/db';
-import MessageService from './server/messageService';
-import { Toaster, toast } from "sonner";
+import { Toaster } from "sonner";
+import db from './service/db';
+// 导入模型选择器组件
+import ChangeModel from "./ModelManagement/ChangeModel";
 
-/**
- * 提示词增强页面组件
- * 该组件整合了聊天界面、模板管理、模型选择等功能
- * 用于提供一个完整的AI对话和提示词管理体验
- */
+// 导入自定义钩子
+import {useMessages,useSessions,useTemplates,useApplicationInit,useInput} from './hooks/index';
+
 const PromptEnhancementPage: React.FC = () => {
-  // ===== 状态管理 =====
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [activeSessionId, setActiveSessionId] = useState<string | undefined>();
-  const [isAddTemplateDialogOpen, setIsAddTemplateDialogOpen] = useState<boolean>(false);
-  const [newTemplate, setNewTemplate] = useState<Template>({ id: '', name: '', content: '' });
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [inputHeight, setInputHeight] = useState<number>(56);
-  const [selectedModel, setSelectedModel] = useState<string>('gpt-4');
-  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  // ===== 状态和模型选择 =====
+  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [messages, setMessages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  // 添加选中模板状态
-  const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
-  const [customPrompt, setCustomPrompt] = useState<string>('');
-
-  /**
-   * 处理发送消息
-   * @param content 要发送的消息内容
-   */
-  const handleSendMessage = async (content: string): Promise<void> => {
-    // 设置生成状态
-    setIsGenerating(true);
-
-    // 检查是否需要创建新会话（对临时会话ID的情况）
-    let currentSessionId = activeSessionId;
-    if (!currentSessionId || currentSessionId.startsWith('temp_')) {
-      try {
-        // 使用用户首次输入的内容作为会话名称
-        const sessionTitle = content.length > 20
-          ? `${content.substring(0, 20)}...`
-          : content;
-        
-        currentSessionId = await MessageService.createNewSession(content, sessionTitle);
-        if (!currentSessionId) {
-          throw new Error('创建会话失败');
-        }
-        setActiveSessionId(currentSessionId);
-      } catch (error) {
-        console.error('创建会话失败:', error);
-        toast.error('创建新对话失败');
-        setIsGenerating(false);
-        return;
-      }
-    }
-
-    // 调用消息服务发送消息
-    MessageService.sendMessage(
-      content,
-      currentSessionId,
-      selectedModel,
-      {
-        // 当用户消息保存完成
-        onUserMessageSaved: (userMessage) => {
-          setMessages(prev => [...prev, userMessage]);
-        },
-        // 当AI回复内容更新（流式输出）
-        onAiMessageUpdate: (partialMessage) => {
-          setMessages(prev => {
-            // 检查是否已存在此ID的消息
-            const existingIndex = prev.findIndex(m => m.id === partialMessage.id);
-            
-            if (existingIndex >= 0) {
-              // 更新现有消息
-              const newMessages = [...prev];
-              newMessages[existingIndex] = {
-                ...newMessages[existingIndex],
-                content: partialMessage.content
-              };
-              return newMessages;
-            } else {
-              // 添加新消息
-              return [...prev, {
-                id: partialMessage.id || Date.now().toString(), // 确保ID不为undefined
-                sessionId: partialMessage.sessionId || currentSessionId || '',
-                role: 'assistant' as const,
-                content: partialMessage.content || '',
-                timestamp: new Date()
-              }];
-            }
-          });
-        },
-        // 当AI回复完成
-        onAiMessageComplete: () => {
-          setIsGenerating(false);
-        },
-        // 当会话更新
-        onSessionUpdated: () => {
-          loadSessions();
-        },
-        // 当发生错误
-        onError: (error) => {
-          console.error('消息服务错误:', error);
-          toast.error(error.message || '发送消息失败');
-          setIsGenerating(false);
-        }
-      },
-      // 只有当存在激活的模板ID时才传递自定义提示词
-      activeTemplateId ? customPrompt : undefined
-    ).catch(error => {
-      console.error('发送消息失败:', error);
-      toast.error('发送消息失败');
-      setIsGenerating(false);
-    });
-  };
-
-  /**
-   * 加载聊天会话列表
-   */
-  const loadSessions = async () => {
-    try {
-      const sessions = await MessageService.loadSessions();
-      setChatSessions(sessions);
-      return sessions;
-    } catch (error) {
-      console.error('加载会话失败:', error);
-      toast.error('加载会话列表失败');
-      return [];
-    }
-  };
-
-  /**
-   * 加载会话消息
-   * @param sessionId 会话ID
-   */
-  const loadSessionMessages = async (sessionId: string) => {
-    try {
-      const messages = await MessageService.loadSessionMessages(sessionId);
-      setMessages(messages);
-    } catch (error) {
-      console.error('加载消息失败:', error);
-      toast.error('加载消息失败');
-    }
-  };
-
-  /**
-   * 创建新会话
-   * @param title 会话标题，可选
-   * @param firstMessage 首条消息内容，可选
-   */
-  const createNewSession = async (title?: string, firstMessage?: string): Promise<string | undefined> => {
-    try {
-      // 创建临时会话ID，不立即保存到数据库
-      // 只有当用户发送第一条消息时才真正创建会话
-      const tempSessionId = `temp_${Date.now().toString()}`;
-      setActiveSessionId(tempSessionId);
-      setMessages([]);
-      return tempSessionId;
-    } catch (error) {
-      console.error('创建会话失败:', error);
-      toast.error('创建新对话失败');
-      return undefined;
-    }
-  };
-
-  /**
-   * 停止生成回复
-   */
-  const handleStopGeneration = (): void => {
-    if (!activeSessionId) return;
-    
-    // 取消当前会话的生成
-    MessageService.cancelGeneration(activeSessionId);
-    
-    setIsGenerating(false);
-    toast.info('已停止生成回复');
-  };
-
-  /**
-   * 处理添加模板
-   */
-  const handleAddTemplate = (): void => {
-    setIsAddTemplateDialogOpen(true);
-  };
-
-  /**
-   * 保存新模板
-   */
-  const handleSaveTemplate = async (): Promise<void> => {
-    try {
-      // 生成ID
-      const templateToSave: Template = {
-        ...newTemplate,
-        id: newTemplate.id || Date.now().toString()
-      };
-      
-      // 保存模板到数据库
-      await db.saveTemplate(templateToSave);
-      
-      // 重新加载模板列表
-      loadTemplates();
-      
-      // 关闭对话框并重置状态
-      setIsAddTemplateDialogOpen(false);
-      setNewTemplate({ id: '', name: '', content: '' });
-      
-      toast.success('模板保存成功');
-    } catch (error) {
-      console.error('保存模板失败:', error);
-      toast.error('保存模板失败');
-    }
-  };
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   
-  /**
-   * 处理使用模板
-   * @param template 要使用的模板
-   */
-  const handleUseTemplate = (template: Template): void => {
-    // 如果当前模板已经被选中，就取消选中并重置自定义提示词
-    if (activeTemplateId === template.id) {
-      setActiveTemplateId(null);
-      setCustomPrompt('');
-      toast.info(`已取消模板: ${template.name}`);
-    } else {
-      // 选中新模板，设置自定义提示词
-      setActiveTemplateId(template.id);
-      setCustomPrompt(template.content);
-      toast.success(`已应用模板: ${template.name}`);
-    }
-  };
-  
-  /**
-   * 加载模板列表
-   */
-  const loadTemplates = async (): Promise<void> => {
-    try {
-      const loadedTemplates = await db.getAllTemplates();
-      setTemplates(loadedTemplates);
-    } catch (error) {
-      console.error('加载模板失败:', error);
-      toast.error('加载模板失败');
-    }
-  };
-
-  /**
-   * 开始新的对话
-   */
-  const handleNewChat = async (): Promise<void> => {
-    // 如果正在生成，先取消当前的生成
-    if (isGenerating && activeSessionId) {
-      MessageService.cancelGeneration(activeSessionId);
-      setIsGenerating(false);
-    }
-    
-    // 创建新的临时会话
-    try {
-      const tempSessionId = `temp_${Date.now().toString()}`;
-      setActiveSessionId(tempSessionId);
-      setMessages([]);
-      
-      // 重置模板相关状态
-      setActiveTemplateId(null);
-      setCustomPrompt('');
-      
-      toast.info('请输入内容以开始新对话');
-    } catch (error) {
-      console.error('创建新对话失败:', error);
-      toast.error('创建新对话失败');
-    }
-  };
-
-  /**
-   * 处理输入框大小调整
-   * @param height 新的高度值
-   */
-  const handleInputResize = (height: number): void => {
-    setInputHeight(height);
-  };
-
-  /**
-   * 处理会话选择
-   * @param sessionId 会话ID
-   */
-  const handleSelectSession = async (sessionId: string): Promise<void> => {
-    // 如果正在生成，先取消当前的生成
-    if (isGenerating && activeSessionId) {
-      MessageService.cancelGeneration(activeSessionId);
-      setIsGenerating(false);
-    }
-    
-    // 设置新的活动会话ID
-    setActiveSessionId(sessionId);
-    
-    // 重置模板状态
-    setActiveTemplateId(null);
-    setCustomPrompt('');
-  };
-
-  // 组件初始化时确保数据库已初始化和加载会话数据
-  useEffect(() => {
-    const initApplication = async () => {
-      setIsLoading(true);
-      try {
-        // 确保数据库初始化
-        await db.initDefaultModels();
-        
-        // 加载API模型列表
-        const apiModels = await db.getAllModels('api');
-        if (apiModels.length > 0) {
-          // 使用第一个API模型作为默认
-          setSelectedModel(apiModels[0].id);
-        } else {
-          // 尝试加载本地模型
-          const localModels = await db.getAllModels('local');
-          if (localModels.length > 0) {
-            setSelectedModel(localModels[0].id);
-          }
-        }
-        
-        // 加载会话列表
-        const sessions = await loadSessions();
-        
-        // 加载模板列表
-        await loadTemplates();
-        
-        // 如果有会话，加载最近的一个会话
-        if (sessions.length > 0) {
-          // 按时间戳排序，获取最新的会话
-          const sortedSessions = [...sessions].sort(
-            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-          );
-          
-          const latestSessionId = sortedSessions[0].id;
-          setActiveSessionId(latestSessionId);
-          await loadSessionMessages(latestSessionId);
-        } else {
-          // 如果没有会话，创建一个新会话
-          const newSessionId = await createNewSession("新对话");
-          if (newSessionId) {
-            setActiveSessionId(newSessionId);
-            setMessages([]);
-          }
-        }
-      } catch (error) {
-        console.error('应用初始化失败:', error);
-        toast.error('初始化应用失败，请刷新页面重试');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    initApplication();
+  // 创建模型选择的处理函数，保存最后使用的模型ID
+  const handleModelChange = useCallback((modelId: string) => {
+    setSelectedModel(modelId);
+    // 保存最后使用的模型ID到数据库
+    db.saveLastUsedModelId(modelId)
+      .then(() => {
+        console.log(`已保存最后使用的模型ID: ${modelId}`);
+      })
+      .catch(error => {
+        console.error('保存模型ID失败:', error);
+      });
   }, []);
   
+  // 使用自定义钩子
+  const templates = useTemplates();
+  
+  const sessions = useSessions(
+    setMessages,
+    isGenerating,
+    setIsGenerating,
+    templates.setActiveTemplateId,
+    templates.setCustomPrompt
+  );
+  
+  const messagesHook = useMessages(
+    sessions.activeSessionId,
+    sessions.setActiveSessionId,
+    selectedModel,
+    sessions.loadSessions,
+    templates.activeTemplateId,
+    templates.customPrompt
+  );
+  
+  const input = useInput();
+  
+  const appInit = useApplicationInit(
+    sessions.loadSessions,
+    templates.loadTemplates,
+    sessions.createNewSession,
+    sessions.setActiveSessionId,
+    messagesHook.loadSessionMessages,
+    messagesHook.setMessages,
+    setSelectedModel
+  );
+
+  // 使用钩子返回的状态更新组件状态
+  useEffect(() => {
+    setMessages(messagesHook.messages);
+    setIsLoading(appInit.isLoading);
+    setIsGenerating(messagesHook.isGenerating);
+  }, [messagesHook.messages, appInit.isLoading, messagesHook.isGenerating]);
+
   // 当选择会话时加载消息
   useEffect(() => {
-    if (activeSessionId) {
-      loadSessionMessages(activeSessionId);
+    if (sessions.activeSessionId) {
+      messagesHook.loadSessionMessages(sessions.activeSessionId);
     }
-  }, [activeSessionId]);
+  }, [sessions.activeSessionId]);
 
   return (
     <div className="prompt-enhancement-container">
       <Toaster position="top-center" />
       <div className="main-content">
+        {/* 添加模型选择器到页面右上角 */}
+
+        
         <Card className="chat-card">
           <CardContent className="chat-card-content">
+            <ChangeModel 
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+            />
             <div className="chat-window-container">
-              {isLoading ? (
-                <div className="loading-indicator">加载中...</div>
-              ) : (
+              {(
                 <ChatWindow 
-                  messages={messages}
-                  isTyping={isGenerating}
-                  sessions={chatSessions}
-                  onSelectSession={handleSelectSession}
-                  activeSessionId={activeSessionId}
-                  onNewChat={handleNewChat}
+                  messages={messagesHook.messages}
+                  isTyping={messagesHook.isGenerating}
+                  sessions={sessions.chatSessions}
+                  onSelectSession={sessions.handleSelectSession}
+                  activeSessionId={sessions.activeSessionId}
+                  onNewChat={sessions.handleNewChat}
                   className="chat-window"
-                  selectedModel={selectedModel}
-                  setSelectedModel={setSelectedModel}
                 />
               )}
             </div>
@@ -402,20 +118,20 @@ const PromptEnhancementPage: React.FC = () => {
             <div className="input-container">
               <Card>
                 <MessageInput
-                  onSend={handleSendMessage}
-                  onStop={handleStopGeneration}
-                  isGenerating={isGenerating}
-                  onResize={handleInputResize}
+                  onSend={messagesHook.handleSendMessage}
+                  onStop={messagesHook.handleStopGeneration}
+                  isGenerating={messagesHook.isGenerating}
+                  onResize={input.handleInputResize}
                 />
               </Card>
             </div>
 
             <div className="template-bar-container">
               <TemplateBar 
-                onAddTemplate={handleAddTemplate} 
-                templates={templates}
-                onUseTemplate={handleUseTemplate}
-                activeTemplateId={activeTemplateId}
+                onAddTemplate={templates.handleAddTemplate} 
+                templates={templates.templates}
+                onUseTemplate={templates.handleUseTemplate}
+                activeTemplateId={templates.activeTemplateId}
               />
             </div>
           </CardContent>
@@ -423,7 +139,7 @@ const PromptEnhancementPage: React.FC = () => {
       </div>
       
       {/* 添加模板对话框 */}
-      <Dialog open={isAddTemplateDialogOpen} onOpenChange={setIsAddTemplateDialogOpen}>
+      <Dialog open={templates.isAddTemplateDialogOpen} onOpenChange={templates.setIsAddTemplateDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>添加提示词模板</DialogTitle>
@@ -435,8 +151,8 @@ const PromptEnhancementPage: React.FC = () => {
               </label>
               <Input
                 id="name"
-                value={newTemplate.name}
-                onChange={(e) => setNewTemplate({...newTemplate, name: e.target.value})}
+                value={templates.newTemplate.name}
+                onChange={(e) => templates.setNewTemplate({...templates.newTemplate, name: e.target.value})}
                 className="col-span-3"
               />
             </div>
@@ -446,18 +162,18 @@ const PromptEnhancementPage: React.FC = () => {
               </label>
               <Textarea
                 id="content"
-                value={newTemplate.content}
-                onChange={(e) => setNewTemplate({...newTemplate, content: e.target.value})}
+                value={templates.newTemplate.content}
+                onChange={(e) => templates.setNewTemplate({...templates.newTemplate, content: e.target.value})}
                 className="col-span-3"
                 rows={5}
               />
             </div>
           </div>
           <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsAddTemplateDialogOpen(false)}>
+            <Button variant="outline" onClick={() => templates.setIsAddTemplateDialogOpen(false)}>
               取消
             </Button>
-            <Button type="submit" onClick={handleSaveTemplate}>
+            <Button type="submit" onClick={templates.handleSaveTemplate}>
               保存
             </Button>
           </div>

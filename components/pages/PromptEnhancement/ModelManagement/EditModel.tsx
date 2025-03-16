@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // 导入类型
-import { Model } from "../server/db";
+import { Model } from "../service/db";
 
 // 导入样式
 import "../styles/ModelManagement.css";

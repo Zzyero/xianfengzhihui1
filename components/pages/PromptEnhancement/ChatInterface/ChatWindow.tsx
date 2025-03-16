@@ -10,15 +10,11 @@ import { History, Search, MessageSquare, PlusCircle, Trash, Edit, Star, Save } f
 import { Input } from "@/components/ui/input";
 import '../styles/ChatInterface.css';
 // 导入数据库工具类和类型定义
-import db, { Message, ChatSession } from '../server/db';
+import db, { Message, ChatSession } from '../service/db';
 import { Toaster, toast } from "sonner";
 // 导入消息显示组件
 import MessageDisplay from './MessageDisplay';
-// 导入模型选择组件
-import ChangeModel from '../ModelManagement/ChangeModel';
 
-// 从db.ts导入的类型
-// import type { Message, ChatSession } from '../server/db';
 
 interface ChatWindowProps {
   messages: Message[];
@@ -28,8 +24,6 @@ interface ChatWindowProps {
   onSelectSession: (id: string) => void;
   activeSessionId?: string;
   onNewChat: () => void;
-  selectedModel: string;
-  setSelectedModel: (modelId: string) => void;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -39,9 +33,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   sessions,
   onSelectSession,
   activeSessionId,
-  onNewChat,
-  selectedModel,
-  setSelectedModel
+  onNewChat
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isPinned, setIsPinned] = useState<boolean>(false);
@@ -213,17 +205,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       toast.error('更新会话星标失败');
     }
   };
-// 添加模型选择组件
+
   return (
     <div className="chat-window">
       <Toaster position="top-center" />
       <div className="chat-controls">
-        <div className="model-controls">
-          <ChangeModel 
-            selectedModel={selectedModel}
-            setSelectedModel={setSelectedModel}
-          />
-        </div>
         <div className="history-controls">
           <Button
             variant="ghost"

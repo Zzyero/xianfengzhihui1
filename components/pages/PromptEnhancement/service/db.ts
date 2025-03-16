@@ -6,7 +6,7 @@
 
 // 数据库名称和版本
 const DB_NAME = 'promptEnhancementDB';
-const DB_VERSION = 3; // 增加版本号以支持输入历史记录存储
+const DB_VERSION = 4; // 增加版本号以支持应用设置存储
 
 // 对象仓库名称
 const STORES = {
@@ -14,7 +14,8 @@ const STORES = {
   SESSIONS: 'sessions',     // 聊天会话
   TEMPLATES: 'templates',   // 提示词模板
   MODELS: 'models',         // 模型配置
-  INPUT_HISTORY: 'inputHistory' // 输入历史记录
+  INPUT_HISTORY: 'inputHistory', // 输入历史记录
+  SETTINGS: 'settings'      // 应用设置
 };
 
 // 接口定义
@@ -60,6 +61,14 @@ export interface InputHistory {
   id: string;               // 唯一ID
   content: string[];        // 历史记录内容
   timestamp: Date;          // 最后更新时间
+}
+
+// 应用设置接口
+export interface AppSettings {
+  id: string;               // 设置ID
+  lastUsedModelId?: string; // 最后使用的模型ID
+  timestamp: Date;          // 最后更新时间
+  [key: string]: any;       // 其他设置项
 }
 
 /**
@@ -108,6 +117,11 @@ const initDB = (): Promise<IDBDatabase> => {
       // 创建输入历史记录对象仓库
       if (!db.objectStoreNames.contains(STORES.INPUT_HISTORY)) {
         db.createObjectStore(STORES.INPUT_HISTORY, { keyPath: 'id' });
+      }
+      
+      // 创建应用设置对象仓库
+      if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
+        db.createObjectStore(STORES.SETTINGS, { keyPath: 'id' });
       }
     };
     
@@ -522,6 +536,56 @@ const db = {
   },
   
   /**
+   * 保存最后使用的模型ID
+   * @param modelId 模型ID
+   */
+  saveLastUsedModelId: (modelId: string): Promise<IDBValidKey> => {
+    return new Promise((resolve, reject) => {
+      // 首先尝试获取现有设置
+      runTransaction<AppSettings | undefined>(
+        STORES.SETTINGS,
+        'readonly',
+        (store) => store.get('app-settings')
+      )
+        .then((settings) => {
+          // 合并设置或创建新设置
+          const updatedSettings: AppSettings = {
+            ...(settings || { id: 'app-settings' }),
+            lastUsedModelId: modelId,
+            timestamp: new Date()
+          };
+          
+          // 保存更新后的设置
+          return runTransaction<IDBValidKey>(
+            STORES.SETTINGS,
+            'readwrite',
+            (store) => store.put(updatedSettings)
+          );
+        })
+        .then(resolve)
+        .catch(reject);
+    });
+  },
+  
+  /**
+   * 获取最后使用的模型ID
+   * @returns 最后使用的模型ID，如果不存在则返回undefined
+   */
+  getLastUsedModelId: (): Promise<string | undefined> => {
+    return new Promise((resolve, reject) => {
+      runTransaction<AppSettings | undefined>(
+        STORES.SETTINGS,
+        'readonly',
+        (store) => store.get('app-settings')
+      )
+        .then((settings) => {
+          resolve(settings?.lastUsedModelId);
+        })
+        .catch(reject);
+    });
+  },
+
+  /**
    * 初始化默认模型（如果数据库中没有模型）
    */
   initDefaultModels: (): Promise<void> => {
@@ -574,6 +638,10 @@ const db = {
             const savePromises = defaultModels.map(model => db.saveModel(model));
             
             Promise.all(savePromises)
+              .then(() => {
+                // 设置默认模型为gpt-4
+                return db.saveLastUsedModelId('gpt-4');
+              })
               .then(() => resolve())
               .catch(reject);
           } else {

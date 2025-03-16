@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
-import { Message } from '../server/db';
+import { Message } from '../service/db';
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import '../styles/MessageDisplay.css';
