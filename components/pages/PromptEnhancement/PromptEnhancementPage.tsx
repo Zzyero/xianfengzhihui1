@@ -18,7 +18,9 @@ import { Toaster } from "sonner";
 import db from './service/db';
 // 导入模型选择器组件
 import ChangeModel from "./ModelManagement/ChangeModel";
-
+// 在 PromptEnhancementPage.tsx 中添加导入导出组件
+// 在 import 部分添加
+import ExportData from './Data/DataTransfer';
 // 导入自定义钩子
 import {useMessages,useSessions,useTemplates,useApplicationInit,useInput} from './hooks/index';
 
@@ -97,10 +99,13 @@ const PromptEnhancementPage: React.FC = () => {
         
         <Card className="chat-card">
           <CardContent className="chat-card-content">
-            <ChangeModel 
-            selectedModel={selectedModel}
-            setSelectedModel={setSelectedModel}
-            />
+            <div className="flex items-center justify-end gap-2">
+              <ExportData />
+              <ChangeModel 
+                selectedModel={selectedModel}
+                setSelectedModel={setSelectedModel}
+              />
+            </div>
             <div className="chat-window-container">
               {(
                 <ChatWindow 
@@ -114,7 +119,7 @@ const PromptEnhancementPage: React.FC = () => {
                 />
               )}
             </div>
-
+              
             <div className="input-container">
               <Card>
                 <MessageInput

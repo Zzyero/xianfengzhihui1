@@ -54,10 +54,9 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       // 加载本地模型
       const localModelsData = await db.getAllModels('local');
       setLocalModels(localModelsData);
-
       // 获取所有模型列表
       const allModels = [...apiModelsData, ...localModelsData];
-      
+
       // 查找当前选中模型并更新名称
       if (selectedModel) {
         // 根据模型ID查找对应的模型对象
@@ -104,7 +103,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
     if (model) {
       setSelectedModelName(model.name);
     }
-    
+    db.saveLastUsedModelId(modelId);
     setIsModelDialogOpen(false);
   };
 

@@ -44,7 +44,6 @@ export interface Template {
   timestamp?: Date;         // 创建/更新时间
 }
 
-// 模型接口定义
 export interface Model {
   id: string;               // 模型ID
   name: string;             // 模型名称
@@ -56,14 +55,12 @@ export interface Model {
   timestamp: Date;          // 创建/更新时间
 }
 
-// 输入历史记录接口
 export interface InputHistory {
   id: string;               // 唯一ID
   content: string[];        // 历史记录内容
   timestamp: Date;          // 最后更新时间
 }
 
-// 应用设置接口
 export interface AppSettings {
   id: string;               // 设置ID
   lastUsedModelId?: string; // 最后使用的模型ID
@@ -72,94 +69,79 @@ export interface AppSettings {
 }
 
 /**
- * 数据库初始化
- * 创建数据库连接并设置对象仓库
+ * 获取数据库连接
+ * @returns Promise<IDBDatabase>
  */
-const initDB = (): Promise<IDBDatabase> => {
+const getDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     
-    // 数据库升级事件（首次创建或版本更新时触发）
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
       
-      // 如果对象仓库不存在，则创建
-      if (!db.objectStoreNames.contains(STORES.MESSAGES)) {
-        // 创建消息对象仓库，使用id作为键路径
-        const messageStore = db.createObjectStore(STORES.MESSAGES, { keyPath: 'id' });
-        // 创建索引，便于按会话ID和时间戳检索
-        messageStore.createIndex('sessionId', 'sessionId', { unique: false });
-        messageStore.createIndex('timestamp', 'timestamp', { unique: false });
-      }
+      // 创建所需的存储对象
+      const createStoreIfNotExists = (storeName: string, keyPath: string, indexes?: {name: string, keyPath: string, unique: boolean}[]) => {
+        if (!db.objectStoreNames.contains(storeName)) {
+          const store = db.createObjectStore(storeName, { keyPath });
+          if (indexes) {
+            indexes.forEach(index => {
+              store.createIndex(index.name, index.keyPath, { unique: index.unique });
+            });
+          }
+        }
+      };
       
-      if (!db.objectStoreNames.contains(STORES.SESSIONS)) {
-        // 创建会话对象仓库
-        const sessionStore = db.createObjectStore(STORES.SESSIONS, { keyPath: 'id' });
-        // 创建时间戳索引，便于排序
-        sessionStore.createIndex('timestamp', 'timestamp', { unique: false });
-      }
+      // 创建各个存储对象
+      createStoreIfNotExists(STORES.MESSAGES, 'id', [
+        { name: 'sessionId', keyPath: 'sessionId', unique: false },
+        { name: 'timestamp', keyPath: 'timestamp', unique: false }
+      ]);
       
-      if (!db.objectStoreNames.contains(STORES.TEMPLATES)) {
-        // 创建模板对象仓库
-        const templateStore = db.createObjectStore(STORES.TEMPLATES, { keyPath: 'id' });
-        // 创建索引，便于按名称搜索
-        templateStore.createIndex('name', 'name', { unique: false });
-      }
+      createStoreIfNotExists(STORES.SESSIONS, 'id', [
+        { name: 'timestamp', keyPath: 'timestamp', unique: false }
+      ]);
       
-      // 创建模型配置对象仓库
-      if (!db.objectStoreNames.contains(STORES.MODELS)) {
-        const modelStore = db.createObjectStore(STORES.MODELS, { keyPath: 'id' });
-        // 创建索引
-        modelStore.createIndex('name', 'name', { unique: false });
-        modelStore.createIndex('type', 'type', { unique: false });
-      }
+      createStoreIfNotExists(STORES.TEMPLATES, 'id', [
+        { name: 'name', keyPath: 'name', unique: false }
+      ]);
       
-      // 创建输入历史记录对象仓库
-      if (!db.objectStoreNames.contains(STORES.INPUT_HISTORY)) {
-        db.createObjectStore(STORES.INPUT_HISTORY, { keyPath: 'id' });
-      }
+      createStoreIfNotExists(STORES.MODELS, 'id', [
+        { name: 'name', keyPath: 'name', unique: false },
+        { name: 'type', keyPath: 'type', unique: false }
+      ]);
       
-      // 创建应用设置对象仓库
-      if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
-        db.createObjectStore(STORES.SETTINGS, { keyPath: 'id' });
-      }
+      createStoreIfNotExists(STORES.INPUT_HISTORY, 'id', []);
+      createStoreIfNotExists(STORES.SETTINGS, 'id', []);
     };
     
-    request.onsuccess = (event) => {
-      resolve((event.target as IDBOpenDBRequest).result);
-    };
-    
-    request.onerror = (event) => {
-      console.error('数据库连接失败:', (event.target as IDBOpenDBRequest).error);
-      reject((event.target as IDBOpenDBRequest).error);
-    };
+    request.onsuccess = (event) => resolve((event.target as IDBOpenDBRequest).result);
+    request.onerror = (event) => reject((event.target as IDBOpenDBRequest).error);
   });
 };
 
 /**
- * 执行数据库事务
- * @param storeName 对象仓库名称
- * @param mode 事务模式（readonly/readwrite）
- * @param callback 事务回调函数
+ * 执行数据库操作的通用方法
+ * @param storeName 存储对象名称
+ * @param mode 操作模式（只读/读写）
+ * @param operation 操作函数
+ * @returns Promise<T>
  */
-const runTransaction = <T>(
-  storeName: string,
+const executeOperation = async <T>(
+  storeName: string, 
   mode: IDBTransactionMode,
-  callback: (store: IDBObjectStore) => IDBRequest<T>
+  operation: (store: IDBObjectStore) => Promise<T> | T
 ): Promise<T> => {
-  return new Promise((resolve, reject) => {
-    initDB().then(db => {
-      const transaction = db.transaction(storeName, mode);
-      const store = transaction.objectStore(storeName);
-      const request = callback(store);
-      
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-      
-      // 事务完成后关闭数据库连接
-      transaction.oncomplete = () => db.close();
-    }).catch(reject);
-  });
+  const db = await getDB();
+  const transaction = db.transaction(storeName, mode);
+  const store = transaction.objectStore(storeName);
+  
+  try {
+    const result = await operation(store);
+    return result;
+  } finally {
+    transaction.oncomplete = () => db.close();
+    transaction.onerror = () => db.close();
+  }
 };
 
 // 数据库工具类
@@ -168,28 +150,27 @@ const db = {
    * 添加消息
    * @param message 消息对象
    */
-  addMessage: (message: Message): Promise<IDBValidKey> => {
-    return runTransaction<IDBValidKey>(
-      STORES.MESSAGES,
-      'readwrite',
-      (store) => store.add(message)
-    );
+  addMessage: async (message: Message): Promise<IDBValidKey> => {
+    return executeOperation<IDBValidKey>(STORES.MESSAGES, 'readwrite', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.add(message);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    });
   },
   
   /**
    * 获取会话的所有消息
    * @param sessionId 会话ID
    */
-  getMessagesBySession: (sessionId: string): Promise<Message[]> => {
-    return new Promise((resolve, reject) => {
-      initDB().then(db => {
-        const transaction = db.transaction(STORES.MESSAGES, 'readonly');
-        const store = transaction.objectStore(STORES.MESSAGES);
+  getMessagesBySession: async (sessionId: string): Promise<Message[]> => {
+    return executeOperation<Message[]>(STORES.MESSAGES, 'readonly', store => {
+      return new Promise((resolve, reject) => {
         const index = store.index('sessionId');
         const request = index.getAll(sessionId);
         
         request.onsuccess = () => {
-          // 按时间戳排序
           const messages = request.result.sort((a, b) => 
             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
           );
@@ -197,9 +178,7 @@ const db = {
         };
         
         request.onerror = () => reject(request.error);
-        
-        transaction.oncomplete = () => db.close();
-      }).catch(reject);
+      });
     });
   },
   
@@ -207,46 +186,39 @@ const db = {
    * 添加或更新会话
    * @param session 会话对象
    */
-  saveSession: (session: ChatSession): Promise<IDBValidKey> => {
-    return runTransaction<IDBValidKey>(
-      STORES.SESSIONS,
-      'readwrite',
-      (store) => store.put(session)
-    );
+  saveSession: async (session: ChatSession): Promise<IDBValidKey> => {
+    return executeOperation<IDBValidKey>(STORES.SESSIONS, 'readwrite', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.put(session);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    });
   },
   
   /**
    * 获取所有会话
    */
-  getAllSessions: (): Promise<ChatSession[]> => {
-    return new Promise((resolve, reject) => {
-      initDB().then(db => {
-        const transaction = db.transaction(STORES.SESSIONS, 'readonly');
-        const store = transaction.objectStore(STORES.SESSIONS);
+  getAllSessions: async (): Promise<ChatSession[]> => {
+    return executeOperation<ChatSession[]>(STORES.SESSIONS, 'readonly', store => {
+      return new Promise((resolve, reject) => {
         const request = store.getAll();
         
         request.onsuccess = () => {
-          // 首先按照starred和order排序，然后按时间戳降序排序
           const sessions = request.result.sort((a, b) => {
-            // 优先显示标星会话
             if ((a.starred && b.starred) || (!a.starred && !b.starred)) {
-              // 如果都是标星或都不是标星，则按order排序
               if (typeof a.order === 'number' && typeof b.order === 'number') {
                 return a.order - b.order;
               }
-              // 然后按时间戳
               return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
             }
-            // 标星会话优先
             return a.starred ? -1 : 1;
           });
           resolve(sessions);
         };
         
         request.onerror = () => reject(request.error);
-        
-        transaction.oncomplete = () => db.close();
-      }).catch(reject);
+      });
     });
   },
   
@@ -254,64 +226,51 @@ const db = {
    * 获取单个会话
    * @param sessionId 会话ID
    */
-  getSession: (sessionId: string): Promise<ChatSession | undefined> => {
-    return runTransaction<ChatSession | undefined>(
-      STORES.SESSIONS,
-      'readonly',
-      (store) => store.get(sessionId)
-    );
+  getSession: async (sessionId: string): Promise<ChatSession | undefined> => {
+    return executeOperation<ChatSession | undefined>(STORES.SESSIONS, 'readonly', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.get(sessionId);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    });
   },
   
   /**
    * 删除会话及其所有消息
    * @param sessionId 会话ID
    */
-  deleteSession: (sessionId: string): Promise<void> => {
+  deleteSession: async (sessionId: string): Promise<void> => {
+    const db = await getDB();
+    const tx = db.transaction([STORES.SESSIONS, STORES.MESSAGES], 'readwrite');
+    
     return new Promise((resolve, reject) => {
-      initDB().then(async (db) => {
-        try {
-          // 使用一个事务处理整个删除过程，确保原子性
-          const tx = db.transaction([STORES.SESSIONS, STORES.MESSAGES], 'readwrite');
-          const sessionStore = tx.objectStore(STORES.SESSIONS);
-          const messagesStore = tx.objectStore(STORES.MESSAGES);
-          const index = messagesStore.index('sessionId');
-          
-          // 删除会话
-          const deleteSessionRequest = sessionStore.delete(sessionId);
-          
-          // 获取所有相关消息的键
-          const getKeysRequest = index.getAllKeys(sessionId);
-          
-          getKeysRequest.onsuccess = () => {
-            const keys = getKeysRequest.result;
-            console.log(`删除会话 ${sessionId} 的 ${keys.length} 条消息`);
-            
-            // 删除所有相关消息
-            keys.forEach(key => {
-              messagesStore.delete(key);
-            });
-          };
-          
-          // 处理事务完成
-          tx.oncomplete = () => {
-            console.log(`会话 ${sessionId} 及其消息已被删除`);
-            db.close();
-            resolve();
-          };
-          
-          // 处理事务错误
-          tx.onerror = () => {
-            console.error(`删除会话 ${sessionId} 失败:`, tx.error);
-            reject(tx.error);
-          };
-        } catch (error) {
-          console.error('删除会话时发生错误:', error);
-          reject(error);
-        }
-      }).catch(error => {
-        console.error('初始化数据库失败:', error);
+      try {
+        const sessionStore = tx.objectStore(STORES.SESSIONS);
+        const messagesStore = tx.objectStore(STORES.MESSAGES);
+        const index = messagesStore.index('sessionId');
+        
+        sessionStore.delete(sessionId);
+        
+        const getKeysRequest = index.getAllKeys(sessionId);
+        getKeysRequest.onsuccess = () => {
+          const keys = getKeysRequest.result;
+          keys.forEach(key => messagesStore.delete(key));
+        };
+        
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      } catch (error) {
+        db.close();
         reject(error);
-      });
+      }
     });
   },
   
@@ -319,47 +278,45 @@ const db = {
    * 保存模板
    * @param template 模板对象
    */
-  saveTemplate: (template: Template): Promise<IDBValidKey> => {
-    // 确保模板有时间戳
+  saveTemplate: async (template: Template): Promise<IDBValidKey> => {
     const templateWithTimestamp = {
       ...template,
       timestamp: template.timestamp || new Date()
     };
     
-    return runTransaction<IDBValidKey>(
-      STORES.TEMPLATES,
-      'readwrite',
-      (store) => store.put(templateWithTimestamp)
-    );
+    return executeOperation<IDBValidKey>(STORES.TEMPLATES, 'readwrite', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.put(templateWithTimestamp);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    });
   },
   
   /**
    * 获取所有模板
    */
-  getAllTemplates: (): Promise<Template[]> => {
-    return runTransaction<Template[]>(
-      STORES.TEMPLATES,
-      'readonly',
-      (store) => store.getAll()
-    );
+  getAllTemplates: async (): Promise<Template[]> => {
+    return executeOperation<Template[]>(STORES.TEMPLATES, 'readonly', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    });
   },
   
   /**
    * 删除模板
    * @param templateId 模板ID
    */
-  deleteTemplate: (templateId: string): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {
-      initDB().then(db => {
-        const transaction = db.transaction(STORES.TEMPLATES, 'readwrite');
-        const store = transaction.objectStore(STORES.TEMPLATES);
+  deleteTemplate: async (templateId: string): Promise<void> => {
+    return executeOperation<void>(STORES.TEMPLATES, 'readwrite', store => {
+      return new Promise((resolve, reject) => {
         const request = store.delete(templateId);
-        
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
-        
-        transaction.oncomplete = () => db.close();
-      }).catch(reject);
+      });
     });
   },
   
@@ -367,12 +324,9 @@ const db = {
    * 删除多个模板
    * @param templateIds 模板ID数组
    */
-  deleteTemplates: (templateIds: string[]): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      initDB().then(db => {
-        const transaction = db.transaction(STORES.TEMPLATES, 'readwrite');
-        const store = transaction.objectStore(STORES.TEMPLATES);
-        
+  deleteTemplates: async (templateIds: string[]): Promise<void> => {
+    return executeOperation<void>(STORES.TEMPLATES, 'readwrite', store => {
+      return new Promise((resolve, reject) => {
         let completed = 0;
         let hasError = false;
         
@@ -393,14 +347,7 @@ const db = {
             }
           };
         });
-        
-        transaction.oncomplete = () => {
-          db.close();
-          if (!hasError) {
-            resolve();
-          }
-        };
-      }).catch(reject);
+      });
     });
   },
   
@@ -408,84 +355,66 @@ const db = {
    * 搜索会话
    * @param query 搜索关键词
    */
-  searchSessions: (query: string): Promise<ChatSession[]> => {
-    return new Promise((resolve, reject) => {
-      db.getAllSessions()
-        .then(sessions => {
-          if (!query.trim()) {
-            resolve(sessions);
-            return;
-          }
-          
-          const lowerQuery = query.toLowerCase();
-          const filtered = sessions.filter(session => 
-            session.title.toLowerCase().includes(lowerQuery) || 
-            session.lastMessage.toLowerCase().includes(lowerQuery)
-          );
-          
-          resolve(filtered);
-        })
-        .catch(reject);
-    });
+  searchSessions: async (query: string): Promise<ChatSession[]> => {
+    const sessions = await db.getAllSessions();
+    
+    if (!query.trim()) {
+      return sessions;
+    }
+    
+    const lowerQuery = query.toLowerCase();
+    return sessions.filter(session => 
+      session.title.toLowerCase().includes(lowerQuery) || 
+      session.lastMessage.toLowerCase().includes(lowerQuery)
+    );
   },
   
   /**
    * 搜索模板
    * @param query 搜索关键词
    */
-  searchTemplates: (query: string): Promise<Template[]> => {
-    return new Promise((resolve, reject) => {
-      db.getAllTemplates()
-        .then(templates => {
-          if (!query.trim()) {
-            resolve(templates);
-            return;
-          }
-          
-          const lowerQuery = query.toLowerCase();
-          const filtered = templates.filter(template => 
-            template.name.toLowerCase().includes(lowerQuery) || 
-            template.content.toLowerCase().includes(lowerQuery)
-          );
-          
-          resolve(filtered);
-        })
-        .catch(reject);
-    });
+  searchTemplates: async (query: string): Promise<Template[]> => {
+    const templates = await db.getAllTemplates();
+    
+    if (!query.trim()) {
+      return templates;
+    }
+    
+    const lowerQuery = query.toLowerCase();
+    return templates.filter(template => 
+      template.name.toLowerCase().includes(lowerQuery) || 
+      template.content.toLowerCase().includes(lowerQuery)
+    );
   },
 
   /**
    * 保存模型配置
    * @param model 模型对象
    */
-  saveModel: (model: Model): Promise<IDBValidKey> => {
-    // 确保模型有时间戳
+  saveModel: async (model: Model): Promise<IDBValidKey> => {
     const modelWithTimestamp = {
       ...model,
       timestamp: model.timestamp || new Date()
     };
     
-    // 保存模型
-    return runTransaction<IDBValidKey>(
-      STORES.MODELS,
-      'readwrite',
-      (store) => store.put(modelWithTimestamp)
-    );
+    return executeOperation<IDBValidKey>(STORES.MODELS, 'readwrite', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.put(modelWithTimestamp);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    });
   },
   
   /**
    * 获取所有模型
    * @param type 可选，模型类型筛选
    */
-  getAllModels: (type?: 'api' | 'local'): Promise<Model[]> => {
-    return new Promise((resolve, reject) => {
-      initDB().then(db => {
-        const transaction = db.transaction(STORES.MODELS, 'readonly');
-        const store = transaction.objectStore(STORES.MODELS);
-        
+  getAllModels: async (type?: 'api' | 'local'): Promise<Model[]> => {
+    return executeOperation<Model[]>(STORES.MODELS, 'readonly', store => {
+      return new Promise((resolve, reject) => {
         let request: IDBRequest;
         
-        // 如果指定了类型，使用索引查询
         if (type) {
           const index = store.index('type');
           request = index.getAll(type);
@@ -493,14 +422,9 @@ const db = {
           request = store.getAll();
         }
         
-        request.onsuccess = () => {
-          resolve(request.result);
-        };
-        
+        request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
-        
-        transaction.oncomplete = () => db.close();
-      }).catch(reject);
+      });
     });
   },
   
@@ -508,30 +432,27 @@ const db = {
    * 获取单个模型配置
    * @param modelId 模型ID
    */
-  getModel: (modelId: string): Promise<Model | undefined> => {
-    return runTransaction<Model | undefined>(
-      STORES.MODELS,
-      'readonly',
-      (store) => store.get(modelId)
-    );
+  getModel: async (modelId: string): Promise<Model | undefined> => {
+    return executeOperation<Model | undefined>(STORES.MODELS, 'readonly', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.get(modelId);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    });
   },
   
   /**
    * 删除模型
    * @param modelId 模型ID
    */
-  deleteModel: (modelId: string): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {
-      initDB().then(db => {
-        const transaction = db.transaction(STORES.MODELS, 'readwrite');
-        const store = transaction.objectStore(STORES.MODELS);
+  deleteModel: async (modelId: string): Promise<void> => {
+    return executeOperation<void>(STORES.MODELS, 'readwrite', store => {
+      return new Promise((resolve, reject) => {
         const request = store.delete(modelId);
-        
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
-        
-        transaction.oncomplete = () => db.close();
-      }).catch(reject);
+      });
     });
   },
   
@@ -539,31 +460,25 @@ const db = {
    * 保存最后使用的模型ID
    * @param modelId 模型ID
    */
-  saveLastUsedModelId: (modelId: string): Promise<IDBValidKey> => {
-    return new Promise((resolve, reject) => {
-      // 首先尝试获取现有设置
-      runTransaction<AppSettings | undefined>(
-        STORES.SETTINGS,
-        'readonly',
-        (store) => store.get('app-settings')
-      )
-        .then((settings) => {
-          // 合并设置或创建新设置
-          const updatedSettings: AppSettings = {
-            ...(settings || { id: 'app-settings' }),
-            lastUsedModelId: modelId,
-            timestamp: new Date()
-          };
-          
-          // 保存更新后的设置
-          return runTransaction<IDBValidKey>(
-            STORES.SETTINGS,
-            'readwrite',
-            (store) => store.put(updatedSettings)
-          );
-        })
-        .then(resolve)
-        .catch(reject);
+  saveLastUsedModelId: async (modelId: string): Promise<IDBValidKey> => {
+    return executeOperation<IDBValidKey>(STORES.SETTINGS, 'readwrite', async store => {
+      const settings = await new Promise<AppSettings | undefined>((resolve, reject) => {
+        const request = store.get('app-settings');
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      
+      const updatedSettings: AppSettings = {
+        ...(settings || { id: 'app-settings' }),
+        lastUsedModelId: modelId,
+        timestamp: new Date()
+      };
+      
+      return new Promise((resolve, reject) => {
+        const request = store.put(updatedSettings);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
     });
   },
   
@@ -571,127 +486,103 @@ const db = {
    * 获取最后使用的模型ID
    * @returns 最后使用的模型ID，如果不存在则返回undefined
    */
-  getLastUsedModelId: (): Promise<string | undefined> => {
-    return new Promise((resolve, reject) => {
-      runTransaction<AppSettings | undefined>(
-        STORES.SETTINGS,
-        'readonly',
-        (store) => store.get('app-settings')
-      )
-        .then((settings) => {
-          resolve(settings?.lastUsedModelId);
-        })
-        .catch(reject);
+  getLastUsedModelId: async (): Promise<string | undefined> => {
+    return executeOperation<string | undefined>(STORES.SETTINGS, 'readonly', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.get('app-settings');
+        request.onsuccess = () => resolve(request.result?.lastUsedModelId);
+        request.onerror = () => reject(request.error);
+      });
     });
   },
 
   /**
    * 初始化默认模型（如果数据库中没有模型）
    */
-  initDefaultModels: (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      // 先检查是否已有模型
-      db.getAllModels()
-        .then(models => {
-          if (models.length === 0) {
-            // 没有模型，添加默认模型
-            const defaultModels: Model[] = [
-              {
-                id: 'gpt-4',
-                name: 'GPT-4',
-                type: 'api',
-                url: 'https://api.openai.com/v1',
-                timestamp: new Date()
-              },
-              {
-                id: 'gpt-3.5-turbo',
-                name: 'GPT-3.5 Turbo',
-                type: 'api',
-                url: 'https://api.openai.com/v1',
-                timestamp: new Date()
-              },
-              {
-                id: 'qwen-plus',
-                name: '通义千问 Plus',
-                type: 'api',
-                url: 'https://dashscope.aliyuncs.com/api/v1',
-                parameters: '{"model":"qwen-plus"}',
-                timestamp: new Date()
-              },
-              {
-                id: 'llama2',
-                name: 'Llama 2',
-                type: 'local',
-                path: 'llama2:latest',
-                timestamp: new Date()
-              },
-              {
-                id: 'mistral',
-                name: 'Mistral',
-                type: 'local',
-                path: 'mistral:latest',
-                timestamp: new Date()
-              }
-            ];
-            
-            // 依次保存默认模型
-            const savePromises = defaultModels.map(model => db.saveModel(model));
-            
-            Promise.all(savePromises)
-              .then(() => {
-                // 设置默认模型为gpt-4
-                return db.saveLastUsedModelId('gpt-4');
-              })
-              .then(() => resolve())
-              .catch(reject);
-          } else {
-            // 已有模型，无需初始化
-            resolve();
-          }
-        })
-        .catch(reject);
-    });
+  initDefaultModels: async (): Promise<void> => {
+    const models = await db.getAllModels();
+    
+    if (models.length === 0) {
+      const defaultModels: Model[] = [
+        {
+          id: 'gpt-4',
+          name: 'GPT-4',
+          type: 'api',
+          url: 'https://api.openai.com/v1',
+          timestamp: new Date()
+        },
+        {
+          id: 'gpt-3.5-turbo',
+          name: 'GPT-3.5 Turbo',
+          type: 'api',
+          url: 'https://api.openai.com/v1',
+          timestamp: new Date()
+        },
+        {
+          id: 'qwen-plus',
+          name: '通义千问 Plus',
+          type: 'api',
+          url: 'https://dashscope.aliyuncs.com/api/v1',
+          parameters: '{"model":"qwen-plus"}',
+          timestamp: new Date()
+        },
+        {
+          id: 'llama2',
+          name: 'Llama 2',
+          type: 'local',
+          path: 'llama2:latest',
+          timestamp: new Date()
+        },
+        {
+          id: 'mistral',
+          name: 'Mistral',
+          type: 'local',
+          path: 'mistral:latest',
+          timestamp: new Date()
+        }
+      ];
+      
+      for (const model of defaultModels) {
+        await db.saveModel(model);
+      }
+      
+      await db.saveLastUsedModelId('gpt-4');
+    }
   },
 
   /**
    * 保存输入历史记录
    * @param history 输入历史记录数组
    */
-  saveInputHistory: (history: string[]): Promise<IDBValidKey> => {
+  saveInputHistory: async (history: string[]): Promise<IDBValidKey> => {
     const inputHistory: InputHistory = {
-      id: 'input-history',  // 使用固定ID，因为只需要一条记录
+      id: 'input-history',
       content: history,
       timestamp: new Date()
     };
     
-    return runTransaction<IDBValidKey>(
-      STORES.INPUT_HISTORY,
-      'readwrite',
-      (store) => store.put(inputHistory)
-    );
+    return executeOperation<IDBValidKey>(STORES.INPUT_HISTORY, 'readwrite', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.put(inputHistory);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    });
   },
   
   /**
    * 获取输入历史记录
    * @returns 输入历史记录数组
    */
-  getInputHistory: (): Promise<string[]> => {
-    return new Promise((resolve, reject) => {
-      runTransaction<InputHistory | undefined>(
-        STORES.INPUT_HISTORY,
-        'readonly',
-        (store) => store.get('input-history')
-      )
-        .then((result) => {
-          if (result) {
-            resolve(result.content);
-          } else {
-            resolve([]);
-          }
-        })
-        .catch(reject);
+  getInputHistory: async (): Promise<string[]> => {
+    return executeOperation<string[]>(STORES.INPUT_HISTORY, 'readonly', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.get('input-history');
+        request.onsuccess = () => resolve(request.result?.content || []);
+        request.onerror = () => reject(request.error);
+      });
     });
   }
 };
 
-export default db; 
+export default db;
