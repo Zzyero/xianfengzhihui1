@@ -2,93 +2,37 @@
 /**
  * 提示词增强页面组件
  * 该组件整合了聊天界面、模板管理、模型选择等功能
- * 用于提供一个完整的AI对话和提示词管理体验
  */
-import React, { useEffect, useState, useCallback } from 'react';
+//导入react
+import React, { useEffect} from 'react';
+//导入组件
 import { Card, CardContent } from "@/components/ui/card";
 import ChatWindow from './ChatInterface/ChatWindow';
 import MessageInput from './ChatInterface/MessageInput';
+import ExportData from './service/DataTransfer';
 import TemplateBar from './TemplateManagement/TemplateBar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import './styles/PromptEnhancement.css';
-import { Toaster } from "sonner";
-import db from './service/db';
-// 导入模型选择器组件
 import ChangeModel from "./ModelManagement/ChangeModel";
-// 在 PromptEnhancementPage.tsx 中添加导入导出组件
-// 在 import 部分添加
-import ExportData from './Data/DataTransfer';
-// 导入自定义钩子
-import {useMessages,useSessions,useTemplates,useApplicationInit,useInput} from './hooks/index';
 import HistorySidebarControl from './ChatInterface/HistorySidebarControl';
-const PromptEnhancementPage: React.FC = () => {
-  // ===== 状态和模型选择 =====
-  const [selectedModel, setSelectedModel] = useState<string>('');
-  const [messages, setMessages] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  // 创建模型选择的处理函数，保存最后使用的模型ID
-  const handleModelChange = useCallback((modelId: string) => {
-    setSelectedModel(modelId);
-    // 保存最后使用的模型ID到数据库
-    db.saveLastUsedModelId(modelId)
-      .then(() => {
-        console.log(`已保存最后使用的模型ID: ${modelId}`);
-      })
-      .catch(error => {
-        console.error('保存模型ID失败:', error);
-      });
-  }, []);
-  
-  // 使用自定义钩子
-  const templates = useTemplates();
-  
-  const sessions = useSessions(
-    setMessages,
-    isGenerating,
-    setIsGenerating,
-    templates.setActiveTemplateId,
-    templates.setCustomPrompt
-  );
-  
-  const messagesHook = useMessages(
-    sessions.activeSessionId,
-    sessions.setActiveSessionId,
-    selectedModel,
-    sessions.loadSessions,
-    templates.activeTemplateId,
-    templates.customPrompt
-  );
-  
-  const input = useInput();
-  
-  const appInit = useApplicationInit(
-    sessions.loadSessions,
-    templates.loadTemplates,
-    sessions.createNewSession,
-    sessions.setActiveSessionId,
-    messagesHook.loadSessionMessages,
-    messagesHook.setMessages,
-    setSelectedModel
-  );
+import { Toaster } from "sonner";
+//导入样式
+import './styles/PromptEnhancement.css';
+// 导入自定义钩子
+import {AppStateProvider,useAppState} from './hooks/index';
 
-  // 使用钩子返回的状态更新组件状态
-  useEffect(() => {
-    setMessages(messagesHook.messages);
-    setIsLoading(appInit.isLoading);
-    setIsGenerating(messagesHook.isGenerating);
-  }, [messagesHook.messages, appInit.isLoading, messagesHook.isGenerating]);
-
+/**
+ * 应用内部组件
+ * 使用全局状态管理的内部组件
+ */
+const PromptEnhancementInner: React.FC = () => {
+  // 使用全局应用状态
+  const { state, actions } = useAppState();
+  
   // 当选择会话时加载消息
   useEffect(() => {
-    if (sessions.activeSessionId) {
-      messagesHook.loadSessionMessages(sessions.activeSessionId);
+    if (state.activeSessionId) {
+      actions.loadSessionMessages(state.activeSessionId);
     }
-  }, [sessions.activeSessionId]);
+  }, [state.activeSessionId]);
 
   return (
     <div className="prompt-enhancement-container">
@@ -101,8 +45,8 @@ const PromptEnhancementPage: React.FC = () => {
               {/* 中间的模型选择器 */}
               <div className="flex-1 flex justify-center">
                 <ChangeModel 
-                  selectedModel={selectedModel}
-                  setSelectedModel={setSelectedModel}
+                  selectedModel={state.selectedModel}
+                  setSelectedModel={actions.handleModelChange}
                 />
               </div>
               
@@ -113,55 +57,66 @@ const PromptEnhancementPage: React.FC = () => {
                 
                 {/* 历史和新建按钮 */}
                 <HistorySidebarControl
-                  isOpen={sidebarOpen}
-                  setIsOpen={setSidebarOpen}
-                  sessions={sessions.chatSessions}
-                  onSelectSession={sessions.handleSelectSession}
-                  activeSessionId={sessions.activeSessionId}
-                  onNewChat={sessions.handleNewChat}
+                  isOpen={state.sidebarOpen}
+                  setIsOpen={actions.setSidebarOpen}
+                  sessions={state.chatSessions}
+                  onSelectSession={actions.handleSelectSession}
+                  activeSessionId={state.activeSessionId}
+                  onNewChat={actions.handleNewChat}
                 />
               </div>
             </div>
             {/* 聊天窗口 */}
             <div className="chat-window-container">
               <ChatWindow 
-                messages={messagesHook.messages}
-                isTyping={messagesHook.isGenerating}
-                onNewChat={sessions.handleNewChat}
+                messages={state.messages}
+                isTyping={state.isGenerating}
+                onNewChat={actions.handleNewChat}
                 className="chat-window"
-                sidebarOpen={sidebarOpen}
-                setSidebarOpen={setSidebarOpen}
-                sessions={sessions.chatSessions}
-                onSelectSession={sessions.handleSelectSession}
-                activeSessionId={sessions.activeSessionId}
+                sidebarOpen={state.sidebarOpen}
+                setSidebarOpen={actions.setSidebarOpen}
+                sessions={state.chatSessions}
+                onSelectSession={actions.handleSelectSession}
+                activeSessionId={state.activeSessionId}
               />
             </div>
-              {/* 输入窗口 */}
+            {/* 输入窗口 */}
             <div className="input-container">
               <Card>
                 <MessageInput
-                  onSend={messagesHook.handleSendMessage}
-                  onStop={messagesHook.handleStopGeneration}
-                  isGenerating={messagesHook.isGenerating}
-                  onResize={input.handleInputResize}
+                  onSend={actions.handleSendMessage}
+                  onStop={actions.handleStopGeneration}
+                  isGenerating={state.isGenerating}
+                  onResize={actions.handleInputResize}
                 />
               </Card>
             </div>
 
-               {/* 模板栏 */}
+            {/* 模板栏 */}
             <div className="template-bar-container">
               <TemplateBar 
-                onAddTemplate={templates.handleAddTemplate} 
-                templates={templates.templates}
-                onUseTemplate={templates.handleUseTemplate}
-                activeTemplateId={templates.activeTemplateId}
+                onAddTemplate={actions.handleAddTemplate} 
+                templates={state.templates}
+                onUseTemplate={actions.handleUseTemplate}
+                activeTemplateId={state.activeTemplateId}
               />
             </div>
           </CardContent>
         </Card>
       </div>
-      
     </div>
+  );
+};
+
+/**
+ * 主应用组件
+ * 使用AppStateProvider包装整个应用
+ */
+const PromptEnhancementPage: React.FC = () => {
+  return (
+    <AppStateProvider>
+      <PromptEnhancementInner />
+    </AppStateProvider>
   );
 };
 

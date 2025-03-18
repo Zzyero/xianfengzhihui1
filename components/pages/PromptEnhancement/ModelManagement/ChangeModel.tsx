@@ -95,16 +95,8 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       setIsModelDialogOpen(false);
       return;
     }
-    
-    setSelectedModel(modelId);
-    
     // 更新选中模型名称
-    const allModels = [...apiModels, ...localModels];
-    const model = allModels.find(m => m.id === modelId);
-    if (model) {
-      setSelectedModelName(model.name);
-    }
-    db.saveLastUsedModelId(modelId);
+    setSelectedModel(modelId);
     setIsModelDialogOpen(false);
   };
 

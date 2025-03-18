@@ -3,6 +3,8 @@
  * 集中导出所有钩子，便于统一引用
  */
 
+
+export * from './useAppState';
 export * from './useMessages';
 export * from './useSessions';
 export * from './useTemplates';

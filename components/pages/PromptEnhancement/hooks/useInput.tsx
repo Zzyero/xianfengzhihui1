@@ -1,23 +1,16 @@
-import { useState } from 'react';
+import { useAppState } from './useAppState';
 
 /**
  * 输入管理钩子
  * 处理输入框的大小调整等操作
+ * 兼容旧版接口的包装器，内部使用useAppState
  */
 export const useInput = () => {
-  // 输入状态
-  const [inputHeight, setInputHeight] = useState<number>(56);
-
-  /**
-   * 处理输入框大小调整
-   * @param height 新的高度值
-   */
-  const handleInputResize = (height: number): void => {
-    setInputHeight(height);
-  };
+  // 使用全局应用状态
+  const { state, actions } = useAppState();
 
   return {
-    inputHeight,
-    handleInputResize
+    inputHeight: state.inputHeight,
+    handleInputResize: actions.handleInputResize
   };
 }; 
