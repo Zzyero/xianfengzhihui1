@@ -56,7 +56,6 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       setLocalModels(localModelsData);
       // 获取所有模型列表
       const allModels = [...apiModelsData, ...localModelsData];
-
       // 查找当前选中模型并更新名称
       if (selectedModel) {
         // 根据模型ID查找对应的模型对象
@@ -64,11 +63,13 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
         if (currentModel) {
           // 使用模型的名称属性作为显示名称
           setSelectedModelName(currentModel.name);
+
         } else {
           setSelectedModelName("未选择模型");
         }
       } else {
         setSelectedModelName("未选择模型");
+
       }
     } catch (error) {
       console.error('加载模型失败:', error);
@@ -219,7 +220,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
         className="model-select-button"
         onClick={() => setIsModelDialogOpen(true)}
       >
-        <span>模型: {isLoading ? "加载中..." : selectedModelName || "未选择"}</span>
+        <span>模型: {selectedModelName}</span>
       </Button>
 
       {/* 模型选择对话框 */}

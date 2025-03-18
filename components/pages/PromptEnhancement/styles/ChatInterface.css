@@ -18,27 +18,9 @@
   gap: 0.5rem;
 }
 
-
-
-/* 新建聊天和历史记录按钮样式 */
-.chat-window .new-chat-button,
-.chat-window .history-button {
-  width: 4.5rem;
-  height: 2.5rem;
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(4px);
-  border-radius: 0.375rem;
-  border: 1px solid #e5e7eb;
-  margin-left: 0.5rem;
-}
-.new-chat-button:hover,
-.history-button:hover {
+.new-chat-button:hover {
   background-color: rgba(0, 0, 0, 0.03);
   border-color: #d1d5db;
-}
-/* 历史记录按钮固定状态 */
-.chat-window .history-button.pinned {
-  background-color: #f3f4f6;
 }
 
 /* 消息列表区域 */
@@ -50,7 +32,8 @@
 
 /* 侧边栏打开时的消息列表样式 */
 .chat-window .message-list.with-sidebar {
-  margin-right: 320px;
+  width: calc(100% - 320px);
+  transition: width 0.3s ease-in-out;
 }
 
 /* 消息容器 */
@@ -160,243 +143,6 @@
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
-}
-
-/* 侧边栏样式 */
-.chat-window .sidebar {
-  position: absolute;
-  right: 0;
-  top: 3.5rem;
-  height: calc(100% - 3.5rem);
-  transition: transform 0.3s ease-in-out;
-  transform: translateX(100%);
-}
-
-/* 侧边栏打开状态 */
-.chat-window .sidebar.open {
-  transform: translateX(0);
-}
-
-/* 侧边栏内容区 */
-.chat-window .sidebar-content {
-  height: 100%;
-  position: relative;
-}
-
-/* 侧边栏宽度调整把手 */
-.chat-window .resize-handle {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 4px;
-  cursor: ew-resize;
-}
-
-.chat-window .resize-handle:hover {
-  background-color: #e5e7eb;
-}
-
-/* 侧边栏内部容器 */
-.chat-window .sidebar-inner {
-  height: 100%;
-  padding: 0.5rem;
-  overflow-y: auto;
-}
-
-/* 侧边栏头部 */
-.chat-window .sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-  padding: 0.25rem;
-  border: 0px solid #e5e7eb;
-}
-
-.chat-window .sidebar-header h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #000;
-  text-align: center;
-  margin: 0 auto;
-}
-
-/* 搜索框容器 */
-.chat-window .search-container {
-  position: relative;
-  margin-bottom: 1rem;
-}
-
-/* 搜索图标 */
-.chat-window .search-icon {
-  position: absolute;
-  left: 0.5rem;
-  top: 0.625rem;
-  height: 1rem;
-  width: 1rem;
-  color: #9ca3af;
-}
-
-/* 搜索输入框 */
-.chat-window .search-input {
-  padding-left: 2rem;
-  color: #000;
-}
-
-/* 会话列表 */
-.chat-window .sessions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* 会话项 */
-.chat-window .session-item {
-  display: flex;
-  align-items: flex-start;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
-  color: #000;
-  position: relative;
-}
-
-.chat-window .session-item:hover {
-  background-color: #f3f4f6;
-}
-
-.chat-window .session-item.active {
-  background-color: #dbeafe;
-}
-
-.chat-window .session-item.starred {
-  border-left: 3px solid #2563eb;
-}
-
-/* 拖拽样式 */
-.chat-window .session-item.dragging {
-  opacity: 0.5;
-  background-color: #e5e7eb;
-}
-
-.chat-window .session-item.drag-over {
-  border: 2px dashed #2563eb;
-  transform: translateY(2px);
-}
-
-/* 拖拽把手 */
-.chat-window .session-drag-handle {
-  cursor: grab;
-  padding: 0.25rem;
-  margin-right: 0.25rem;
-  display: flex;
-  align-items: center;
-  opacity: 0.3;
-}
-
-.chat-window .session-item:hover .session-drag-handle {
-  opacity: 0.7;
-}
-
-/* 会话内容容器 */
-.chat-window .session-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  width: calc(100% - 1.5rem);
-}
-
-/* 会话标题行 */
-.chat-window .session-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-/* 标题内容 */
-.chat-window .title-content {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.chat-window .title-content span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 500;
-  color: #000;
-}
-
-/* 标题编辑输入框 */
-.chat-window .title-edit-input {
-  flex: 1;
-  height: 1.75rem;
-  padding: 0.25rem 0.5rem;
-  min-width: 0;
-}
-
-/* 会话操作按钮 */
-.chat-window .session-actions {
-  display: flex;
-  align-items: center;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.chat-window .session-item:hover .session-actions {
-  opacity: 1;
-}
-
-/* 操作按钮样式统一 */
-.chat-window .star-button,
-.chat-window .edit-button,
-.chat-window .delete-button {
-  width: 1.5rem;
-  height: 1.5rem;
-  padding: 0;
-  margin-left: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
-}
-
-.chat-window .star-button:hover,
-.chat-window .edit-button:hover,
-.chat-window .delete-button:hover {
-  color: #111827;
-  background-color: #e5e7eb;
-}
-
-/* 标星按钮激活状态 */
-.chat-window .star-button.starred {
-  color: #f59e0b;
-}
-
-/* 会话信息行 */
-.chat-window .session-info {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-/* 会话预览 */
-.chat-window .session-preview {
-  font-size: 0.875rem;
-  color: #4b5563;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
 }
 
 /* 消息输入容器样式 */
@@ -531,11 +277,3 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-
-/* 状态提示 */
-.chat-window .searching-indicator,
-.chat-window .no-sessions {
-  text-align: center;
-  padding: 1rem;
-  color: #6b7280;
-} 

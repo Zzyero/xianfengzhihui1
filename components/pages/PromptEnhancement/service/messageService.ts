@@ -45,6 +45,23 @@ class MessageService {
   }
 
   /**
+   * 删除会话及其所有消息
+   * @param sessionId 会话ID
+   */
+  static async deleteSession(sessionId: string): Promise<void> {
+    try {
+      // 先取消任何正在进行的请求
+      this.cancelGeneration(sessionId);
+      
+      // 使用数据库的deleteSession方法删除会话及其消息
+      await db.deleteSession(sessionId);
+    } catch (error) {
+      console.error('删除会话失败:', error);
+      throw new Error('删除会话失败');
+    }
+  }
+
+  /**
    * 发送用户消息并获取AI响应
    * @param content 消息内容
    * @param sessionId 会话ID

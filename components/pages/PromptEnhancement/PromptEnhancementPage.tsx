@@ -23,14 +23,14 @@ import ChangeModel from "./ModelManagement/ChangeModel";
 import ExportData from './Data/DataTransfer';
 // 导入自定义钩子
 import {useMessages,useSessions,useTemplates,useApplicationInit,useInput} from './hooks/index';
-
+import HistorySidebarControl from './ChatInterface/HistorySidebarControl';
 const PromptEnhancementPage: React.FC = () => {
   // ===== 状态和模型选择 =====
   const [selectedModel, setSelectedModel] = useState<string>('');
   const [messages, setMessages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   // 创建模型选择的处理函数，保存最后使用的模型ID
   const handleModelChange = useCallback((modelId: string) => {
     setSelectedModel(modelId);
@@ -94,32 +94,49 @@ const PromptEnhancementPage: React.FC = () => {
     <div className="prompt-enhancement-container">
       <Toaster position="top-center" />
       <div className="main-content">
-        {/* 添加模型选择器到页面右上角 */}
-
-        
         <Card className="chat-card">
           <CardContent className="chat-card-content">
-            <div className="flex items-center justify-end gap-2">
-              <ExportData />
-              <ChangeModel 
-                selectedModel={selectedModel}
-                setSelectedModel={setSelectedModel}
-              />
-            </div>
-            <div className="chat-window-container">
-              {(
-                <ChatWindow 
-                  messages={messagesHook.messages}
-                  isTyping={messagesHook.isGenerating}
+            {/* 顶部控制栏 */}
+            <div className="control-bar flex items-center justify-between py-2 px-4 border-b mb-2">
+              {/* 中间的模型选择器 */}
+              <div className="flex-1 flex justify-center">
+                <ChangeModel 
+                  selectedModel={selectedModel}
+                  setSelectedModel={setSelectedModel}
+                />
+              </div>
+              
+              {/* 右侧控制按钮 */}
+              <div className="flex items-center gap-2">
+                {/* 导入导出按钮 */}
+                <ExportData />
+                
+                {/* 历史和新建按钮 */}
+                <HistorySidebarControl
+                  isOpen={sidebarOpen}
+                  setIsOpen={setSidebarOpen}
                   sessions={sessions.chatSessions}
                   onSelectSession={sessions.handleSelectSession}
                   activeSessionId={sessions.activeSessionId}
                   onNewChat={sessions.handleNewChat}
-                  className="chat-window"
                 />
-              )}
+              </div>
             </div>
-              
+            {/* 聊天窗口 */}
+            <div className="chat-window-container">
+              <ChatWindow 
+                messages={messagesHook.messages}
+                isTyping={messagesHook.isGenerating}
+                onNewChat={sessions.handleNewChat}
+                className="chat-window"
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+                sessions={sessions.chatSessions}
+                onSelectSession={sessions.handleSelectSession}
+                activeSessionId={sessions.activeSessionId}
+              />
+            </div>
+              {/* 输入窗口 */}
             <div className="input-container">
               <Card>
                 <MessageInput
@@ -131,6 +148,7 @@ const PromptEnhancementPage: React.FC = () => {
               </Card>
             </div>
 
+               {/* 模板栏 */}
             <div className="template-bar-container">
               <TemplateBar 
                 onAddTemplate={templates.handleAddTemplate} 
@@ -143,47 +161,6 @@ const PromptEnhancementPage: React.FC = () => {
         </Card>
       </div>
       
-      {/* 添加模板对话框 */}
-      <Dialog open={templates.isAddTemplateDialogOpen} onOpenChange={templates.setIsAddTemplateDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>添加提示词模板</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="name" className="text-right">
-                模板名称
-              </label>
-              <Input
-                id="name"
-                value={templates.newTemplate.name}
-                onChange={(e) => templates.setNewTemplate({...templates.newTemplate, name: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="content" className="text-right">
-                模板内容
-              </label>
-              <Textarea
-                id="content"
-                value={templates.newTemplate.content}
-                onChange={(e) => templates.setNewTemplate({...templates.newTemplate, content: e.target.value})}
-                className="col-span-3"
-                rows={5}
-              />
-            </div>
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => templates.setIsAddTemplateDialogOpen(false)}>
-              取消
-            </Button>
-            <Button type="submit" onClick={templates.handleSaveTemplate}>
-              保存
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
