@@ -269,7 +269,14 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
       {
         // 当用户消息保存完成
         onUserMessageSaved: (userMessage) => {
-          setMessages(prev => [...prev, userMessage]);
+          setMessages(prev => {
+            // 检查是否存在相同ID的消息，确保不重复添加
+            const messageExists = prev.some(m => m.id === userMessage.id);
+            if (messageExists) {
+              return prev;
+            }
+            return [...prev, userMessage];
+          });
         },
         // 当AI回复内容更新（流式输出）
         onAiMessageUpdate: (partialMessage) => {
@@ -286,6 +293,18 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
               };
               return newMessages;
             } else {
+              // 检查是否有相同ID、角色和会话ID的消息（额外的去重检查）
+              const isDuplicate = prev.some(m => 
+                m.id === partialMessage.id || 
+                (m.sessionId === (partialMessage.sessionId || currentSessionId) && 
+                 m.role === 'assistant' && 
+                 m.content === partialMessage.content)
+              );
+              
+              if (isDuplicate) {
+                return prev;
+              }
+              
               // 添加新消息
               return [...prev, {
                 id: partialMessage.id || Date.now().toString(), // 确保ID不为undefined

@@ -303,7 +303,7 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
                       </div>
                     </div>
                     <div className="session-info">
-                      <span className="message-count">{session.messageCount} 条消息</span>
+                      <span className="message-count">{session.messageCount-1} 条消息</span>
                       <span className="session-time">
                         {new Date(session.timestamp).toLocaleDateString()}
                       </span>

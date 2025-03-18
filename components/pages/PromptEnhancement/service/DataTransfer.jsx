@@ -105,57 +105,90 @@ const ExportData = () => {
     if (!file) return;
     
     const reader = new FileReader();
+    // 用于收集所有内部捕获的错误信息
+    const importErrors = new Set();
     reader.onload = async (event) => {
-      try {
-        const importData = JSON.parse(event.target.result);
-        
-        // 导入模型
-        if (importData.models && Array.isArray(importData.models)) {
-          for (const model of importData.models) {
-            await db.saveModel(model);
+          try {
+              const importData = JSON.parse(event.target.result);
+
+              // 导入模型
+              if (importData.models && Array.isArray(importData.models)) {
+                  for (const model of importData.models) {
+                      try {
+                          await db.saveModel(model);
+                      } catch (error) {
+                          console.error('导入模型失败:', error);
+                          importErrors.add(`导入模型失败: ${error.message}`);
+                      }
+                  }
+              }
+
+              // 导入模板
+              if (importData.templates && Array.isArray(importData.templates)) {
+                  for (const template of importData.templates) {
+                      try {
+                          await db.saveTemplate(template);
+                      } catch (error) {
+                          console.error('导入模板失败:', error);
+                          importErrors.add(`导入模板失败: ${error.message}`);
+                      }
+                  }
+              }
+
+              // 导入会话
+              if (importData.sessions && Array.isArray(importData.sessions)) {
+                  for (const session of importData.sessions) {
+                      try {
+                          await db.saveSession(session);
+                      } catch (error) {
+                          console.error('导入会话失败:', error);
+                          importErrors.add(`导入会话失败: ${error.message}`);
+                      }
+                  }
+              }
+
+              // 导入消息
+              if (importData.messages && Array.isArray(importData.messages)) {
+                  for (const message of importData.messages) {
+                      try {
+                          await db.addMessage(message);
+                      } catch (error) {
+                          console.error('导入消息失败:', error);
+                          importErrors.add(`导入消息失败: ${error.message}`);
+                      }
+                  }
+              }
+
+              // 导入设置
+              if (importData.settings && importData.settings.lastUsedModelId) {
+                  try {
+                      await db.saveLastUsedModelId(importData.settings.lastUsedModelId);
+                  } catch (error) {
+                      console.error('导入设置失败:', error);
+                      importErrors.add(`导入设置失败: ${error.message}`);
+                  }
+              }
+
+              // 如果有内部错误，抛出自定义错误
+              if (importErrors.size > 0) {
+                const errorMessages = Array.from(importErrors).join('\n');
+                throw new Error(errorMessages);
+            }
+
+              toast.success('数据导入成功');
+
+              // 提示用户刷新页面以加载导入的数据
+              if (confirm('数据导入成功，需要刷新页面以加载数据。是否立即刷新？')) {
+                  window.location.reload();
+              } else {
+                  setOpen(false);
+              }
+          } catch (error) {
+              setOpen(false);
+              toast.error(`导入数据失败，请检查文件格式。${'\n'}${error.message}`);
           }
-        }
-        
-        // 导入模板
-        if (importData.templates && Array.isArray(importData.templates)) {
-          for (const template of importData.templates) {
-            await db.saveTemplate(template);
-          }
-        }
-        
-        // 导入会话
-        if (importData.sessions && Array.isArray(importData.sessions)) {
-          for (const session of importData.sessions) {
-            await db.saveSession(session);
-          }
-        }
-        
-        // 导入消息
-        if (importData.messages && Array.isArray(importData.messages)) {
-          for (const message of importData.messages) {
-            await db.addMessage(message);
-          }
-        }
-        
-        // 导入设置
-        if (importData.settings && importData.settings.lastUsedModelId) {
-          await db.saveLastUsedModelId(importData.settings.lastUsedModelId);
-        }
-        
-        setOpen(false);
-        toast.success('数据导入成功');
-        
-        // 提示用户刷新页面以加载导入的数据
-        if (confirm('数据导入成功，需要刷新页面以加载数据。是否立即刷新？')) {
-          window.location.reload();
-        }
-      } catch (error) {
-        setOpen(false);
-        console.error('导入数据失败:', error);
-        toast.error(`导入数据失败，请检查文件格式。\n${error}`);
-      }
-    };
-    reader.readAsText(file);
+      };
+      reader.readAsText(file);
   };
 
   return (
