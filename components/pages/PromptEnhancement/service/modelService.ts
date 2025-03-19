@@ -223,7 +223,7 @@ class ModelService {
   }
 
   /**
-   * 调用本地模型（如Ollama）
+   * 调用本地模型（使用Python后端）
    * @param options 调用选项
    */
   static async callLocalModel(options: LocalModelOptions): Promise<void> {
@@ -238,18 +238,18 @@ class ModelService {
       // 使用自定义提示词或原始提示
       let promptContent = customPrompt ? `${customPrompt}\n\n${prompt}` : prompt;
       let stream = true; // 默认使用流式输出
-      let ollamaParams: Record<string, any> = {};
+      let localParams: Record<string, any> = {};
 
       // 如果有自定义参数，解析并使用
       if (model.parameters) {
         try {
           const customParams = JSON.parse(model.parameters);
           if (customParams.stream !== undefined) stream = customParams.stream;
-          // 提取其他Ollama参数
-          const validKeys = ['temperature', 'top_p', 'top_k', 'repeat_penalty', 'seed', 'num_predict', 'stop', 'format'];
+          // 提取其他参数
+          const validKeys = ['temperature', 'top_p', 'top_k', 'max_tokens', 'repeat_penalty', 'stop'];
           validKeys.forEach(key => {
             if (customParams[key] !== undefined) {
-              ollamaParams[key] = customParams[key];
+              localParams[key] = customParams[key];
             }
           });
         } catch (e) {
@@ -257,22 +257,28 @@ class ModelService {
         }
       }
 
+      // 后端API URL
+      const apiUrl = 'http://localhost:5000/api/generate';
+      
+      // 构建请求体
+      const requestBody = {
+        model: modelPath,
+        prompt: promptContent,
+        stream: stream,
+        temperature: localParams.temperature || 0.7,
+        top_p: localParams.top_p || 0.9,
+        top_k: localParams.top_k || 50,
+        max_tokens: localParams.max_tokens || 1000,
+        repeat_penalty: localParams.repeat_penalty || 1.1,
+        stop: localParams.stop || undefined
+      };
+
       // 流式响应处理
       if (stream) {
-        const ollamaUrl = 'http://localhost:11434/api/generate';
-        
-        // 构建Ollama请求体
-        const requestBody = {
-          model: modelPath,
-          prompt: promptContent,
-          stream: true,
-          ...ollamaParams
-        };
-
         let fullContent = '';
 
         // 创建读取流
-        const response = await fetch(ollamaUrl, {
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -282,7 +288,7 @@ class ModelService {
         });
 
         if (!response.ok) {
-          throw new Error(`Ollama请求失败: ${response.status}`);
+          throw new Error(`本地模型服务请求失败: ${response.status}`);
         }
 
         // 获取响应流
@@ -298,6 +304,8 @@ class ModelService {
         while (!done) {
           // 检查是否已取消
           if (signal?.aborted) {
+            // 发送取消请求
+            this.abortLocalModelRequest(modelPath);
             throw new Error('请求已取消');
           }
           
@@ -307,7 +315,7 @@ class ModelService {
           if (done) break;
 
           const chunk = decoder.decode(value, { stream: true });
-          // Ollama返回的是每行一个JSON，需要分行处理
+          // 后端返回的是每行一个JSON，需要分行处理
           const lines = chunk.split('\n').filter(line => line.trim());
           
           for (const line of lines) {
@@ -316,9 +324,11 @@ class ModelService {
               if (data.response) {
                 fullContent += data.response;
                 callbacks.onUpdate?.(fullContent);
+              } else if (data.error) {
+                throw new Error(data.error);
               }
             } catch (e) {
-              console.warn('解析Ollama响应失败:', e);
+              console.warn('解析响应失败:', e);
             }
           }
         }
@@ -327,17 +337,7 @@ class ModelService {
         callbacks.onComplete?.(fullContent);
       } else {
         // 非流式调用
-        const ollamaUrl = 'http://localhost:11434/api/generate';
-        
-        // 构建Ollama请求体
-        const requestBody = {
-          model: modelPath,
-          prompt: promptContent,
-          stream: false,
-          ...ollamaParams
-        };
-
-        const response = await fetch(ollamaUrl, {
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -347,10 +347,15 @@ class ModelService {
         });
 
         if (!response.ok) {
-          throw new Error(`Ollama请求失败: ${response.status}`);
+          throw new Error(`本地模型服务请求失败: ${response.status}`);
         }
 
         const responseData = await response.json();
+        
+        if (responseData.error) {
+          throw new Error(responseData.error);
+        }
+        
         const fullContent = responseData.response || '';
         callbacks.onComplete?.(fullContent);
       }
@@ -364,7 +369,29 @@ class ModelService {
       
       // 处理API错误
       console.error('本地模型调用失败:', error);
-      callbacks.onError?.(new Error(`Ollama调用失败: ${error.message || '未知错误'}`));
+      callbacks.onError?.(new Error(`本地模型调用失败: ${error.message || '未知错误'}`));
+    }
+  }
+
+  /**
+   * 取消本地模型的请求
+   * @param modelId 模型ID
+   */
+  private static async abortLocalModelRequest(modelId: string): Promise<void> {
+    try {
+      const response = await fetch('http://localhost:5000/api/abort', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ request_id: modelId })
+      });
+      
+      if (!response.ok) {
+        console.error('取消本地模型请求失败:', await response.text());
+      }
+    } catch (error) {
+      console.error('取消本地模型请求失败:', error);
     }
   }
 }

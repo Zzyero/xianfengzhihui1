@@ -4,7 +4,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import AddModel from "./EditModel";
+import EditModel from "./EditApiModel";
+import EditLocalModel from "./EditLocalModel";
+import StartLocalModelServer from "./StartLocalModelServer";
 import { Cpu, Trash, Edit } from "lucide-react";
 import "../styles/ModelManagement.css";
 import db, { Model } from "../service/db";
@@ -27,10 +29,11 @@ interface ChangeModelProps {
  * @param {Function} props.setSelectedModel - 设置选中模型的函数
  * @returns {JSX.Element} 模型选择按钮组件
  */
-const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedModel }) => {
+const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedModel }): JSX.Element => {
   // ===== 状态管理 =====
   const [isModelDialogOpen, setIsModelDialogOpen] = useState<boolean>(false);  // 模型选择对话框状态
-  const [showAddModel, setShowAddModel] = useState<boolean>(false);            // 添加模型面板显示状态
+  const [showAddApiModel, setShowAddApiModel] = useState<boolean>(false);      // 添加API模型面板显示状态
+  const [showAddLocalModel, setShowAddLocalModel] = useState<boolean>(false);  // 添加本地模型面板显示状态
   const [editingModel, setEditingModel] = useState<Model | null>(null);        // 正在编辑的模型
   const [modelType, setModelType] = useState<'api' | 'local'>("api");          // 当前选择的模型类型
   const [apiModels, setApiModels] = useState<Model[]>([]);                     // API模型列表
@@ -63,13 +66,13 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
         if (currentModel) {
           // 使用模型的名称属性作为显示名称
           setSelectedModelName(currentModel.name);
-
+          // 更新当前选择的模型类型
+          setModelType(currentModel.type);
         } else {
           setSelectedModelName("未选择模型");
         }
       } else {
         setSelectedModelName("未选择模型");
-
       }
     } catch (error) {
       console.error('加载模型失败:', error);
@@ -92,19 +95,31 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
   const handleModelSelect = (modelId: string) => {
     // 避免重复选择当前模型
     if (modelId === selectedModel) {
-      setIsModelDialogOpen(false);
       return;
     }
-    // 更新选中模型名称
-    setSelectedModel(modelId);
-    setIsModelDialogOpen(false);
+    
+    // 查找选中的模型
+    const allModels = [...apiModels, ...localModels];
+    const model = allModels.find(m => m.id === modelId);
+    
+    if (model) {
+      // 更新选中模型
+      setSelectedModel(modelId);
+      // 如果是API模型，则关闭对话框
+      if (model.type === 'api') {
+        setIsModelDialogOpen(false);
+      }
+      // 如果是本地模型，保持对话框打开
+    } else {
+      toast.error('选择的模型无效');
+    }
   };
 
   /**
-   * 处理添加模型
+   * 处理添加API模型
    * @param model 新模型数据
    */
-  const handleAddModel = async (model: Omit<Model, 'id' | 'timestamp'> & { id?: string }) => {
+  const handleAddApiModel = async (model: Omit<Model, 'id' | 'timestamp'> & { id?: string }) => {
     try {
       // 如果是编辑模式，保留原有ID
       const isEditing = !!editingModel;
@@ -124,12 +139,57 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       // 重新加载模型列表
       await loadModels();
       
-      toast.success(isEditing ? '模型更新成功' : '模型添加成功');
-      setShowAddModel(false);
+      // 显示成功消息
+      toast.success(isEditing ? 'API模型更新成功' : 'API模型添加成功');
+      
+      // 重置编辑状态
+      setShowAddApiModel(false);
       setEditingModel(null);
+      
+      // 切换到API选项卡
+      setModelType('api');
     } catch (error) {
-      console.error(editingModel ? '更新模型失败:' : '添加模型失败:', error);
-      toast.error(editingModel ? '更新模型失败' : '添加模型失败');
+      console.error(editingModel ? '更新API模型失败:' : '添加API模型失败:', error);
+      toast.error(editingModel ? '更新API模型失败' : '添加API模型失败');
+    }
+  };
+
+  /**
+   * 处理添加本地模型
+   * @param model 新模型数据
+   */
+  const handleAddLocalModel = async (model: Omit<Model, 'id' | 'timestamp'> & { id?: string }) => {
+    try {
+      // 如果是编辑模式，保留原有ID
+      const isEditing = !!editingModel;
+      // 使用编辑模式下的原始ID，或者生成新ID
+      const modelId = isEditing ? editingModel.id : `${model.type}-${Date.now()}`;
+      
+      // 构建完整的模型对象
+      const newModel: Model = {
+        ...model,
+        id: modelId,
+        timestamp: new Date()
+      };
+      
+      // 保存到数据库
+      await db.saveModel(newModel);
+      
+      // 重新加载模型列表
+      await loadModels();
+      
+      // 显示成功消息
+      toast.success(isEditing ? '本地模型更新成功' : '本地模型添加成功');
+      
+      // 重置编辑状态
+      setShowAddLocalModel(false);
+      setEditingModel(null);
+      
+      // 切换到本地模型选项卡
+      setModelType('local');
+    } catch (error) {
+      console.error(editingModel ? '更新本地模型失败:' : '添加本地模型失败:', error);
+      toast.error(editingModel ? '更新本地模型失败' : '添加本地模型失败');
     }
   };
 
@@ -153,8 +213,15 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       
       // 设置编辑模式
       setEditingModel(model);
-      setModelType(model.type);
-      setShowAddModel(true);
+      
+      // 根据模型类型打开相应的编辑面板
+      if (model.type === 'api') {
+        setModelType('api');
+        setShowAddApiModel(true);
+      } else {
+        setModelType('local');
+        setShowAddLocalModel(true);
+      }
     } catch (error) {
       console.error('编辑模型失败:', error);
       toast.error('编辑模型失败');
@@ -176,11 +243,23 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
         return;
       }
       
+      // 查找要删除的模型
+      const allModels = [...apiModels, ...localModels];
+      const modelToDelete = allModels.find(m => m.id === modelId);
+      
+      if (!modelToDelete) {
+        toast.error('找不到要删除的模型');
+        return;
+      }
+      
       // 删除模型
       await db.deleteModel(modelId);
       
       // 重新加载模型列表
       await loadModels();
+      
+      // 保持在当前选项卡
+      setModelType(modelToDelete.type);
       
       toast.success('模型已删除');
     } catch (error) {
@@ -194,19 +273,54 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
     setIsModelDialogOpen(open);
     if (!open) {
       setEditingModel(null);
-      setShowAddModel(false);
+      setShowAddApiModel(false);
+      setShowAddLocalModel(false);
+      
+      // 根据当前选中的模型类型设置选项卡
+      const allModels = [...apiModels, ...localModels];
+      const currentModel = allModels.find(m => m.id === selectedModel);
+      if (currentModel) {
+        setModelType(currentModel.type);
+      }
     }
   };
 
-  // 取消添加/编辑模型
-  const handleCancelEdit = () => {
-    setShowAddModel(false);
+  // 取消添加/编辑API模型
+  const handleCancelApiModelEdit = () => {
+    setShowAddApiModel(false);
     setEditingModel(null);
+  };
+
+  // 取消添加/编辑本地模型
+  const handleCancelLocalModelEdit = () => {
+    setShowAddLocalModel(false);
+    setEditingModel(null);
+  };
+
+  // 处理选项卡切换
+  const handleTabChange = (value: string) => {
+    // 只有在非编辑模式下才允许切换选项卡
+    if (!showAddApiModel && !showAddLocalModel) {
+      setModelType(value as 'api' | 'local');
+    }
+  };
+
+  // 处理添加API模型按钮点击
+  const handleAddApiModelClick = () => {
+    setModelType('api');
+    setShowAddApiModel(true);
+  };
+
+  // 处理添加本地模型按钮点击
+  const handleAddLocalModelClick = () => {
+    setModelType('local');
+    setShowAddLocalModel(true);
   };
 
   return (
     <>
-      <Toaster position="top-center" />
+      <Toaster position="top-center" richColors />
+      
       {/* 模型选择按钮 */}
       <Button
         variant="outline"
@@ -220,21 +334,33 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       <Dialog open={isModelDialogOpen} onOpenChange={handleDialogOpenChange}>
         <DialogContent className="model-dialog-content">
           <DialogHeader>
-            <DialogTitle>{editingModel ? '编辑模型' : showAddModel ? '添加模型' : '选择模型'}</DialogTitle>
+            <DialogTitle>
+              {editingModel && editingModel.type === 'api' ? '编辑API模型' : 
+               editingModel && editingModel.type === 'local' ? '编辑本地模型' : 
+               showAddApiModel ? '添加API模型' : 
+               showAddLocalModel ? '添加本地模型' : 
+               '选择模型'}
+            </DialogTitle>
           </DialogHeader>
 
-          {showAddModel ? (
-            <AddModel
-              onAdd={handleAddModel}
-              onCancel={handleCancelEdit}
+          {showAddApiModel ? (
+            <EditModel
+              onAdd={handleAddApiModel}
+              onCancel={handleCancelApiModelEdit}
+              initialData={editingModel || undefined}
+            />
+          ) : showAddLocalModel ? (
+            <EditLocalModel
+              onAdd={handleAddLocalModel}
+              onCancel={handleCancelLocalModelEdit}
               initialData={editingModel || undefined}
             />
           ) : (
             <>
               <p className="text-sm text-gray-500 mb-4">
-                选择一个模型来处理您的请求。您可以添加API模型（如OpenAI、阿里云通义千问等）或本地模型（使用Ollama）。
+                选择一个模型来处理您的请求。您可以添加API模型（如OpenAI、阿里云通义千问等）或本地模型。
               </p>
-              <Tabs value={modelType} onValueChange={(value) => setModelType(value as 'api' | 'local')} className="w-full">
+              <Tabs value={modelType} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-4">
                   <TabsTrigger value="api">API 模型</TabsTrigger>
                   <TabsTrigger value="local">本地模型</TabsTrigger>
@@ -289,13 +415,19 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
                       ))}
                     </RadioGroup>
                   )}
-                  <Button variant="secondary" className="w-full" onClick={() => setShowAddModel(true)}>
+                  <Button variant="secondary" className="w-full" onClick={handleAddApiModelClick}>
                     添加API模型
                   </Button>
                 </TabsContent>
 
                 {/* 本地模型列表 */}
                 <TabsContent value="local" className="space-y-4">
+                  {/* 本地模型服务控制 */}
+                  <div className="mb-4 p-4 bg-gray-50 rounded-md">
+                    <h3 className="text-sm font-medium mb-2">本地模型服务</h3>
+                    <StartLocalModelServer selectedModel={selectedModel} />
+                  </div>
+
                   {localModels.length === 0 ? (
                     <div className="text-center py-4">暂无本地模型，请添加</div>
                   ) : (
@@ -342,7 +474,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
                       ))}
                     </RadioGroup>
                   )}
-                  <Button variant="secondary" className="w-full" onClick={() => setShowAddModel(true)}>
+                  <Button variant="secondary" className="w-full" onClick={handleAddLocalModelClick}>
                     添加本地模型
                   </Button>
                 </TabsContent>
