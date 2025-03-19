@@ -125,3 +125,118 @@ docker run -it --name viewcomfy-container -p 3000:3000 viewcomfy
 
 ## 贡献
 欢迎通过反馈、建议、问题或拉取请求做出贡献。
+
+# 提示词库功能说明
+
+## 功能概述
+提示词库是一个用于管理和使用提示词的功能模块，支持以下主要功能：
+- 添加新的提示词（支持中英文）
+- 编辑现有提示词
+- 删除提示词
+- 导入提示词
+- 图片上传和预览
+- 标签管理
+- 参数配置
+
+## 目录结构
+```
+├── app/
+│   ├── api/
+│   │   ├── prompt-library/    # 提示词库API
+│   │   │   └── route.ts      # 处理提示词的读写请求
+│   │   └── upload/           # 图片上传API
+│   │       └── route.ts      # 处理图片上传请求
+│   └── prompt-library/       # 提示词库页面
+│       └── page.tsx          # 提示词库主页面
+├── components/
+│   └── prompt-library/       # 提示词库相关组件
+│       ├── prompt-library.tsx # 提示词库主组件
+│       ├── prompt-form.tsx   # 提示词表单组件
+│       ├── image-upload.tsx  # 图片上传组件
+│       └── types.ts          # 类型定义
+├── lib/
+│   └── services/
+│       └── prompt-library-service.ts # 提示词库服务
+└── data/
+    └── prompt-library.json   # 提示词数据存储文件
+```
+
+## 核心文件说明
+
+### 1. 数据类型 (types.ts)
+- `PromptItem`: 提示词数据结构
+  - id: 唯一标识符
+  - prompt: 中文提示词
+  - promptEn: 英文提示词
+  - imageUrl: 图片URL
+  - tags: 标签数组
+  - parameters: 参数配置
+  - createdAt/updatedAt: 创建和更新时间
+
+### 2. API接口 (route.ts)
+- GET `/api/prompt-library`: 获取提示词列表
+- POST `/api/prompt-library`: 保存提示词列表
+- POST `/api/upload`: 处理图片上传
+
+### 3. 服务层 (prompt-library-service.ts)
+- `getPrompts()`: 获取提示词列表
+- `savePrompts()`: 保存提示词列表
+- `importPrompts()`: 导入提示词数据
+
+### 4. 组件
+- `PromptLibrary`: 提示词库主组件，负责展示提示词列表和处理交互
+- `PromptForm`: 提示词表单，用于添加/编辑提示词
+- `ImageUpload`: 图片上传组件，支持URL输入和文件上传
+
+## 主要功能实现
+
+### 提示词管理
+- 提示词支持中英文双语输入
+- 使用JSON文件存储提示词数据
+- 支持标签管理和筛选
+- 支持预设参数配置（步数、CFG、采样器、种子）
+- 支持从ComfyUI生成的PNG图片中解析提示词和参数
+
+### 图片管理
+- 支持图片URL输入
+- 支持本地图片上传
+- 图片存储在 public/images/prompts 目录
+- 支持图片预览和双击放大
+
+### 数据导入导出
+- 支持从JSON文件导入提示词
+- 数据自动保存到服务器和本地存储
+
+## 使用说明
+
+1. 添加提示词
+   - 点击"添加"按钮
+   - 填写中英文提示词
+   - 选择或上传图片
+   - 添加标签
+   - 配置所需参数
+   - 点击保存
+
+2. 导入提示词
+   - 点击"导入"按钮
+   - 选择JSON格式的提示词文件
+   - 系统会自动导入数据
+
+3. 解析ComfyUI图片
+   - 点击"解析图片"按钮
+   - 选择由ComfyUI生成的PNG图片
+   - 系统会自动提取图片中的提示词和参数信息
+   - 提取的信息会自动填充到表单中
+   - 修改或补充信息后点击保存
+
+4. 参数配置
+   - 步数 (steps): 生成图片的迭代次数
+   - CFG: 提示词引导系数
+   - 采样器 (sampler): 使用的采样算法
+   - 种子 (seed): 随机种子值
+
+## 注意事项
+1. 图片上传支持的格式：JPG、PNG、GIF等常见图片格式
+2. 提示词数据会自动保存到服务器
+3. 参数值应该符合实际使用需求
+4. 建议定期备份提示词数据

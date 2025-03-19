@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import {
-    Settings
+    Settings,
+    ChevronDown
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -34,67 +35,54 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
     const { viewComfyState, viewComfyStateDispatcher } = useViewComfy();
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     const [errorAlertDialog, setErrorAlertDialog] = useState<{ open: boolean, errorTitle: string | undefined, errorDescription: React.JSX.Element, onClose: () => void }>({ open: false, errorTitle: undefined, errorDescription: <></>, onClose: () => { } });
-
+    
     //获取视图配置
     useEffect(() => {
         if (viewMode) {
             const fetchViewComfy = async () => {
                 try {
                     const response = await fetch("/api/playground");
-
                     if (!response.ok) {
-                        const responseError: ResponseError =
-                            await response.json();
-                        throw responseError;
+                        const error = await response.json() as ResponseError;
+                        throw error;
                     }
-                    const data = await response.json();
-                    viewComfyStateDispatcher({ type: ActionType.INIT_VIEW_COMFY, payload: data.viewComfyJSON });
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                } catch (error: any) {
-                    if (error.errorType) {
-                        const responseError =
-                            apiErrorHandler.apiErrorToDialog(error);
-                        setErrorAlertDialog({
-                            open: true,
-                            errorTitle: responseError.title,
-                            errorDescription: <>{responseError.description}</>,
-                            onClose: () => { },
-                        });
-                    } else {
-                        setErrorAlertDialog({
-                            open: true,
-                            errorTitle: "Error",
-                            errorDescription: <>{error.message}</>,
-                            onClose: () => { },
-                        });
-                    }
+                    const data = await response.json() as IViewComfy;
+                    viewComfyStateDispatcher({
+                        type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
+                        payload: data
+                    });
+                } catch (error) {
+                    const errorDialog = apiErrorHandler.apiErrorToDialog(error as ResponseError);
+                    setErrorAlertDialog({
+                        open: true,
+                        errorTitle: errorDialog.title,
+                        errorDescription: <>{errorDialog.description}</>,
+                        onClose: () => {
+                            setErrorAlertDialog(prev => ({ ...prev, open: false }));
+                        }
+                    });
                 }
             };
             fetchViewComfy();
         }
     }, [viewMode, viewComfyStateDispatcher]);
 
-    const { doPost } = usePostPlayground();
+    //提交表单
+    const { doPost, loading: postLoading } = usePostPlayground();
 
-    // useEffect(() => {
-    //     if (viewComfyState?.viewComfyJSON) {
-    //         setFormState({ ...viewComfyState.viewComfyJSON });
-    //         SetResults({});
-    //     }
-    // }, [viewComfyState?.viewComfyJSON]);
-
-    // 处理中断和清除队列
+    //中断生成
     const handleInterrupt = () => {
-        setLoading(false);
+        // 实现中断逻辑
     };
 
+    //清空队列
     const handleClearQueue = () => {
-        setLoading(false);
+        // 实现清空队列逻辑
     };
 
     function onSubmit(data: IViewComfyWorkflow) {
-        // setFormState(data);
-
+        setLoading(true);
+        
         //获取输入
         const inputs: { key: string, value: string }[] = [];
 
@@ -116,55 +104,50 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
         };
 
         //提交表单
-        setLoading(true); // 开始加载
         doPost({
             viewComfy: generationData,
             workflow: viewComfyState.currentViewComfy?.workflowApiJSON,
             onSuccess: (data) => {
                 onSetResults(data);
-                setLoading(false); // 成功后结束加载
-            }, 
+                setLoading(false);
+            },
             onError: (error) => {
-                setLoading(false); // 错误时结束加载
                 const errorDialog = apiErrorHandler.apiErrorToDialog(error);
                 setErrorAlertDialog({
                     open: true,
                     errorTitle: errorDialog.title,
-                    errorDescription: <> {errorDialog.description} </>,
+                    errorDescription: <>{errorDialog.description}</>,
                     onClose: () => {
-                        setErrorAlertDialog({ open: false, errorTitle: undefined, errorDescription: <></>, onClose: () => { } });
+                        setErrorAlertDialog(prev => ({ ...prev, open: false }));
+                        setLoading(false);
                     }
                 });
             }
         });
     }
 
+    //设置结果
     const onSetResults = (data: Blob[]) => {
-        const timestamp = Date.now();
-        const newGeneration = data.map((output) => ({ outputs: output, url: URL.createObjectURL(output) }));
-        SetResults((prevResults) => ({
-            [timestamp]: newGeneration,
-            ...prevResults
+        const timestamp = new Date().getTime().toString();
+        const urls = data.map((blob) => {
+            return {
+                outputs: blob,
+                url: URL.createObjectURL(blob)
+            };
+        });
+        SetResults(prev => ({
+            ...prev,
+            [timestamp]: urls
         }));
     };
 
-    useEffect(() => {
-        return () => {
-            for (const generation of Object.values(results)) {
-                for (const output of generation) {
-                    URL.revokeObjectURL(output.url);
-                }
-            }
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
+    //选择变更
     const onSelectChange = (data: IViewComfy) => {
-        return viewComfyStateDispatcher({
+        viewComfyStateDispatcher({
             type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
-            payload: { ...data }
+            payload: data
         });
-    }
+    };
 
     if (!viewComfyState.currentViewComfy) {
         return <>
@@ -179,34 +162,22 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
             <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center p-4 border-b">
                     <h1 className="text-2xl font-bold">生图区</h1>
-                    <QueueManager 
-                        onInterrupt={handleInterrupt}
-                        onClear={handleClearQueue}
-                    />
-                </div>
-                <div className="md:hidden w-full flex pl-4 gap-x-2">
-                    <WorkflowSwitcher viewComfys={viewComfyState.viewComfys} currentViewComfy={viewComfyState.currentViewComfy} onSelectChange={onSelectChange} />
-                    <Drawer>
-                        <DrawerTrigger asChild>
-                            <Button variant="ghost" size="icon" className="md:hidden self-bottom w-[85px] gap-1">
-                                <Settings className="size-4" />
-                                Settings
-                            </Button>
-                        </DrawerTrigger>
-                        <DrawerContent className="max-h-[80vh] gap-4 px-4 h-full">
-                            <PlaygroundForm viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON} onSubmit={onSubmit} loading={loading} />
-                        </DrawerContent>
-                    </Drawer>
+                    <div className="flex items-center gap-2">
+                        <QueueManager 
+                            onInterrupt={handleInterrupt}
+                            onClear={handleClearQueue}
+                        />
+                    </div>
                 </div>
                 <main className="grid overflow-hidden flex-1 gap-4 p-2 md:grid-cols-2 lg:grid-cols-3">
                     <div className="relative hidden flex-col items-start gap-8 md:flex overflow-hidden">
-                        {viewComfyState.viewComfys.length > 0 && viewComfyState.currentViewComfy && (
-                            <div className="px-3 w-full">
-                                <WorkflowSwitcher viewComfys={viewComfyState.viewComfys} currentViewComfy={viewComfyState.currentViewComfy} onSelectChange={onSelectChange} />
-                            </div>
-                        )}
-                        {viewComfyState.currentViewComfy && <PlaygroundForm viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON} onSubmit={onSubmit} loading={loading} />}
-
+                        <ScrollArea className="w-full h-full">
+                            <PlaygroundForm 
+                                viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON} 
+                                onSubmit={onSubmit} 
+                                loading={loading} 
+                            />
+                        </ScrollArea>
                     </div>
                     <div className="relative h-full min-h-[50vh] rounded-xl bg-muted/50 px-1 lg:col-span-2">
                         <ScrollArea className="relative flex h-full w-full flex-col">

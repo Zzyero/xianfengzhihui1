@@ -1,0 +1,60 @@
+{
+  "prompts": [
+    {
+      "tags": [],
+      "parameters": {
+        "steps": "20",
+        "cfg": "",
+        "sampler": "euler",
+        "seed": "1102277200849674",
+        "scheduler": "simple",
+        "denoise": "1",
+        "negative": ""
+      },
+      "prompt": "",
+      "promptEn": "a man happy says something",
+      "imageUrl": "/images/prompts/1742303960665.png",
+      "id": "1742303962200",
+      "createdAt": "2025-03-18T13:19:22.200Z",
+      "updatedAt": "2025-03-18T13:19:22.200Z"
+    },
+    {
+      "tags": [],
+      "parameters": {
+        "steps": "25",
+        "cfg": "",
+        "sampler": "dpmpp_2m",
+        "seed": "936361400359807",
+        "scheduler": "simple",
+        "denoise": "1",
+        "model": "/comfyui/liblibai-models/models/6ce0161689b3853acaa03779ec93eafe75a02f4ced659bee03f50797806fa2fa.safetensors",
+        "negative": ""
+      },
+      "prompt": "",
+      "promptEn": "a man happiles doing something",
+      "imageUrl": "/images/prompts/1742346933923.png",
+      "id": "1742346939371",
+      "createdAt": "2025-03-19T01:15:39.371Z",
+      "updatedAt": "2025-03-19T01:15:39.371Z"
+    },
+    {
+      "tags": [],
+      "parameters": {
+        "steps": "35",
+        "cfg": "",
+        "sampler": "euler",
+        "seed": "109270284300615",
+        "scheduler": "simple",
+        "denoise": "1",
+        "model": "/comfyui/liblibai-models/models/4d23592a53e541688b95f8f4578af1c61e323170.safetensors",
+        "negative": ""
+      },
+      "prompt": "",
+      "promptEn": "sanguo a man happiles doing something",
+      "imageUrl": "/images/prompts/1742366555196.png",
+      "id": "1742366556584",
+      "createdAt": "2025-03-19T06:42:36.584Z",
+      "updatedAt": "2025-03-19T06:42:36.584Z"
+    }
+  ]
+}

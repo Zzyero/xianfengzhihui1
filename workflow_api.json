@@ -31,7 +31,7 @@
   },
   "4": {
     "inputs": {
-      "ckpt_name": "wildcardxXLTURBO_wildcardxXLTURBOV10.safetensors"
+      "ckpt_name": "【写实】majicMIX_realistic_麦橘写实_v7.safetensors"
     },
     "class_type": "CheckpointLoaderSimple",
     "_meta": {
