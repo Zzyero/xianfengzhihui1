@@ -140,7 +140,18 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
       </div>
       
       <div className="message-content">
-        {hasMarkdown ? (
+        {isUser ? (
+          // 用户消息始终以纯文本形式显示
+          <div className="plain-text">
+            {message.content.split("\n").map((line, i) => (
+              <React.Fragment key={i}>
+                {line}
+                {i < message.content.split("\n").length - 1 && <br />}
+              </React.Fragment>
+            ))}
+          </div>
+        ) : (
+          // AI助手消息使用Markdown解析
           <div className="markdown-content">
             <ReactMarkdown 
               rehypePlugins={[rehypeRaw]} 
@@ -149,15 +160,6 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
             >
               {message.content}
             </ReactMarkdown>
-          </div>
-        ) : (
-          <div className="plain-text">
-            {message.content.split("\n").map((line, i) => (
-              <React.Fragment key={i}>
-                {line}
-                {i < message.content.split("\n").length - 1 && <br />}
-              </React.Fragment>
-            ))}
           </div>
         )}
         

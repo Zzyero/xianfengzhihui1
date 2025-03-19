@@ -104,10 +104,11 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
    * 处理添加模型
    * @param model 新模型数据
    */
-  const handleAddModel = async (model: Omit<Model, 'id' | 'timestamp'>) => {
+  const handleAddModel = async (model: Omit<Model, 'id' | 'timestamp'> & { id?: string }) => {
     try {
       // 如果是编辑模式，保留原有ID
       const isEditing = !!editingModel;
+      // 使用编辑模式下的原始ID，或者生成新ID
       const modelId = isEditing ? editingModel.id : `${model.type}-${Date.now()}`;
       
       // 构建完整的模型对象

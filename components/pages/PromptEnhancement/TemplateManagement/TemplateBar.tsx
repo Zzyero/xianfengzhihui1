@@ -365,45 +365,45 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
+            </div>
 
-              {/* 模式控制按钮 */}
-              <div className="template-controls">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    "control-button",
-                    isCreateMode && "create-active"
-                  )}
-                  onClick={handleCreateModeToggle}
-                >
-                  <PlusCircle className="h-4 w-4" />
-                </Button>
+            {/* 将控制按钮组放在模板列表外部，避免被挤掉 */}
+            <div className="template-controls">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "control-button",
+                  isCreateMode && "create-active"
+                )}
+                onClick={handleCreateModeToggle}
+              >
+                <PlusCircle className="h-4 w-4" />
+              </Button>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    "control-button",
-                    isEditMode && "edit-active"
-                  )}
-                  onClick={handleEditModeToggle}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "control-button",
+                  isEditMode && "edit-active"
+                )}
+                onClick={handleEditModeToggle}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    "control-button",
-                    isDeleteMode && "delete-active"
-                  )}
-                  onClick={handleDeleteModeToggle}
-                >
-                  <Trash className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "control-button",
+                  isDeleteMode && "delete-active"
+                )}
+                onClick={handleDeleteModeToggle}
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
             </div>
           </>
         )}

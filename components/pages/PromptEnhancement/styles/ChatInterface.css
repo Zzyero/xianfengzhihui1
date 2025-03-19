@@ -27,7 +27,11 @@
 .chat-window .message-list {
   flex: 1;
   padding: 0 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0; /* 移除下边距，避免出现不必要的空间 */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* 允许flex子项收缩 */
 }
 
 /* 侧边栏打开时的消息列表样式 */
@@ -39,8 +43,7 @@
 /* 消息容器 */
 .chat-window .messages-container {
   display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
+  flex-direction: column;
   min-height: 100%;
   padding: 1rem 0;
   gap: 1rem;
@@ -276,4 +279,14 @@
 .send-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* 消息结束标记 */
+.messages-end-marker {
+  height: 1px;
+  width: 100%;
+  margin-top: 1rem;
+  opacity: 0;
+  padding-bottom: 1rem;
+  scroll-margin-top: 100px; /* 向上偏移滚动位置，避免内容贴底 */
 }

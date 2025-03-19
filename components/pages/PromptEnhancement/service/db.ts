@@ -45,8 +45,8 @@ export interface Template {
 }
 
 export interface Model {
-  id: string;               // 模型ID
-  name: string;             // 模型名称
+  id: string;               // 模型ID - 用于API调用的唯一标识符
+  name: string;             // 模型名称 - 用于界面显示给用户
   type: 'api' | 'local';    // 模型类型：API或本地
   url?: string;             // API URL（API模型）
   apiKey?: string;          // API密钥（API模型）
@@ -576,20 +576,6 @@ const db = {
           parameters: '{"model":"qwen-plus"}',
           timestamp: new Date()
         },
-        {
-          id: 'llama2',
-          name: 'Llama 2',
-          type: 'local',
-          path: 'llama2:latest',
-          timestamp: new Date()
-        },
-        {
-          id: 'mistral',
-          name: 'Mistral',
-          type: 'local',
-          path: 'mistral:latest',
-          timestamp: new Date()
-        }
       ];
       
       for (const model of defaultModels) {
