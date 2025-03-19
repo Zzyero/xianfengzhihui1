@@ -520,6 +520,23 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
         );
     }
 
+    // Lora加载器下拉选择框
+    if (input.key?.includes("lora_name")) {
+        const loraOptions = [
+            "laiqingde2-000029.safetensors"
+        ];
+        return (
+            <FormSelectInput 
+                input={input} 
+                field={field} 
+                options={loraOptions} 
+                editMode={editMode} 
+                remove={remove} 
+                index={index} 
+            />
+        );
+    }
+
     // 长文本输入
     if (input.valueType === "long-text") {
         return (
