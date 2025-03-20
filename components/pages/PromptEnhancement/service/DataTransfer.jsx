@@ -194,12 +194,14 @@ const ExportData = () => {
   return (
     <>
       <Button 
-        variant="ghost" 
-        size="icon" 
+        variant="outline"
+        size="sm"
+        className="new-chat-button flex items-center gap-1"
         onClick={() => setOpen(true)}
         title="导入/导出数据"
       >
         <Settings2Icon className="h-5 w-5" />
+        <span>导入/导出数据</span>
       </Button>
       
       <Dialog open={open} onOpenChange={setOpen}>

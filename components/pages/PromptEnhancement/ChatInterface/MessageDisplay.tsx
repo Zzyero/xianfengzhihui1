@@ -157,8 +157,10 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
               rehypePlugins={[rehypeRaw]} 
               remarkPlugins={[remarkGfm]}
               components={customComponents}
+              skipHtml={true}
+              unwrapDisallowed={true}
             >
-              {message.content}
+              {message.content.replace(/<think>[\s\S]*?<\/think>/g, '')}
             </ReactMarkdown>
           </div>
         )}

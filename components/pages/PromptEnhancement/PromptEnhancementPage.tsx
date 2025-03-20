@@ -19,7 +19,7 @@ import Loading from './ChatInterface/Loading';
 // 导入样式
 import './styles/PromptEnhancement.css';
 // 导入自定义钩子
-import { AppStateProvider, useAppState } from './hooks/index';
+import { AppStateProvider, useAppState } from './service/useAppState';
 
 /**
  * 应用内部组件

@@ -31,8 +31,9 @@ interface EditModelProps {
 const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) => {
   // ===== 状态管理 =====
   const [formData, setFormData] = useState({   
-    id: initialData?.id || "",                            // 模型ID - 用于API调用的唯一标识符
+    id: initialData?.id || "",                            // 模型ID - 数据库唯一标识符
     name: initialData?.name || "",                        // 模型名称 - 用于界面展示
+    apiId: initialData?.apiId || "",                      // API模型ID - 用于API调用的标识符
     url: initialData?.url || "",
     apiKey: initialData?.apiKey || "",
     parameters: initialData?.parameters || "",
@@ -66,11 +67,11 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
     const newErrors: Record<string, string> = {};
 
     // 必填字段验证
-    if (!formData.id.trim()) {
-      newErrors.id = "模型ID不能为空";
-    }
     if (!formData.name.trim()) {
       newErrors.name = "模型名称不能为空";
+    }
+    if (!formData.apiId.trim()) {
+      newErrors.apiId = "API模型ID不能为空";
     }
     if (!formData.url.trim()) {
       newErrors.url = "请输入API URL";
@@ -94,6 +95,7 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
       onAdd({
         type: 'api', // 固定为API模型类型
         name: formData.name,
+        apiId: formData.apiId,
         url: formData.url,
         apiKey: formData.apiKey,
         parameters: formData.parameters || undefined,
@@ -121,21 +123,21 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
           <p className="text-xs text-gray-500 mt-1">模型名称仅用于界面显示，可自定义易于识别的名称</p>
         </div>
 
-        {/* 模型ID */}
+        {/* API模型ID */}
         <div className="form-field">
-          <Label htmlFor="model-id">模型ID</Label>
+          <Label htmlFor="api-model-id">API模型ID</Label>
           <Input
             type="text"
-            value={formData.id}
-            onChange={(e) => handleInputChange('id', e.target.value)}
+            value={formData.apiId}
+            onChange={(e) => handleInputChange('apiId', e.target.value)}
             required
-            id="model-id"
-            placeholder="输入模型ID，如gpt-4、gpt-3.5-turbo等"
-            className={errors.id ? "error" : ""}
+            id="api-model-id"
+            placeholder="输入API模型ID，如gpt-4、gpt-3.5-turbo等"
+            className={errors.apiId ? "error" : ""}
             style={{color: '#111827', backgroundColor: 'white'}}
           />
-          {errors.id && <span className="error-message">{errors.id}</span>}
-          <p className="text-xs text-gray-500 mt-1">模型ID用于API调用，应与API提供方的模型标识符一致</p>
+          {errors.apiId && <span className="error-message">{errors.apiId}</span>}
+          <p className="text-xs text-gray-500 mt-1">API模型ID用于API调用，必须与API提供方的模型标识符一致</p>
         </div>
 
         {/* API URL */}

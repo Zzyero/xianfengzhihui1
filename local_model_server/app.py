@@ -50,44 +50,74 @@ def check_cuda_availability():
         return False, "CUDA不可用，使用CPU"
 
 # 加载模型函数
-def load_model(model_name: str):
+def load_model(model_name: str,model_path:str):
     # 检查是否已经缓存
-    if model_name in model_cache:
-        return model_cache[model_name], tokenizer_cache[model_name]
+    if model_path in model_cache:
+        return model_cache[model_path], tokenizer_cache[model_path]
     
-    logger.info(f"正在加载模型: {model_name}")
+    logger.info(f"正在加载模型: {model_path}")
     try:
         # 确定设备
         device = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"使用设备: {device}")
         
         # 加载分词器和模型
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
         model = AutoModelForCausalLM.from_pretrained(
-            model_name, 
+            model_path, 
             torch_dtype=torch.float16 if device == "cuda" else torch.float32,
             device_map="auto" if device == "cuda" else None,
             low_cpu_mem_usage=True if device == "cuda" else False
         )
         
         # 缓存模型和分词器
-        model_cache[model_name] = model
-        tokenizer_cache[model_name] = tokenizer
+        model_cache[model_path] = model
+        tokenizer_cache[model_path] = tokenizer
         
-        logger.info(f"模型 {model_name} 加载成功")
+        logger.info(f"模型 {model_name} 加载成功,模型地址:{model_path}")
         return model, tokenizer
     except Exception as e:
-        logger.error(f"加载模型 {model_name} 失败: {str(e)}")
+        logger.error(f"加载模型 {model_name} 失败: {str(e)}，模型名称:{model_path}")
         raise
 
+# 卸载模型
+def unload_model(model_name: str,model_path:str):
+    if model_path in model_cache:
+        logger.info(f"正在卸载模型: {model_path}")
+        try:
+            # 从缓存中删除模型和分词器
+            del model_cache[model_path]
+            del tokenizer_cache[model_path]
+            
+            # 尝试手动触发垃圾回收
+            import gc
+            gc.collect()
+            
+            # 如果使用CUDA，清理CUDA缓存
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                
+            logger.info(f"模型 {model_name} 已成功卸载，模型地址:{model_path}")
+            return True
+        except Exception as e:
+            logger.error(f"卸载模型 {model_name} 失败: {str(e)}，模型地址:{model_path}")
+            return False
+    else:
+        logger.warning(f"模型 {model_name} 未加载，无需卸载")
+        return False
+
 # 流式文本生成
-def generate_stream(model_name: str, prompt: str, params: Dict[str, Any], request_id: str) -> Generator[str, None, None]:
+def generate_stream(model_path: str, prompt: str, params: Dict[str, Any], request_id: str) -> Generator[str, None, None]:
     try:
         # 创建中断信号
         abort_signals[request_id] = Event()
         
-        # 加载模型和分词器
-        model, tokenizer = load_model(model_name)
+        # 获取模型和分词器（假设已经加载）
+        if model_path not in model_cache or model_path not in tokenizer_cache:
+            raise ValueError(f"模型 {model_path} 未加载，请先加载模型")
+            
+        model = model_cache[model_path]
+        tokenizer = tokenizer_cache[model_path]
         
         # 设置生成参数
         generation_config = {
@@ -142,8 +172,12 @@ def generate_text(model_name: str, prompt: str, params: Dict[str, Any], request_
         # 创建中断信号
         abort_signals[request_id] = Event()
         
-        # 加载模型和分词器
-        model, tokenizer = load_model(model_name)
+        # 获取模型和分词器（假设已经加载）
+        if model_name not in model_cache or model_name not in tokenizer_cache:
+            raise ValueError(f"模型 {model_name} 未加载，请先加载模型")
+            
+        model = model_cache[model_name]
+        tokenizer = tokenizer_cache[model_name]
         
         # 设置生成参数
         generation_config = {
@@ -177,12 +211,80 @@ def generate_text(model_name: str, prompt: str, params: Dict[str, Any], request_
         logger.error(f"生成文本出错: {str(e)}")
         raise
 
+@app.route('/api/start', methods=['POST'])
+def start():
+    try:
+        data = request.json
+        model_path = data.get('modelpath', '')
+        model_name = data.get('modelname', '')
+
+        if not model_path:
+            return jsonify({"error": "缺少模型路径参数"}), 400
+            
+        # 检查模型是否已经加载
+        if model_path in model_cache:
+            return jsonify({
+                "status": "success", 
+                "message": f"模型 {model_name} 已经加载",
+                "modelpath": model_path
+            })
+            
+        # 加载模型
+        _, _ = load_model(model_name,model_path)
+        
+        return jsonify({
+            "status": "success", 
+            "message": f"模型 {model_name} 加载成功",
+            "modelpath": model_path
+        })
+        
+    except Exception as e:
+        logger.error(f"加载模型失败: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+        
+@app.route('/api/delete', methods=['POST'])
+def delete():
+    try:
+        data = request.json
+        model_path = data.get('modelpath', '')
+        model_name = data.get('modelname', '')
+        if not model_path:
+            return jsonify({"error": "缺少模型路径参数"}), 400
+            
+        # 检查模型是否已经加载
+        if model_path not in model_cache:
+            return jsonify({
+                "status": "warning", 
+                "message": f"模型 {model_name} 未加载，无需卸载",
+                "modelpath": model_path
+            })
+            
+        # 卸载模型
+        success = unload_model(model_name,model_path)
+        
+        if success:
+            return jsonify({
+                "status": "success", 
+                "message": f"模型 {model_name} 卸载成功",
+                "modelpath": model_path
+            })
+        else:
+            return jsonify({
+                "status": "error", 
+                "message": f"模型 {model_name} 卸载失败",
+                "modelpath": model_path
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"卸载模型失败: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/generate', methods=['POST'])
 def generate():
     # 解析请求数据
     try:
         data = request.json
-        model_name = data.get('model', '')
+        model_path = data.get('modelpath', '')
         prompt = data.get('prompt', '')
         stream = data.get('stream', True)
         
@@ -199,24 +301,28 @@ def generate():
         # 生成请求ID
         request_id = f"req_{time.time()}"
         
-        logger.info(f"收到生成请求 ID: {request_id}, 模型: {model_name}, 流式: {stream}")
+        logger.info(f"收到生成请求 ID: {request_id}, 模型路径: {model_path}, 流式: {stream}")
         
-        if not model_name:
-            return jsonify({"error": "缺少模型名称参数"}), 400
+        if not model_path:
+            return jsonify({"error": "缺少模型路径参数"}), 400
         
         if not prompt:
             return jsonify({"error": "缺少提示词参数"}), 400
+        
+        # 检查模型是否已加载    
+        if model_path not in model_cache:
+            return jsonify({"error": f"模型 {model_path} 未加载，请先加载模型"}), 400
             
         # 根据流式标志选择不同处理方式
         if stream:
             # 流式响应
             return Response(
-                stream_with_context(generate_stream(model_name, prompt, params, request_id)),
-                content_type='application/x-ndjson'
-            )
+                stream_with_context(generate_stream(model_path, prompt, params, request_id)),
+                content_type='application/x-ndjson',
+                headers={'X-Request-ID': request_id})
         else:
             # 非流式响应
-            result = generate_text(model_name, prompt, params, request_id)
+            result = generate_text(model_path, prompt, params, request_id)
             return jsonify({"response": result})
             
     except Exception as e:
@@ -241,36 +347,6 @@ def abort_generation():
             
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@app.route('/api/models', methods=['GET'])
-def list_models():
-    """列出可用的本地模型"""
-    # 这里可以扫描模型目录或返回预定义的模型列表
-    # 示例实现，实际可根据需要修改
-    models_dir = os.environ.get("MODELS_DIR", "./models")
-    
-    # 检查目录是否存在
-    if not os.path.exists(models_dir):
-        return jsonify({
-            "models": [
-                {"id": "ChatGLM3-6B", "name": "ChatGLM3-6B", "description": "清华大学开源的对话模型"},
-                {"id": "Qwen-7B-Chat", "name": "Qwen-7B-Chat", "description": "阿里通义千问对话模型"},
-                {"id": "THUDM/chatglm3-6b", "name": "ChatGLM3-6B (HF)", "description": "从HuggingFace加载的ChatGLM3"}
-            ]
-        })
-    
-    # 实际扫描目录下的模型（简化实现）
-    models = []
-    for item in os.listdir(models_dir):
-        item_path = os.path.join(models_dir, item)
-        if os.path.isdir(item_path) and os.path.exists(os.path.join(item_path, "config.json")):
-            models.append({
-                "id": item,
-                "name": item,
-                "description": f"本地模型: {item}"
-            })
-    
-    return jsonify({"models": models})
 
 @app.route('/api/system', methods=['GET'])
 def system_info():

@@ -423,14 +423,14 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   // ===== 模型操作 =====
   /**
    * 处理模型选择
-   * @param modelId 选择的模型ID
+   * @param modelName 选择的模型名字
    */
-  const handleModelChange = (modelId: string): void => {
-    setSelectedModel(modelId);
+  const handleModelChange = (modelName: string): void => {
+    setSelectedModel(modelName);
     // 保存最后使用的模型ID到数据库
-    db.saveLastUsedModelId(modelId)
+    db.saveLastUsedModelId(modelName)
       .then(() => {
-        console.log(`已保存最后使用的模型ID: ${modelId}`);
+        console.log(`已保存最后使用的模型ID: ${modelName}`);
       })
       .catch(error => {
         console.error('保存模型ID失败:', error);

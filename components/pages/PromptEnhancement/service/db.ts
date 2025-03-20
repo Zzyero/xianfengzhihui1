@@ -45,13 +45,14 @@ export interface Template {
 }
 
 export interface Model {
-  id: string;               // 模型ID - 用于API调用的唯一标识符
+  id: string;               // 模型ID 数据库标识
   name: string;             // 模型名称 - 用于界面显示给用户
   type: 'api' | 'local';    // 模型类型：API或本地
   url?: string;             // API URL（API模型）
   apiKey?: string;          // API密钥（API模型）
   path?: string;            // 模型路径（本地模型）
   parameters?: string;      // 其他参数
+  apiId?: string;           // API调用的模型标识符
   timestamp: Date;          // 创建/更新时间
 }
 
@@ -547,42 +548,28 @@ const db = {
   },
 
   /**
-   * 初始化默认模型（如果数据库中没有模型）
+   * 初始化默认模型
+   * 如果数据库中没有模型，则添加默认的模型配置
    */
-  initDefaultModels: async (): Promise<void> => {
-    const models = await db.getAllModels();
-    
-    if (models.length === 0) {
-      const defaultModels: Model[] = [
-        {
-          id: 'gpt-4',
-          name: 'GPT-4',
+  async initDefaultModels(): Promise<void> {
+    try {
+      const models = await this.getAllModels();
+      if (models.length === 0) {
+        // 添加默认的OpenAI GPT-3.5模型
+        const defaultModel: Model = {
+          id: 'api-' + Date.now(),
+          name: 'OpenAI GPT-3.5',
           type: 'api',
           url: 'https://api.openai.com/v1',
+          apiKey: '',
+          apiId: 'gpt-3.5-turbo',
+          parameters: '{"temperature":0.7,"max_tokens":2000}',
           timestamp: new Date()
-        },
-        {
-          id: 'gpt-3.5-turbo',
-          name: 'GPT-3.5 Turbo',
-          type: 'api',
-          url: 'https://api.openai.com/v1',
-          timestamp: new Date()
-        },
-        {
-          id: 'qwen-plus',
-          name: '通义千问 Plus',
-          type: 'api',
-          url: 'https://dashscope.aliyuncs.com/api/v1',
-          parameters: '{"model":"qwen-plus"}',
-          timestamp: new Date()
-        },
-      ];
-      
-      for (const model of defaultModels) {
-        await db.saveModel(model);
+        };
+        await this.saveModel(defaultModel);
       }
-      
-      await db.saveLastUsedModelId('gpt-4');
+    } catch (error) {
+      console.error('初始化默认模型失败:', error);
     }
   },
 

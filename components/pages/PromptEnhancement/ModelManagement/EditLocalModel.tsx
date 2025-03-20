@@ -31,7 +31,7 @@ interface EditLocalModelProps {
 const EditLocalModel: React.FC<EditLocalModelProps> = ({ onAdd, onCancel, initialData }) => {
   // ===== 状态管理 =====
   const [formData, setFormData] = useState({   
-    id: initialData?.id || "",                  // 模型ID
+    id: initialData?.id || "",                  // 数据库ID
     name: initialData?.name || "",              // 模型名称
     path: initialData?.path || "",              // 模型路径
     parameters: initialData?.parameters || "",  // 其他参数
@@ -65,9 +65,6 @@ const EditLocalModel: React.FC<EditLocalModelProps> = ({ onAdd, onCancel, initia
     const newErrors: Record<string, string> = {};
 
     // 必填字段验证
-    if (!formData.id.trim()) {
-      newErrors.id = "模型ID不能为空";
-    }
     if (!formData.name.trim()) {
       newErrors.name = "模型名称不能为空";
     }
@@ -92,6 +89,7 @@ const EditLocalModel: React.FC<EditLocalModelProps> = ({ onAdd, onCancel, initia
         name: formData.name,
         path: formData.path,
         parameters: formData.parameters || undefined,
+        // 对于本地模型，不需要apiId，因为使用path进行调用
       });
     }
   };
@@ -99,21 +97,7 @@ const EditLocalModel: React.FC<EditLocalModelProps> = ({ onAdd, onCancel, initia
   return (
     <form onSubmit={handleSubmit} className="model-form">
       <div className="space-y-4">
-        <div className="form-field">
-          <Label htmlFor="local-id">模型ID</Label>
-          <Input
-            type="text"
-            value={formData.id}
-            onChange={(e) => handleInputChange('id', e.target.value)}
-            required
-            id="local-model-id"
-            placeholder="输入模型ID，如llama2、chatglm3等"
-            className={errors.id ? "error" : ""}
-            style={{color: '#111827', backgroundColor: 'white'}}
-          />
-          {errors.id && <span className="error-message">{errors.id}</span>}
-          <p className="text-xs text-gray-500 mt-1">模型ID用于API调用，应与本地模型的标识符一致</p>
-        </div>
+
         
         <div className="form-field">
           <Label htmlFor="local-name">模型名称</Label>
@@ -131,6 +115,7 @@ const EditLocalModel: React.FC<EditLocalModelProps> = ({ onAdd, onCancel, initia
           <p className="text-xs text-gray-500 mt-1">模型名称仅用于界面显示，可自定义易于识别的名称</p>
         </div>
 
+        
         <div className="form-field">
           <Label htmlFor="local-path">模型路径</Label>
           <Input

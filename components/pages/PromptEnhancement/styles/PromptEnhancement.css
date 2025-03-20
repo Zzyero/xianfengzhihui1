@@ -4,7 +4,7 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  padding-top: 53px; /* 导航栏高度 */
+  padding-top: 56px; /* 导航栏高度 */
   box-sizing: border-box;
   position: relative;
   z-index: 1; /* 确保在导航栏下方 */
@@ -351,7 +351,7 @@
 /* 控制栏子元素 */
 .model-selector-container {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   flex: 1;
 }
 

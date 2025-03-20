@@ -44,6 +44,14 @@ interface LocalModelOptions {
 }
 
 /**
+ * 本地模型服务操作类型
+ */
+export enum LocalModelOperation {
+  START = 'start',
+  DELETE = 'delete'
+}
+
+/**
  * 模型服务类
  */
 class ModelService {
@@ -88,6 +96,49 @@ class ModelService {
     for (const [id, controller] of controllerEntries) {
       controller.abort();
       this.controllers.delete(id);
+    }
+  }
+
+  /**
+   * 操作本地模型（加载或卸载）
+   * @param operation 操作类型（加载或卸载）
+   * @param modelPath 模型路径
+   * @param modelName 模型名称（用于显示）
+   * @returns 操作结果
+   */
+  static async operateLocalModel(operation: LocalModelOperation, modelPath: string, modelName: string): Promise<{
+    status: string;
+    message: string;
+  }> {
+    try {
+      // 确定API路径
+      const apiUrl = `http://localhost:5000/api/${operation}`;
+      
+      // 发送请求
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ modelpath: modelPath, modelname: modelName })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`服务器错误 (${response.status}): ${errorText}`);
+      }
+      
+      const result = await response.json();
+      return {
+        status: result.status || 'error',
+        message: result.message || '操作完成'
+      };
+    } catch (error: any) {
+      console.error(`${operation}模型失败:`, error);
+      return {
+        status: 'error',
+        message: error.message || `${operation}模型失败`
+      };
     }
   }
 
@@ -143,7 +194,8 @@ class ModelService {
       }
 
       // 设置默认参数
-      let modelName = model.name;
+      // 使用apiId
+      let apiModelId = model.apiId;
       let temperature = 0.7;
       let max_tokens = 2000;
       let stream = true; // 默认使用流式输出
@@ -152,7 +204,6 @@ class ModelService {
       if (model.parameters) {
         try {
           const customParams = JSON.parse(model.parameters);
-          if (customParams.model) modelName = customParams.model;
           if (customParams.temperature !== undefined) temperature = customParams.temperature;
           if (customParams.max_tokens !== undefined) max_tokens = customParams.max_tokens;
           if (customParams.stream !== undefined) stream = customParams.stream;
@@ -169,7 +220,7 @@ class ModelService {
         const requestOptions = signal ? { signal } : {};
         
         const stream = await openai.chat.completions.create({
-          model: modelName,
+          model: apiModelId || '', 
           messages: apiMessages,
           temperature: temperature,
           max_tokens: max_tokens,
@@ -195,7 +246,7 @@ class ModelService {
         const requestOptions = signal ? { signal } : {};
         
         const completion = await openai.chat.completions.create({
-          model: modelName,
+          model: apiModelId || '',
           messages: apiMessages,
           temperature: temperature,
           max_tokens: max_tokens,
@@ -262,13 +313,13 @@ class ModelService {
       
       // 构建请求体
       const requestBody = {
-        model: modelPath,
+        modelpath: modelPath, // 传递模型路径
         prompt: promptContent,
         stream: stream,
         temperature: localParams.temperature || 0.7,
         top_p: localParams.top_p || 0.9,
         top_k: localParams.top_k || 50,
-        max_tokens: localParams.max_tokens || 1000,
+        max_tokens: localParams.max_tokens || 2000,
         repeat_penalty: localParams.repeat_penalty || 1.1,
         stop: localParams.stop || undefined
       };
@@ -286,6 +337,8 @@ class ModelService {
           body: JSON.stringify(requestBody),
           signal: signal, // 使用信号来支持取消
         });
+        //获得请求id以便取消请求
+        const request_id = response.headers.get('X-Request-ID');
 
         if (!response.ok) {
           throw new Error(`本地模型服务请求失败: ${response.status}`);
@@ -300,12 +353,12 @@ class ModelService {
         // 处理流式响应
         const decoder = new TextDecoder();
         let done = false;
-
+        
         while (!done) {
           // 检查是否已取消
           if (signal?.aborted) {
             // 发送取消请求
-            this.abortLocalModelRequest(modelPath);
+            this.abortLocalModelRequest(request_id || '');
             throw new Error('请求已取消');
           }
           
@@ -375,16 +428,16 @@ class ModelService {
 
   /**
    * 取消本地模型的请求
-   * @param modelId 模型ID
+   * @param request_id 请求id
    */
-  private static async abortLocalModelRequest(modelId: string): Promise<void> {
+  private static async abortLocalModelRequest(request_id: string): Promise<void> {
     try {
       const response = await fetch('http://localhost:5000/api/abort', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ request_id: modelId })
+        body: JSON.stringify({ request_id: request_id })
       });
       
       if (!response.ok) {

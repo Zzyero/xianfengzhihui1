@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle,DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -90,21 +90,21 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
 
   /**
    * 处理模型选择
-   * @param {string} modelId - 选中的模型ID
+   * @param {string} modelName - 选中的模型名字
    */
-  const handleModelSelect = (modelId: string) => {
+  const handleModelSelect = (modelName: string) => {
     // 避免重复选择当前模型
-    if (modelId === selectedModel) {
+    if (modelName === selectedModel) {
       return;
     }
     
     // 查找选中的模型
     const allModels = [...apiModels, ...localModels];
-    const model = allModels.find(m => m.id === modelId);
+    const model = allModels.find(m => m.id === modelName);
     
     if (model) {
       // 更新选中模型
-      setSelectedModel(modelId);
+      setSelectedModel(modelName);
       // 如果是API模型，则关闭对话框
       if (model.type === 'api') {
         setIsModelDialogOpen(false);
@@ -324,9 +324,10 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       {/* 模型选择按钮 */}
       <Button
         variant="outline"
-        className="model-select-button"
+        size="sm"
+        className="new-chat-button flex items-center gap-1"
         onClick={() => setIsModelDialogOpen(true)}
-      >
+      ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot size-5"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg>
         <span>模型: {selectedModelName}</span>
       </Button>
 
@@ -341,6 +342,11 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
                showAddLocalModel ? '添加本地模型' : 
                '选择模型'}
             </DialogTitle>
+            {!showAddApiModel && !showAddLocalModel && (
+              <DialogDescription>
+                选择一个模型来处理您的请求。您可以添加API模型（如OpenAI、阿里云通义千问等）或本地模型。
+              </DialogDescription>
+            )}
           </DialogHeader>
 
           {showAddApiModel ? (
@@ -356,130 +362,126 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
               initialData={editingModel || undefined}
             />
           ) : (
-            <>
-              <p className="text-sm text-gray-500 mb-4">
-                选择一个模型来处理您的请求。您可以添加API模型（如OpenAI、阿里云通义千问等）或本地模型。
-              </p>
-              <Tabs value={modelType} onValueChange={handleTabChange} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="api">API 模型</TabsTrigger>
-                  <TabsTrigger value="local">本地模型</TabsTrigger>
-                </TabsList>
+            <Tabs value={modelType} onValueChange={handleTabChange} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="api">API 模型</TabsTrigger>
+                <TabsTrigger value="local">本地模型</TabsTrigger>
+              </TabsList>
 
-                {/* API模型列表 */}
-                <TabsContent value="api" className="space-y-4">
-                  {apiModels.length === 0 ? (
-                    <div className="text-center py-4">暂无API模型，请添加</div>
-                  ) : (
-                    <RadioGroup value={selectedModel} className="space-y-2">
-                      {apiModels.map((model) => (
-                        <div
-                          key={model.id}
-                          className={`model-item ${model.id === selectedModel ? 'selected' : ''}`}
-                          onClick={() => handleModelSelect(model.id)}
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <div className="flex items-center">
-                              <RadioGroupItem value={model.id} id={model.id} />
-                              <Label htmlFor={model.id} className="ml-2 cursor-pointer">
-                                {model.name}
-                              </Label>
-                            </div>
-                            <div className="flex items-center">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="edit-button"
-                                onClick={(e) => handleEditModel(model.id, e)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="delete-button"
-                                onClick={(e) => handleDeleteModel(model.id, e)}
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </div>
+              {/* API模型列表 */}
+              <TabsContent value="api" className="space-y-4">
+                {apiModels.length === 0 ? (
+                  <div className="text-center py-4">暂无API模型，请添加</div>
+                ) : (
+                  <RadioGroup value={selectedModel} className="space-y-2">
+                    {apiModels.map((model) => (
+                      <div
+                        key={model.id}
+                        className={`model-item ${model.id === selectedModel ? 'selected' : ''}`}
+                        onClick={() => handleModelSelect(model.id)}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center">
+                            <RadioGroupItem value={model.id} id={model.id} />
+                            <Label htmlFor={model.id} className="ml-2 cursor-pointer">
+                              {model.name}
+                            </Label>
                           </div>
-                          {model.id === selectedModel && (
-                            <div className="model-details">
-                              <p><strong>URL:</strong> {model.url || '未设置'}</p>
-                              <p><strong>API Key:</strong> {model.apiKey ? '******' : '未设置'}</p>
-                              {model.parameters && <p><strong>参数:</strong> {model.parameters}</p>}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  )}
-                  <Button variant="secondary" className="w-full" onClick={handleAddApiModelClick}>
-                    添加API模型
-                  </Button>
-                </TabsContent>
-
-                {/* 本地模型列表 */}
-                <TabsContent value="local" className="space-y-4">
-                  {/* 本地模型服务控制 */}
-                  <div className="mb-4 p-4 bg-gray-50 rounded-md">
-                    <h3 className="text-sm font-medium mb-2">本地模型服务</h3>
-                    <StartLocalModelServer selectedModel={selectedModel} />
-                  </div>
-
-                  {localModels.length === 0 ? (
-                    <div className="text-center py-4">暂无本地模型，请添加</div>
-                  ) : (
-                    <RadioGroup value={selectedModel} className="space-y-2">
-                      {localModels.map((model) => (
-                        <div
-                          key={model.id}
-                          className={`model-item ${model.id === selectedModel ? 'selected' : ''}`}
-                          onClick={() => handleModelSelect(model.id)}
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <div className="flex items-center">
-                              <RadioGroupItem value={model.id} id={model.id} />
-                              <Label htmlFor={model.id} className="ml-2 cursor-pointer">
-                                {model.name}
-                              </Label>
-                            </div>
-                            <div className="flex items-center">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="edit-button"
-                                onClick={(e) => handleEditModel(model.id, e)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="delete-button"
-                                onClick={(e) => handleDeleteModel(model.id, e)}
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </div>
+                          <div className="flex items-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="edit-button"
+                              onClick={(e) => handleEditModel(model.id, e)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="delete-button"
+                              onClick={(e) => handleDeleteModel(model.id, e)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
                           </div>
-                          {model.id === selectedModel && (
-                            <div className="model-details">
-                              <p><strong>路径:</strong> {model.path || '未设置'}</p>
-                              {model.parameters && <p><strong>参数:</strong> {model.parameters}</p>}
-                            </div>
-                          )}
                         </div>
-                      ))}
-                    </RadioGroup>
-                  )}
-                  <Button variant="secondary" className="w-full" onClick={handleAddLocalModelClick}>
-                    添加本地模型
-                  </Button>
-                </TabsContent>
-              </Tabs>
-            </>
+                        {model.id === selectedModel && (
+                          <div className="model-details">
+                            <p><strong>API模型ID:</strong> {model.apiId || model.id}</p>
+                            <p><strong>URL:</strong> {model.url || '未设置'}</p>
+                            <p><strong>API Key:</strong> {model.apiKey ? '******************' : '未设置'}</p>
+                            {model.parameters && <p><strong>参数:</strong> {model.parameters}</p>}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </RadioGroup>
+                )}
+                <Button variant="secondary" className="w-full" onClick={handleAddApiModelClick}>
+                  添加API模型
+                </Button>
+              </TabsContent>
+
+              {/* 本地模型列表 */}
+              <TabsContent value="local" className="space-y-4">
+                {/* 本地模型服务控制 */}
+                <div className="mb-4 p-4 bg-gray-50 rounded-md">
+                  <div className="text-sm font-medium mb-2">本地模型服务</div>
+                  <StartLocalModelServer selectedModel={selectedModel} />
+                </div>
+
+                {localModels.length === 0 ? (
+                  <div className="text-center py-4">暂无本地模型，请添加</div>
+                ) : (
+                  <RadioGroup value={selectedModel} className="space-y-2">
+                    {localModels.map((model) => (
+                      <div
+                        key={model.id}
+                        className={`model-item ${model.id === selectedModel ? 'selected' : ''}`}
+                        onClick={() => handleModelSelect(model.id)}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center">
+                            <RadioGroupItem value={model.id} id={model.id} />
+                            <Label htmlFor={model.id} className="ml-2 cursor-pointer">
+                              {model.name}
+                            </Label>
+                          </div>
+                          <div className="flex items-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="edit-button"
+                              onClick={(e) => handleEditModel(model.id, e)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="delete-button"
+                              onClick={(e) => handleDeleteModel(model.id, e)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        {model.id === selectedModel && (
+                          <div className="model-details">
+                            <p><strong>路径:</strong> {model.path || '未设置'}</p>
+                            {model.parameters && <p><strong>参数:</strong> {model.parameters}</p>}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </RadioGroup>
+                )}
+                <Button variant="secondary" className="w-full" onClick={handleAddLocalModelClick}>
+                  添加本地模型
+                </Button>
+              </TabsContent>
+            </Tabs>
           )}
         </DialogContent>
       </Dialog>
