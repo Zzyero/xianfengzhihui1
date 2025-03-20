@@ -13,41 +13,49 @@
 - **提示词响应**：流式输出
 - **数据持久化**：IndexedDB (通过自定义服务层封装)
 - **通知系统**：Sonner Toast
+- **本地模型服务**：Flask + Transformers
+- **模型管理**：PyTorch + Hugging Face Transformers
 
 ## 项目结构
 
 ```
 components/pages/PromptEnhancement/
-├── hooks/                       # 自定义钩子目录
-│   ├── index.ts                 # 钩子统一导出
-│   ├── useAppState.tsx          # 全局状态管理钩子
-│   ├── useMessages.tsx          # 消息管理钩子
-│   ├── useSessions.tsx          # 会话管理钩子
-│   ├── useTemplates.tsx         # 模板管理钩子
-│   ├── useApplicationInit.tsx   # 应用初始化钩子
-│   └── useInput.tsx             # 输入管理钩子
-├── service/                     # 服务层目录
+├── service/                     # 服务层和状态管理目录
 │   ├── db.ts                    # 数据库服务
 │   ├── messageService.ts        # 消息服务
-│   └── DataTransfer.tsx         # 数据导入导出服务
+│   ├── modelService.ts          # 模型服务
+│   ├── DataTransfer.jsx         # 数据导入导出服务
+│   ├── useAppState.tsx          # 全局状态管理实现
+│   └── deldb.jsx                # 删除数据库工具
 ├── ChatInterface/               # 聊天界面组件
 │   ├── ChatWindow.tsx           # 聊天窗口组件
 │   ├── MessageInput.tsx         # 消息输入组件
-│   └── HistorySidebarControl.tsx # 历史侧边栏控制组件
+│   ├── MessageDisplay.tsx       # 消息显示组件
+│   ├── HistorySidebar.tsx       # 历史侧边栏组件
+│   ├── HistorySidebarControl.tsx# 历史侧边栏控制组件
+│   └── Loading.jsx              # 加载组件
 ├── TemplateManagement/          # 模板管理组件
 │   └── TemplateBar.tsx          # 模板栏组件
 ├── ModelManagement/             # 模型管理组件
-│   └── ChangeModel.tsx          # 模型选择组件
+│   ├── ChangeModel.tsx          # 模型选择组件
+│   ├── StartLocalModelServer.tsx# 本地模型服务器启动组件
+│   ├── EditLocalModel.tsx       # 本地模型编辑组件
+│   └── EditApiModel.tsx         # API模型编辑组件
 ├── styles/                      # 样式文件目录
 │   └── PromptEnhancement.css    # 主样式文件
 └── PromptEnhancementPage.tsx    # 主页面组件
+
+local_model_server/              # 本地模型服务器
+├── app.py                       # Flask应用主文件
+├── requirements.txt             # Python依赖文件
+└── README.md                    # 服务器说明文档
 ```
 
 ## 核心功能实现
 
 ### 1. 全局状态管理
 
-项目采用React Context API实现全局状态管理，通过`useAppState.tsx`定义和管理应用状态：
+项目采用React Context API实现全局状态管理，通过`service/useAppState.tsx`定义和管理应用状态：
 
 ```typescript
 // 创建上下文和Provider
@@ -275,8 +283,8 @@ interface AppState {
 
 项目通过以下架构实现状态管理：
 
-1. **全局状态层**：`useAppState.tsx`中定义所有状态和操作
-2. **兼容层**：如`useMessages.tsx`等钩子，为了兼容旧接口
+1. **全局状态层**：`service/useAppState.tsx`中定义所有状态和操作
+2. **服务层**：如`messageService.ts`、`db.ts`等，提供基础功能
 3. **组件层**：`PromptEnhancementInner`通过`useAppState`获取状态和操作
 
 ### 状态操作封装
@@ -306,6 +314,12 @@ const actions = {
   setCustomPrompt,
   setIsAddTemplateDialogOpen,
   
+  // 模型操作
+  loadModels,
+  handleModelChange,
+  handleLocalModelServerStart,
+  handleModelEdit,
+  
   // 等等...
 };
 ```
@@ -318,9 +332,25 @@ const actions = {
 
 ```tsx
 const PromptEnhancementPage: React.FC = () => {
+  // 页面加载状态
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  // 初始化加载，等待组件渲染完成
+  useEffect(() => {
+    // 延迟关闭加载页面
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 750);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <AppStateProvider>
-      <PromptEnhancementInner />
+      {/* Loading组件包裹主应用内容 */}
+      <Loading isLoading={isPageLoading}>
+        <PromptEnhancementInner />
+      </Loading>
     </AppStateProvider>
   );
 };
@@ -557,7 +587,7 @@ useEffect(() => {
 用户使用该模块的典型流程：
 
 1. **初始页面加载**：自动加载最近的会话或创建新会话
-2. **选择模型**：用户可以从顶部选择不同的AI模型
+2. **选择模型**：用户可以从顶部选择不同的AI模型（包括本地模型和API模型）
 3. **发送消息**：在输入框中输入内容并发送
 4. **接收回复**：AI模型生成回复，实时显示在对话窗口中
 5. **应用模板**：用户可以从底部的模板栏选择预设模板
@@ -568,7 +598,7 @@ useEffect(() => {
 
 ### 扩展新功能
 
-1. **添加新状态**：在`useAppState.tsx`的`AppState`接口中添加新状态
+1. **添加新状态**：在`service/useAppState.tsx`的`AppState`接口中添加新状态
 2. **添加新操作**：在`AppStateProvider`中实现新的操作方法并添加到`actions`对象
 3. **创建新组件**：在适当的目录创建新组件，并通过`useAppState`获取状态和操作
 4. **更新服务层**：如需持久化存储，在`db.ts`中添加相应操作
@@ -577,6 +607,7 @@ useEffect(() => {
 
 1. 在`db.ts`的`initDefaultModels`方法中添加新模型定义
 2. 如需特殊处理，在`messageService.ts`的`sendMessage`方法中添加新模型的处理逻辑
+3. 在`ModelManagement`目录下添加相应的模型管理组件
 
 ## 性能优化
 
@@ -589,4 +620,149 @@ useEffect(() => {
 
 ## 总结
 
-提示词增强模块是一个功能完善的AI对话与提示词管理系统，通过统一的状态管理机制，实现了会话、消息、模板等功能的有效管理，使数据流更加清晰、状态变更更加可控。系统具有良好的可扩展性和可维护性，可以方便地扩展新功能和添加新模型支持。 
+提示词增强模块是一个功能完善的AI对话与提示词管理系统，通过统一的状态管理机制，实现了会话、消息、模板等功能的有效管理，使数据流更加清晰、状态变更更加可控。系统具有良好的可扩展性和可维护性，可以方便地扩展新功能和添加新模型支持。
+
+## 本地模型服务器
+
+### 服务器架构
+
+本地模型服务器使用 Flask 框架实现，提供以下主要功能：
+
+1. **模型管理**
+   - 模型加载和卸载
+   - 模型缓存管理
+   - CUDA 资源管理
+
+2. **文本生成**
+   - 流式文本生成
+   - 非流式文本生成
+   - 生成中断控制
+
+3. **系统监控**
+   - CUDA 可用性检查
+   - 内存使用监控
+   - 加载模型状态查询
+
+### 主要接口
+
+```python
+# 启动模型服务
+@app.route('/api/start', methods=['POST'])
+def start():
+    # 加载指定模型
+    # 返回加载状态
+
+# 卸载模型
+@app.route('/api/delete', methods=['POST'])
+def delete():
+    # 卸载指定模型
+    # 清理相关资源
+
+# 生成文本
+@app.route('/api/generate', methods=['POST'])
+def generate():
+    # 支持流式和非流式生成
+    # 可配置生成参数
+
+# 中断生成
+@app.route('/api/abort', methods=['POST'])
+def abort_generation():
+    # 中断正在进行的生成任务
+
+# 系统信息
+@app.route('/api/system', methods=['GET'])
+def system_info():
+    # 返回系统状态和资源使用情况
+```
+
+### 模型管理
+
+```python
+# 模型加载
+def load_model(model_name: str, model_path: str):
+    # 检查模型缓存
+    # 加载模型和分词器
+    # 配置设备（CUDA/CPU）
+    # 缓存模型资源
+
+# 模型卸载
+def unload_model(model_name: str, model_path: str):
+    # 清理模型缓存
+    # 释放内存资源
+    # 触发垃圾回收
+```
+
+### 文本生成
+
+```python
+# 流式生成
+def generate_stream(model_path: str, prompt: str, params: Dict[str, Any], request_id: str):
+    # 配置生成参数
+    # 创建流式输出器
+    # 处理中断信号
+    # 返回生成结果
+
+# 非流式生成
+def generate_text(model_name: str, prompt: str, params: Dict[str, Any], request_id: str):
+    # 配置生成参数
+    # 生成完整文本
+    # 处理中断信号
+    # 返回生成结果
+```
+
+### 系统监控
+
+```python
+# CUDA 可用性检查
+def check_cuda_availability():
+    # 检查 CUDA 是否可用
+    # 获取设备信息
+    # 返回状态信息
+
+# 系统信息查询
+@app.route('/api/system', methods=['GET'])
+def system_info():
+    # 获取 CUDA 状态
+    # 获取已加载模型
+    # 获取内存使用情况
+    # 返回系统状态
+```
+
+### 性能优化
+
+1. **模型缓存**
+   - 使用内存缓存已加载的模型
+   - 避免重复加载相同模型
+   - 支持手动卸载模型释放资源
+
+2. **CUDA 优化**
+   - 自动检测 CUDA 可用性
+   - 使用 float16 精度减少内存占用
+   - 支持自动设备映射
+
+3. **内存管理**
+   - 及时清理未使用的模型资源
+   - 支持手动触发垃圾回收
+   - 监控内存使用情况
+
+4. **流式输出**
+   - 支持实时返回生成结果
+   - 可中断长时间运行的生成任务
+   - 优化用户体验
+
+### 错误处理
+
+1. **异常捕获**
+   - 模型加载失败处理
+   - 生成过程异常处理
+   - 资源清理保证
+
+2. **日志记录**
+   - 详细的错误日志
+   - 操作状态追踪
+   - 性能监控数据
+
+3. **状态反馈**
+   - 清晰的错误消息
+   - 操作结果通知
+   - 系统状态报告
