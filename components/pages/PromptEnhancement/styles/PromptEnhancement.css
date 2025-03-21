@@ -2,12 +2,23 @@
 .prompt-enhancement-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
-  padding-top: 56px; /* 导航栏高度 */
   box-sizing: border-box;
   position: relative;
-  z-index: 1; /* 确保在导航栏下方 */
+  background-color: var(--background, #ffffff); /* 确保背景为白色 */
+}
+
+.prompt-enhancement-container.active {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+  background-color: var(--background, #ffffff); /* 确保背景为白色 */
 }
 
 /* 页面头部 */
@@ -39,7 +50,8 @@
   flex: 1;
   overflow: hidden;
   position: relative;
-  height: calc(100vh - 53px); /* 减去导航栏高度 */
+  height: 100%; /* 使用100%高度而不是固定计算值 */
+  width: 100%;
 }
 
 /* 控制栏 */

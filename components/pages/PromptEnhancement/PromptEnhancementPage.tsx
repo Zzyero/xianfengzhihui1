@@ -14,18 +14,17 @@ import TemplateBar from './TemplateManagement/TemplateBar';
 import ChangeModel from "./ModelManagement/ChangeModel";
 import HistorySidebarControl from './ChatInterface/HistorySidebarControl';
 import { Toaster } from "sonner";
-// 导入Loading组件
-import Loading from './ChatInterface/Loading';
 // 导入样式
 import './styles/PromptEnhancement.css';
 // 导入自定义钩子
 import { AppStateProvider, useAppState } from './service/useAppState';
-
+// 导入加载动画
+import Loading from './ChatInterface/Loading';
 /**
  * 应用内部组件
  * 使用全局状态管理的内部组件
  */
-const PromptEnhancementInner: React.FC = () => {
+const PromptEnhancementInner: React.FC<{ isactive: boolean }> = ({ isactive }) => {
   // 使用全局应用状态
   const { state, actions } = useAppState();
 
@@ -37,7 +36,7 @@ const PromptEnhancementInner: React.FC = () => {
   }, [state.activeSessionId]);
 
   return (
-    <div className="prompt-enhancement-container">
+    <div className={`prompt-enhancement-container ${isactive ? 'active' : ''}`}>
       <Toaster position="top-center" />
       <div className="main-content">
         <Card className="chat-card">
@@ -112,33 +111,38 @@ const PromptEnhancementInner: React.FC = () => {
   );
 };
 
+
 /**
  * 主应用组件
  * 使用 AppStateProvider 包装整个应用
  */
-const PromptEnhancementPage: React.FC = () => {
-  // 页面加载状态
-  const [isPageLoading, setIsPageLoading] = useState(true);
-
-  // 初始化加载，等待组件渲染完成
+const PromptEnhancementPage: React.FC<{ isactive: boolean }> = ({ isactive }) => {
+  // 使用组件内的状态，不依赖模块级变量
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // 组件初次挂载和激活状态变化时执行
   useEffect(() => {
-    // 延迟关闭加载页面
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 750);
-
-    return () => clearTimeout(timer);
-  }, []);
+      console.log('首次激活提示词增强页面，显示加载动画');
+      // 延迟关闭加载动画
+      const timer = setTimeout(() => {
+        console.log('关闭加载动画');
+        setIsLoading(false);
+      }, 750);
+      return () => clearTimeout(timer);
+    }
+  , []);
 
   return (
-    <AppStateProvider>
-      {/* Loading组件包裹主应用内容 */}
-      <Loading isLoading={isPageLoading}>
-        <PromptEnhancementInner />
-      </Loading>
-    </AppStateProvider>
+    <>
+      {/* 内联加载动画 - 只在加载状态显示 */}
+      {isLoading && <Loading />}
+      
+      {/* 主应用内容 */}
+      <AppStateProvider>
+        <PromptEnhancementInner isactive={isactive} />
+      </AppStateProvider>
+    </>
   );
 };
 
 export default PromptEnhancementPage;
-    
