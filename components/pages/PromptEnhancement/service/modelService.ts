@@ -260,7 +260,6 @@ class ModelService {
       // 检查是否是取消的错误
       if (error.name === 'AbortError' || (signal && signal.aborted)) {
         console.log('API调用已取消');
-        callbacks.onError?.(new Error('生成已停止'));
         return;
       }
       
@@ -416,7 +415,6 @@ class ModelService {
       // 检查是否是取消的错误
       if (error.name === 'AbortError' || (signal && signal.aborted)) {
         console.log('本地模型调用已取消');
-        callbacks.onError?.(new Error('生成已停止'));
         return;
       }
       

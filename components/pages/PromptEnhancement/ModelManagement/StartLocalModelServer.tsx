@@ -102,34 +102,34 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
   };
 
   /**
-   * 启动本地模型服务
+   * 启动本地模型服务(手动启动)
    */
-  const startServer = async () => {
-    // 检查是否有本地模型
-    if (localModels.length === 0) {
-      toast.error('没有可用的本地模型，请先添加模型');
-      return;
-    }
+  // const startServer = async () => {
+  //   // 检查是否有本地模型
+  //   if (localModels.length === 0) {
+  //     toast.error('没有可用的本地模型，请先添加模型');
+  //     return;
+  //   }
 
-    // 设置状态为启动中
-    setServerStatus({ status: 'starting' });
-    toast.info('正在启动本地模型服务...');
+  //   // 设置状态为启动中
+  //   setServerStatus({ status: 'starting' });
+  //   toast.info('请在local_model_server.py中启动app.py');
 
-    try {
-      // 检查服务是否已启动
-      const isRunning = await checkServerStatus();
+  //   try {
+  //     // 检查服务是否已启动
+  //     const isRunning = await checkServerStatus();
       
-      if (isRunning) {
-        toast.success('本地模型服务已启动');
-      } else {
-        toast.error('启动本地模型服务失败');
-      }
-    } catch (error) {
-      console.error('启动服务失败:', error);
-      toast.error('启动本地模型服务失败');
-      setServerStatus({ status: 'stopped' });
-    }
-  };
+  //     if (isRunning) {
+  //       toast.success('本地模型服务已启动');
+  //     } else {
+  //       toast.error('启动本地模型服务失败');
+  //     }
+  //   } catch (error) {
+  //     console.error('启动服务失败:', error);
+  //     toast.error('启动本地模型服务失败');
+  //     setServerStatus({ status: 'stopped' });
+  //   }
+  // };
   
   /**
    * 加载选中的模型
@@ -279,20 +279,20 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
   };
 
   // 获取按钮文本
-  const getButtonText = () => {
-    switch (serverStatus.status) {
-      case 'checking':
-        return '检查中...';
-      case 'starting':
-        return '启动中...';
-      case 'running':
-        return '服务运行中';
-      case 'stopped':
-      case 'idle':
-      default:
-        return '启动服务';
-    }
-  };
+  // const getButtonText = () => {
+  //   switch (serverStatus.status) {
+  //     case 'checking':
+  //       return '检查中...';
+  //     case 'starting':
+  //       return '启动中...';
+  //     case 'running':
+  //       return '服务运行中';
+  //     case 'stopped':
+  //     case 'idle':
+  //     default:
+  //       return '手动启动服务';
+  //   }
+  // };
 
   // 获取按钮禁用状态
   const isButtonDisabled = () => {
@@ -353,11 +353,10 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
         )}
       </div>
       
-      <Button 
+      {/* <Button 
         variant={serverStatus.status === 'running' ? "secondary" : "default"}
         className="w-full mb-4"
-        disabled={isButtonDisabled()}
-        onClick={startServer}
+        disabled={true}
       >
         {serverStatus.status === 'checking' || serverStatus.status === 'starting' ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -365,7 +364,7 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
           <Server className="mr-2 h-4 w-4" />
         ) : null}
         {getButtonText()}
-      </Button>
+      </Button> */}
       
       {/* 模型加载和卸载按钮 */}
       {serverStatus.status === 'running' && (

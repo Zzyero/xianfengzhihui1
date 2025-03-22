@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
@@ -17,6 +17,16 @@ import { Code } from 'lucide-react';
 interface MessageDisplayProps {
   message: Message;
   showTimestamp?: boolean;
+}
+
+// 定义 React 元素类型，解决类型检查问题
+interface ReactElementWithChildren {
+  props: {
+    children?: React.ReactNode;
+    className?: string;
+    [key: string]: any;
+  };
+  type: string | React.JSXElementConstructor<any>;
 }
 
 /**
@@ -53,6 +63,11 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
 
   // 处理代码复制
   const handleCopyCode = useCallback((code: string) => {
+    if (!code || code.trim() === '') {
+      toast.error("无代码内容可复制");
+      return;
+    }
+    
     navigator.clipboard.writeText(code)
       .then(() => {
         toast.success("代码已复制到剪贴板");
@@ -63,30 +78,109 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
       });
   }, []);
 
+  // 从Markdown代码块中提取语言
+  const extractLanguageFromMarkdown = (content: string, codeBlockIndex: number = 0): string => {
+    const codeBlockRegex = /```(\w*)\n[\s\S]*?```/g;
+    let match;
+    let currentIndex = 0;
+    
+    while ((match = codeBlockRegex.exec(content)) !== null) {
+      if (currentIndex === codeBlockIndex) {
+        // 返回语言名称，如果没有指定则返回默认值
+        return match[1] || 'code';
+      }
+      currentIndex++;
+    }
+    
+    return 'code'; // 默认语言
+  };
+
+  // 安全地提取代码内容
+  const extractCodeContent = (element: React.ReactElement | React.ReactNode | string): string => {
+    // 处理字符串元素
+    if (typeof element === 'string') {
+      return element;
+    }
+    
+    // 处理React元素
+    if (React.isValidElement(element)) {
+      // 如果元素有children属性，递归处理
+      const elementWithProps = element as ReactElementWithChildren;
+      if (elementWithProps.props && elementWithProps.props.children) {
+        if (Array.isArray(elementWithProps.props.children)) {
+          return elementWithProps.props.children.map((child) => 
+            extractCodeContent(child)
+          ).join('');
+        } else {
+          return extractCodeContent(elementWithProps.props.children);
+        }
+      }
+    }
+    
+    return '';
+  };
+
+  // 跟踪当前渲染的代码块索引
+  const codeBlockIndexRef = useRef<number>(0);
+  
+  // 在组件挂载时重置代码块索引
+  useEffect(() => {
+    codeBlockIndexRef.current = 0;
+  }, [message.content]);
+
   // 自定义组件配置
   const customComponents: Components = {
     // 自定义pre标签渲染
     pre: (props) => {
       const { children, className, ...rest } = props;
+      const preRef = useRef<HTMLPreElement>(null);
+      
       // 获取代码内容和语言类型
       const codeElement = React.Children.toArray(children).find(
-        child => React.isValidElement(child) && child.type === 'code'
-      );
+        child => React.isValidElement(child) && (child as React.ReactElement).type === 'code'
+      ) as React.ReactElement | undefined;
       
       let code = '';
-      let language = 'code'; // 默认语言
+      // 从markdown原始内容中提取语言
+      let language = extractLanguageFromMarkdown(message.content, codeBlockIndexRef.current);
       
-      if (React.isValidElement(codeElement)) {
-        // 从code元素的className中提取语言类型
-        const langMatch = /language-(\w+)/.exec(codeElement.props.className || '');
-        if (langMatch && langMatch[1]) {
-          language = langMatch[1];
+      // 递增代码块索引，为下一个代码块准备
+      codeBlockIndexRef.current += 1;
+      
+      if (codeElement && React.isValidElement(codeElement)) {
+        const codeElementWithProps = codeElement as ReactElementWithChildren;
+        
+        // 尝试从className提取语言 (备用方法)
+        if (codeElementWithProps.props.className) {
+          const langMatch = /language-(\w+)/.exec(codeElementWithProps.props.className);
+          if (langMatch && langMatch[1] && langMatch[1] !== 'null') {
+            language = langMatch[1];
+          }
         }
         
-        code = React.Children.toArray(codeElement.props.children)
-          .join('')
-          .replace(/\n$/, '');
+        // 提取代码内容
+        const codeChildren = codeElementWithProps.props.children;
+        if (Array.isArray(codeChildren)) {
+          code = codeChildren.map((child) => extractCodeContent(child)).join('');
+        } else {
+          code = extractCodeContent(codeChildren || '');
+        }
+        
+        // 删除末尾的换行符
+        code = code.replace(/\n$/, '');
       }
+      
+      // 复制按钮点击处理函数
+      const handleCopyClick = () => {
+        // 如果code为空，尝试从DOM元素获取内容
+        if (!code && preRef.current) {
+          const codeElement = preRef.current.querySelector('code');
+          if (codeElement) {
+            code = codeElement.textContent || '';
+          }
+        }
+        handleCopyCode(code);
+      };
       
       // 创建带导航栏的代码块
       return (
@@ -99,12 +193,12 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
               variant="ghost" 
               size="icon" 
               className="copy-button"
-              onClick={() => handleCopyCode(code)}
+              onClick={handleCopyClick}
             >
               <Copy className="h-4 w-4" />
             </Button>
           </div>
-          <pre className={className} {...rest}>
+          <pre ref={preRef} className={className} {...rest}>
             {children}
           </pre>
         </div>

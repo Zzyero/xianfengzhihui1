@@ -210,7 +210,8 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
     
     // 设置新的活动会话ID
     setActiveSessionId(sessionId);
-    
+    // 保存最后使用的会话ID到数据库
+    db.saveLastUsedSessionId(sessionId);
     // 重置模板状态
     setActiveTemplateId(null);
     setCustomPrompt('');
@@ -350,7 +351,6 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
     MessageService.cancelGeneration(activeSessionId);
     
     setIsGenerating(false);
-    toast.info('已停止生成回复');
   };
 
   // ===== 模板操作 =====
@@ -454,9 +454,9 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
         // 确保数据库初始化
         await db.initDefaultModels();
         
-        // 首先尝试获取最后使用的模型ID
+        // 尝试获取最后使用的模型ID
         const lastUsedModelId = await db.getLastUsedModelId();
-        
+
         if (lastUsedModelId) {
           // 如果有最后使用的模型ID，直接使用它
           setSelectedModel(lastUsedModelId);
@@ -486,24 +486,31 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
         // 加载模板列表
         await loadTemplates();
         
-        // 如果有会话，加载最近的一个会话
-        if (sessions.length > 0) {
-          // 按时间戳排序，获取最新的会话
-          const sortedSessions = [...sessions].sort(
-            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-          );
-          
-          const latestSessionId = sortedSessions[0].id;
-          setActiveSessionId(latestSessionId);
-          await loadSessionMessages(latestSessionId);
-        } else {
-          // 如果没有会话，创建一个新会话
-          const newSessionId = await createNewSession("新对话");
-          if (newSessionId) {
-            setActiveSessionId(newSessionId);
-            setMessages([]);
-          }
+        // 获取最后使用的会话ID,如果没有找最新会话
+        const lastUsedSessionId = await db.getLastUsedSessionId();
+        if (lastUsedSessionId) {
+          // 如果有最后使用的会话ID，直接使用它
+          setActiveSessionId(lastUsedSessionId);
+          console.log(`回到上次选择的会话: ${lastUsedSessionId}`);
         }
+        else
+        {if (sessions.length > 0) {
+            // 按时间戳排序，获取最新的会话
+            const sortedSessions = [...sessions].sort(
+              (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+            );
+            // 获取最新会话ID
+            const latestSessionId = sortedSessions[0].id;
+            setActiveSessionId(latestSessionId);
+            await loadSessionMessages(latestSessionId);
+          } else {
+            // 如果没有会话，创建一个新会话
+            const newSessionId = await createNewSession("新对话");
+            if (newSessionId) {
+              setActiveSessionId(newSessionId);
+              setMessages([]);
+            }
+          }}
       } catch (error) {
         console.error('应用初始化失败:', error);
         toast.error('初始化应用失败，请刷新页面重试');

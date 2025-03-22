@@ -38,7 +38,7 @@
 }
 
 .message-content {
-  padding: 1rem;
+  padding: 0.25rem;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -68,7 +68,7 @@
 /* Markdown 内容样式 */
 .markdown-content {
   line-height: 1.6;
-  color: var(--text-primary);
+  color: var(--text-primary, #1E293B);
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
@@ -152,12 +152,12 @@
 /* 代码块容器样式 */
 .code-block-container {
   position: relative;
-  margin: 1rem 0;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-color, #e0e0e0);
   background-color: var(--code-block-bg, rgba(0, 0, 0, 0.02));
   max-width: 100%;
+  margin-bottom: 1rem;
 }
 
 /* 代码块头部导航栏 */
@@ -165,9 +165,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 1rem;
   background-color: rgba(0, 0, 0, 0.03);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
   font-family: var(--font-mono, monospace);
   font-size: 0.8rem;
   z-index: 10;
@@ -197,17 +197,18 @@
   align-items: center;
   justify-content: center;
   padding: 0.25rem 0.5rem;
-  color: var(--text-secondary);
+  color: var(--text-secondary, #6a737d);
   background: transparent;
   border-radius: 4px;
   transition: all 0.2s;
   flex-shrink: 0;
   font-size: 0.75rem;
+  cursor: pointer;
 }
 
 .copy-button:hover {
   background-color: rgba(0, 0, 0, 0.05);
-  color: var(--text-primary);
+  color: var(--text-primary, #1E293B);
 }
 
 .markdown-content pre {
@@ -303,4 +304,31 @@
 .plain-text {
   white-space: pre-wrap;
   line-height: 1.6;
+}
+
+/* 主题适配 */
+.light {
+  --background: #FFFFFF;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --border-color: #e0e0e0;
+  --code-block-bg: rgba(0, 0, 0, 0.02);
+  --code-text: #333;
+}
+
+.dark {
+  --background: #1F1F1F;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A3A3A3;
+  --border-color: #2d2d2d;
+  --code-block-bg: rgba(255, 255, 255, 0.05);
+  --code-text: #e0e0e0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+  }
 } 

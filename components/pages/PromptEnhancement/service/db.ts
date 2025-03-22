@@ -547,6 +547,46 @@ const db = {
     });
   },
 
+ /**
+   * 保存最后使用的会话ID
+   * @param sessionId 会话ID
+   */
+  saveLastUsedSessionId: async (sessionId: string): Promise<IDBValidKey> => {
+    return executeOperation<IDBValidKey>(STORES.SETTINGS, 'readwrite', async store => {
+      const settings = await new Promise<AppSettings | undefined>((resolve, reject) => {
+        const request = store.get('app-settings');
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      
+      const updatedSettings: AppSettings = {
+        ...(settings || { id: 'app-settings' }),
+        lastUsedSessionId: sessionId, 
+        timestamp: new Date()
+      };
+      
+      return new Promise((resolve, reject) => {
+        const request = store.put(updatedSettings);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    });
+  },
+
+  /**
+   * 获取最后使用的会话ID
+   * @returns 最后使用的会话ID，如果不存在则返回undefined
+   */
+  getLastUsedSessionId: async (): Promise<string | undefined> => {
+    return executeOperation<string | undefined>(STORES.SETTINGS, 'readonly', store => {
+      return new Promise((resolve, reject) => {
+        const request = store.get('app-settings');
+        request.onsuccess = () => resolve(request.result?.lastUsedSessionId);
+        request.onerror = () => reject(request.error);
+      });
+    });
+  },
+
   /**
    * 初始化默认模型
    * 如果数据库中没有模型，则添加默认的模型配置

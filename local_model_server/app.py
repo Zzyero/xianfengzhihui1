@@ -97,7 +97,13 @@ def unload_model(model_name: str,model_path:str):
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
                 
-            logger.info(f"模型 {model_name} 已成功卸载，模型地址:{model_path}")
+            extra_tensors = [t for t in gc.get_objects() if isinstance(t, torch.Tensor) and t.is_cuda]
+            for t in extra_tensors:
+                del t
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                logger.info(f"模型 {model_name} 已成功卸载，模型地址:{model_path}")
             return True
         except Exception as e:
             logger.error(f"卸载模型 {model_name} 失败: {str(e)}，模型地址:{model_path}")

@@ -32,7 +32,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const [message, setMessage] = useState<string>('');  // 输入的消息内容
   const [inputHistory, setInputHistory] = useState<string[]>([]);  // 输入历史记录
   const [historyIndex, setHistoryIndex] = useState<number>(-1);  // 历史记录索引
-  
   // ===== Refs =====
   const textareaRef = useRef<HTMLTextAreaElement>(null);  // 文本输入框引用
   const dummyTextareaRef = useRef<HTMLDivElement>(null);  // 用于计算高度的隐藏div
@@ -161,7 +160,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
    * 上下箭头浏览输入历史
    */
   const handleKeyDown = (e: React.KeyboardEvent): void => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !isGenerating) {
       e.preventDefault();
       handleSubmit();
     } else if (e.key === 'ArrowUp' && !e.shiftKey && inputHistory.length > 0) {
