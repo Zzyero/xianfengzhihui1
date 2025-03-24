@@ -174,7 +174,7 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
           {errors.apiKey && <span className="error-message">{errors.apiKey}</span>}
         </div>
 
-        {/* 其他参数 */}
+        {/* 其他参数
         <div className="form-field">
           <Label htmlFor="parameters">其他参数 (可选)</Label>
           <Input
@@ -188,7 +188,7 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
           <p className="text-xs text-gray-500 mt-1">
             JSON格式，例如: {"\"model\":\"gpt-4\",\"temperature\":0.7,\"max_tokens\":2000"}
           </p>
-        </div>
+        </div> */}
       </div>
 
       {/* 表单按钮 */}

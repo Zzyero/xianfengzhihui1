@@ -127,7 +127,7 @@ const PromptEnhancementPage: React.FC<{ isactive: boolean }> = ({ isactive }) =>
       const timer = setTimeout(() => {
         console.log('关闭加载动画');
         setIsLoading(false);
-      }, 750);
+      }, 500);
       return () => clearTimeout(timer);
     }
   , []);

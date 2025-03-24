@@ -132,7 +132,7 @@ const EditLocalModel: React.FC<EditLocalModelProps> = ({ onAdd, onCancel, initia
           <p className="text-xs text-gray-500 mt-1">输入模型路径或模型标识符，例如: ChatGLM3-6B、THUDM/chatglm3-6b等</p>
         </div>
 
-        <div className="form-field">
+        {/* <div className="form-field">
           <Label htmlFor="local-parameters">其他参数 (可选)</Label>
           <Input
             type="text"
@@ -145,7 +145,7 @@ const EditLocalModel: React.FC<EditLocalModelProps> = ({ onAdd, onCancel, initia
           <p className="text-xs text-gray-500 mt-1">
             JSON格式，例如: {"\"temperature\":0.7,\"top_p\":0.9,\"top_k\":50,\"max_tokens\":1000"}
           </p>
-        </div>
+        </div> */}
       </div>
 
       {/* 表单按钮 */}

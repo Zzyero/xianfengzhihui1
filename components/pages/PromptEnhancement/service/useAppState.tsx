@@ -351,6 +351,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
     MessageService.cancelGeneration(activeSessionId);
     
     setIsGenerating(false);
+    toast.info('生成已停止');
   };
 
   // ===== 模板操作 =====
@@ -423,14 +424,14 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   // ===== 模型操作 =====
   /**
    * 处理模型选择
-   * @param modelName 选择的模型名字
+   * @param modelId 选择的模型ID
    */
-  const handleModelChange = (modelName: string): void => {
-    setSelectedModel(modelName);
+  const handleModelChange = (modelID: string): void => {
+    setSelectedModel(modelID);
     // 保存最后使用的模型ID到数据库
-    db.saveLastUsedModelId(modelName)
+    db.saveLastUsedModelId(modelID)
       .then(() => {
-        console.log(`已保存最后使用的模型ID: ${modelName}`);
+        console.log(`已保存最后使用的模型ID: ${modelID}`);
       })
       .catch(error => {
         console.error('保存模型ID失败:', error);
@@ -456,11 +457,11 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
         
         // 尝试获取最后使用的模型ID
         const lastUsedModelId = await db.getLastUsedModelId();
-
+        const models = await db.getAllModels();
         if (lastUsedModelId) {
           // 如果有最后使用的模型ID，直接使用它
           setSelectedModel(lastUsedModelId);
-          console.log(`使用上次选择的模型: ${lastUsedModelId}`);
+          console.log(`使用上次选择的模型: ${models.find(m => m.id === lastUsedModelId)?.name}`);
         } else {
           // 如果没有最后使用的模型ID，尝试使用API模型列表中的第一个
           const apiModels = await db.getAllModels('api');

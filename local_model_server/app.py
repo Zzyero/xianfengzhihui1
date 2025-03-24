@@ -307,7 +307,7 @@ def generate():
         # 生成请求ID
         request_id = f"req_{time.time()}"
         
-        logger.info(f"收到生成请求 ID: {request_id}, 模型路径: {model_path}, 流式: {stream}")
+        logger.info(f"收到生成请求 ID: {request_id}, 模型路径: {model_path}, 流式: {stream} 参数: {params}")
         
         if not model_path:
             return jsonify({"error": "缺少模型路径参数"}), 400
