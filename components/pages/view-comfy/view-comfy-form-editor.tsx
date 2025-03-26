@@ -29,6 +29,7 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
         previewImages: viewComfyJSON.previewImages,
         inputs: viewComfyJSON.inputs,
         advancedInputs: viewComfyJSON.advancedInputs,
+        type: viewComfyJSON.type || 'image_generation',
     }
 
     //表单
@@ -58,6 +59,7 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
                 previewImages: viewComfyJSON.previewImages,
                 inputs: viewComfyJSON.inputs,
                 advancedInputs: viewComfyJSON.advancedInputs,
+                type: viewComfyJSON.type || 'image_generation',
             });
         }
     }, [viewComfyJSON, form]);
@@ -91,6 +93,7 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
         if (downloadJson) {
             const workflows = viewComfyState.viewComfys.map((item) => {
                 return {
+                    type: item.type || item.viewComfyJSON.type || 'image_generation',
                     viewComfyJSON: item.viewComfyJSON,
                     workflowApiJSON: item.workflowApiJSON
                 }

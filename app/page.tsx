@@ -4,6 +4,7 @@ import { TopNav } from "@/components/top-nav"
 import { useState } from "react"
 import PlaygroundPage from "@/components/pages/playground/playground-page";
 import ViewComfyPage from "@/components/pages/view-comfy/view-comfy-page";
+import SmartPSPage from "@/components/pages/smartPS/smartPS-page";
 import { ViewComfyProvider } from "@/app/providers/view-comfy-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,8 @@ export default function Page() {
                         {currentTab === TabValue.Playground && <PlaygroundPage />}
                         {/* 工作流页面 */}
                         {currentTab === TabValue.WorkflowApi && <ViewComfyPage />}
+                        {/* 智能PS页面 */}
+                        {currentTab === TabValue.SmartPS && <SmartPSPage />}
                     </main>
                 </div>
             </div>
