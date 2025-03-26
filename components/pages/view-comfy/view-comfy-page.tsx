@@ -118,6 +118,7 @@ export default function ViewComfyPage() {
                     id: viewComfyState.currentViewComfy.viewComfyJSON
                         .id,
                     viewComfy: {
+                        type: data.type || 'image_generation',
                         viewComfyJSON: {
                             ...data,
                             id: viewComfyState.currentViewComfy
@@ -137,7 +138,12 @@ export default function ViewComfyPage() {
 
             viewComfyStateDispatcher({
                 type: ActionType.ADD_VIEW_COMFY,
-                payload: { viewComfyJSON: { ...data, id: Math.random().toString(16).slice(2) }, file: viewComfyState.viewComfyDraft?.file, workflowApiJSON: viewComfyState.viewComfyDraft?.workflowApiJSON }
+                payload: { 
+                    type: data.type || 'image_generation',
+                    viewComfyJSON: { ...data, id: Math.random().toString(16).slice(2) }, 
+                    file: viewComfyState.viewComfyDraft?.file, 
+                    workflowApiJSON: viewComfyState.viewComfyDraft?.workflowApiJSON 
+                }
             });
         }
     }
@@ -230,7 +236,7 @@ function getErrorText(error: Error | undefined) {
     if (error instanceof WorkflowJSONError) {
         return <>
             Looks like you have uploaded a workflow.json instead of workflow_api.json <br />
-            To generate workflow_api.json, enable dev mode options in the ComfyUI settings and export using the “Save (API format)” button.
+            To generate workflow_api.json, enable dev mode options in the ComfyUI settings and export using the "Save (API format)" button.
         </>
     }
 

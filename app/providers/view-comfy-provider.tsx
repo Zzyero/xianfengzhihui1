@@ -9,10 +9,12 @@ export interface IViewComfyBase {
     previewImages: string[];
     inputs: IMultiValueInput[];
     advancedInputs: IMultiValueInput[];
+    type?: 'image_generation' | 'smart_ps';
 }
 
 // 视图模式草稿接口
 export interface IViewComfyDraft {
+    type?: 'image_generation' | 'smart_ps';
     viewComfyJSON: IViewComfyBase;
     workflowApiJSON?: object | undefined;
     file?: File | undefined;
@@ -33,6 +35,7 @@ export interface IViewComfyJSON {
 
 // ViewComfy 配置接口
 export interface IViewComfy {
+    type?: 'image_generation' | 'smart_ps';
     viewComfyJSON: IViewComfyWorkflow;
     workflowApiJSON?: object | undefined;
     file?: File | undefined;
@@ -76,11 +79,13 @@ function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfySta
                 ...state,
                 viewComfys: [...state.viewComfys, { ...action.payload }],
                 currentViewComfy: {
+                    type: action.payload.type,
                     viewComfyJSON: action.payload.viewComfyJSON,
                     workflowApiJSON: action.payload.workflowApiJSON,
                     file: action.payload.file
                 },
                 viewComfyDraft: {
+                    type: action.payload.type,
                     viewComfyJSON: action.payload.viewComfyJSON,
                     workflowApiJSON: action.payload.workflowApiJSON,
                     file: action.payload.file
@@ -103,11 +108,13 @@ function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfySta
                         : item
                 ),
                 currentViewComfy: {
+                    type: action.payload.viewComfy.type,
                     viewComfyJSON: action.payload.viewComfy.viewComfyJSON,
                     workflowApiJSON: action.payload.viewComfy.workflowApiJSON,
                     file: action.payload.viewComfy.file
                 },
                 viewComfyDraft: {
+                    type: action.payload.viewComfy.type,
                     viewComfyJSON: action.payload.viewComfy.viewComfyJSON,
                     workflowApiJSON: action.payload.viewComfy.workflowApiJSON,
                     file: action.payload.viewComfy.file
@@ -122,6 +129,7 @@ function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfySta
             if (data.viewComfys.length > 0) {
                 data.currentViewComfy = data.viewComfys[0];
                 data.viewComfyDraft = {
+                    type: data.viewComfys[0].type,
                     viewComfyJSON: data.viewComfys[0].viewComfyJSON,
                     workflowApiJSON: data.viewComfys[0].workflowApiJSON,
                     file: data.viewComfys[0].file
@@ -149,13 +157,22 @@ function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfySta
             if (action.payload.workflows.length === 0) {
                 return state;
             }
+            
+            // 确保每个工作流都有 type 字段
+            const workflows = action.payload.workflows.map(workflow => ({
+                type: workflow.type,
+                viewComfyJSON: workflow.viewComfyJSON,
+                workflowApiJSON: workflow.workflowApiJSON,
+            }));
+            
             return {
-                viewComfys: [...action.payload.workflows.map((workflow) => ({
-                    viewComfyJSON: workflow.viewComfyJSON,
-                    workflowApiJSON: workflow.workflowApiJSON,
-                }))],
-                currentViewComfy: { viewComfyJSON: action.payload.workflows[0].viewComfyJSON, workflowApiJSON: action.payload.workflows[0].workflowApiJSON },
-                viewComfyDraft: { viewComfyJSON: action.payload.workflows[0].viewComfyJSON, workflowApiJSON: action.payload.workflows[0].workflowApiJSON },
+                viewComfys: workflows,
+                currentViewComfy: workflows.length > 0 ? workflows[0] : undefined,
+                viewComfyDraft: workflows.length > 0 ? {
+                    type: workflows[0].type,
+                    viewComfyJSON: workflows[0].viewComfyJSON,
+                    workflowApiJSON: workflows[0].workflowApiJSON
+                } : undefined,
             };
         }
         default:

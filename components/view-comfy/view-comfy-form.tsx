@@ -42,6 +42,13 @@ import { Eraser } from "lucide-react"
 import { MaskEditor } from "@/components/ui/mask-editor";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 interface IInputForm extends IInputField {
     id: string;
@@ -92,11 +99,45 @@ export function ViewComfyForm(args: {
                                             control={form.control}
                                             name="description"
                                             render={({ field }) => (
-                                                <FormItem key="description" className="ml-0.5">
+                                                <FormItem>
                                                     <FormLabel>描述</FormLabel>
                                                     <FormControl>
-                                                        <Textarea placeholder="描述工作流的功能" {...field} />
+                                                        <Textarea
+                                                            placeholder="描述"
+                                                            className={TEXT_AREA_STYLE}
+                                                            {...field}
+                                                        />
                                                     </FormControl>
+                                                    <FormDescription>
+                                                        工作流的描述
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="type"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>工作流类型</FormLabel>
+                                                    <Select
+                                                        onValueChange={field.onChange}
+                                                        defaultValue={field.value || "image_generation"}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="选择工作流类型" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value="image_generation">生图</SelectItem>
+                                                            <SelectItem value="smart_ps">智能PS</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormDescription>
+                                                        选择工作流的类型，不同类型的工作流会在不同的页面显示
+                                                    </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -106,24 +147,22 @@ export function ViewComfyForm(args: {
                                             control={form.control}
                                             name="textOutputEnabled"
                                             render={({ field }) => (
-                                                <FormItem key="textOutputEnabled" className="">
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                                     <FormControl>
-                                                        <div className={cn(`flex ml-0.5 space-x-2 pt-2`,
-                                                            (field.value) ? "mb-[-5px]" : "pb-2"
-                                                        )}>
-                                                            <FormLabel>允许文本生成</FormLabel>
-                                                            <Checkbox
-                                                                checked={field.value}
-                                                                onCheckedChange={field.onChange}
-                                                            />
-                                                        </div>
+                                                        <Checkbox
+                                                            className={CHECKBOX_STYLE}
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
                                                     </FormControl>
-                                                    {/* 文本输出的警告提示 */}
-                                                    {(field.value) && (
-                                                        <FormDescription className="pb-2">
-                                                            Text output is in beta and can lead to unexpected text being rendered
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            启用文本输出
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            是否启用文本输出
                                                         </FormDescription>
-                                                    )}
+                                                    </div>
                                                 </FormItem>
                                             )}
                                         />

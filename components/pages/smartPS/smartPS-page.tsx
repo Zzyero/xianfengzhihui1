@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/drawer"
 import { Fragment, useEffect, useState } from "react";
 import { Header } from "@/components/header";
-import PlaygroundForm from "./playground-form";
+import PlaygroundForm from "./smartPS-form";
 import { Loader } from "@/components/loader";
 import { usePostPlayground } from "@/hooks/playground/use-post-playground";
 import { ActionType, type IViewComfy, type IViewComfyWorkflow, useViewComfy } from "@/app/providers/view-comfy-provider";
@@ -49,15 +49,15 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                     }
                     const data = await response.json();
                     
-                    // 过滤只获取 image_generation 类型的工作流
-                    const imageGenerationWorkflows = {
+                    // 过滤只获取 smart_ps 类型的工作流
+                    const smartPSWorkflows = {
                         ...data.viewComfyJSON,
                         workflows: data.viewComfyJSON.workflows.filter(
-                            (workflow: any) => workflow.type === 'image_generation'
+                            (workflow: any) => workflow.type === 'smart_ps'
                         )
                     };
                     
-                    viewComfyStateDispatcher({ type: ActionType.INIT_VIEW_COMFY, payload: imageGenerationWorkflows });
+                    viewComfyStateDispatcher({ type: ActionType.INIT_VIEW_COMFY, payload: smartPSWorkflows });
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
                     if (error.errorType) {
@@ -83,22 +83,22 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
         }
     }, [viewMode, viewComfyStateDispatcher]);
 
-    // 自动切换到 image_generation 类型的工作流
+    // 自动切换到 smart_ps 类型的工作流
     useEffect(() => {
-        // 如果有工作流且当前工作流类型不是 image_generation
+        // 如果有工作流且当前工作流类型不是 smart_ps
         if (viewComfyState.viewComfys.length > 0 && 
-            (!viewComfyState.currentViewComfy || viewComfyState.currentViewComfy.type !== 'image_generation')) {
+            (!viewComfyState.currentViewComfy || viewComfyState.currentViewComfy.type !== 'smart_ps')) {
             
-            // 查找第一个 image_generation 类型的工作流
-            const imageGenerationWorkflow = viewComfyState.viewComfys.find(
-                workflow => workflow.type === 'image_generation'
+            // 查找第一个 smart_ps 类型的工作流
+            const smartPSWorkflow = viewComfyState.viewComfys.find(
+                workflow => workflow.type === 'smart_ps'
             );
             
             // 如果找到了匹配的工作流，自动选择它
-            if (imageGenerationWorkflow) {
+            if (smartPSWorkflow) {
                 viewComfyStateDispatcher({
                     type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
-                    payload: imageGenerationWorkflow
+                    payload: smartPSWorkflow
                 });
             }
         }
@@ -190,8 +190,8 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
     }, []);
 
     const onSelectChange = (data: IViewComfy) => {
-        // 确保只选择 image_generation 类型的工作流
-        if (data.type !== 'image_generation') {
+        // 确保只选择 smart_ps 类型的工作流
+        if (data.type !== 'smart_ps') {
             return;
         }
         return viewComfyStateDispatcher({
@@ -212,7 +212,7 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
         <>
             <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center p-4 border-b">
-                    <h1 className="text-2xl font-bold">生图区</h1>
+                    <h1 className="text-2xl font-bold">智能PS</h1>
                     <QueueManager 
                         onInterrupt={handleInterrupt}
                         onClear={handleClearQueue}
@@ -237,7 +237,7 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                         {viewComfyState.viewComfys.length > 0 && viewComfyState.currentViewComfy && (
                             <div className="px-3 w-full">
                                 <WorkflowSwitcher 
-                                    viewComfys={viewComfyState.viewComfys.filter(workflow => workflow.type === 'image_generation')} 
+                                    viewComfys={viewComfyState.viewComfys.filter(workflow => workflow.type === 'smart_ps')} 
                                     currentViewComfy={viewComfyState.currentViewComfy} 
                                     onSelectChange={onSelectChange} 
                                 />
