@@ -52,6 +52,7 @@ import {
 
 interface IInputForm extends IInputField {
     id: string;
+    valueKey?: string;
 }
 
 // ViewComfyForm 组件的主要功能：
@@ -150,7 +151,6 @@ export function ViewComfyForm(args: {
                                                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                                     <FormControl>
                                                         <Checkbox
-                                                            className={CHECKBOX_STYLE}
                                                             checked={field.value}
                                                             onCheckedChange={field.onChange}
                                                         />
@@ -466,36 +466,100 @@ function NestedInputField(args: { form: UseFormReturn<IViewComfyBase, any, undef
 }
 
 /**
- * 输入字段类型转换组件
- * 根据输入字段类型返回对应的UI组件
+ * 将输入字段转换为相应的UI组件
+ * 根据字段类型选择不同的输入组件
  */
 function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolean, remove?: UseFieldArrayRemove, index: number }) {
     const { input, field, editMode, remove, index } = args;
 
-    // 根据不同的输入类型返回对应的组件
+    // 根据key判断是否为采样器或调度器输入
+    if (input.key?.includes("sampler_name")) {
+        const samplerOptions = [
+            "euler",
+            "heun",
+            "dpm2",
+            "dpmpp_2s_a",
+            "dpmpp_2m",
+            "dpmpp_sde",
+            "dpmpp_2m_sde",
+            "dpm_adaptive",
+            "lms",
+            "uni_pc",
+            "ddim"
+        ];
+        return (
+            <FormSelectInput 
+                input={input} 
+                field={field} 
+                options={samplerOptions} 
+                editMode={editMode} 
+                remove={remove} 
+                index={index} 
+            />
+        );
+    }
+
+    if (input.key?.includes("scheduler")) {
+        const schedulerOptions = [
+            "normal",
+            "karras",
+            "exponential",
+            "sgm_uniform",
+            "simple",
+            "ddim_uniform"
+        ];
+        return (
+            <FormSelectInput 
+                input={input} 
+                field={field} 
+                options={schedulerOptions} 
+                editMode={editMode} 
+                remove={remove} 
+                index={index} 
+            />
+        );
+    }
+
+    // Lora加载器下拉选择框
+    if (input.key?.includes("lora_name")) {
+        const loraOptions = [
+            "laiqingde2-000029.safetensors"
+        ];
+        return (
+            <FormSelectInput 
+                input={input} 
+                field={field} 
+                options={loraOptions} 
+                editMode={editMode} 
+                remove={remove} 
+                index={index} 
+            />
+        );
+    }
+
+    // 长文本输入
     if (input.valueType === "long-text") {
-        // 长文本输入
         return (
             <FormTextAreaInput input={input} field={field} editMode={editMode} remove={remove} index={index} />
         )
     }
 
+    // 布尔类型判断
     if (input.valueType === "boolean") {
-        // 布尔值复选框
         return (
             <FormCheckboxInput input={input} field={field} editMode={editMode} remove={remove} index={index} />
         )
     }
 
+    // 媒体文件类型判断
     if (input.valueType === "video" || input.valueType === "image") {
-        // 媒体文件输入
         return (
             <FormMediaInput input={input} field={field} editMode={editMode} remove={remove} index={index} />
         )
     }
 
-    if (input.valueType === "seed" || input.valueType === "noise_seed" || input.valueType === "rand_seed") {
-        // 随机种子输入
+    // 种子类型判断
+    if (input.key?.includes("seed") || input.key?.includes("noise_seed")) {
         return (
             <FormSeedInput input={input} field={field} editMode={editMode} remove={remove} index={index} />
         )
@@ -869,4 +933,62 @@ function FormBasicInput(args: { input: IInputForm, field: any, editMode?: boolea
             )}
         </FormItem>
     )
+}
+
+/**
+ * 下拉选择框输入组件
+ * 用于展示预定义选项的选择框
+ */
+function FormSelectInput(args: { 
+    input: IInputForm, 
+    field: any, 
+    options: string[], 
+    editMode?: boolean, 
+    remove?: UseFieldArrayRemove, 
+    index: number 
+}) {
+    const { input, field, options, editMode, remove, index } = args;
+    
+    return (
+        <FormItem key={input.id}>
+            <FormLabel className={FORM_STYLE.label}>
+                {input.title}
+                {/* 编辑模式下显示删除按钮 */}
+                {editMode && (
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="text-muted-foreground"
+                        onClick={remove ? () => remove(index) : undefined}
+                    >
+                        <Trash2 className="size-5" />
+                    </Button>
+                )}
+            </FormLabel>
+            <FormControl>
+                <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value || options[0]}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder={input.placeholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {options.map(option => (
+                            <SelectItem key={option} value={option}>
+                                {option}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </FormControl>
+            {/* 帮助文本 */}
+            {input.helpText !== "Helper Text" && (
+                <FormDescription>
+                    {input.helpText}
+                </FormDescription>
+            )}
+        </FormItem>
+    );
 }
