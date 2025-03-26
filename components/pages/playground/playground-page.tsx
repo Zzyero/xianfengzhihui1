@@ -20,7 +20,7 @@ import { ErrorAlertDialog } from "@/components/ui/error-alert-dialog";
 import { ApiErrorHandler } from "@/lib/api-error-handler";
 import type { ResponseError } from "@/app/models/errors";
 import BlurFade from "@/components/ui/blur-fade";
-import { cn } from "@/lib/utils";
+import { blobToBase64, cn } from "@/lib/utils";
 import WorkflowSwitcher from "@/components/workflow-switchter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PreviewOutputsImageGallery } from "@/components/images-preview"
@@ -30,7 +30,6 @@ const apiErrorHandler = new ApiErrorHandler();
 
 //页面内容组件
 function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setLoading: (loading: boolean) => void }) {
-    const [results, SetResults] = useState<{ [key: string]: { outputs: Blob, url: string }[] }>({});
     const { viewComfyState, viewComfyStateDispatcher } = useViewComfy();
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     const [errorAlertDialog, setErrorAlertDialog] = useState<{ open: boolean, errorTitle: string | undefined, errorDescription: React.JSX.Element, onClose: () => void }>({ open: false, errorTitle: undefined, errorDescription: <></>, onClose: () => { } });
@@ -106,27 +105,9 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
 
     const { doPost } = usePostPlayground();
 
-    // useEffect(() => {
-    //     if (viewComfyState?.viewComfyJSON) {
-    //         setFormState({ ...viewComfyState.viewComfyJSON });
-    //         SetResults({});
-    //     }
-    // }, [viewComfyState?.viewComfyJSON]);
-
-    // 处理中断和清除队列
-    const handleInterrupt = () => {
-        setLoading(false);
-    };
-
-    const handleClearQueue = () => {
-        setLoading(false);
-    };
-
     function onSubmit(data: IViewComfyWorkflow) {
-        // setFormState(data);
-
         //获取输入
-        const inputs: { key: string, value: string }[] = [];
+        const inputs: { key: string, value: string | File }[] = [];
 
         for (const dataInputs of data.inputs) {
             for (const input of dataInputs.inputs) {
@@ -146,16 +127,36 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
         };
 
         //提交表单
-        setLoading(true); // 开始加载
+        setLoading(true);
         doPost({
             viewComfy: generationData,
             workflow: viewComfyState.currentViewComfy?.workflowApiJSON,
-            onSuccess: (data) => {
-                onSetResults(data);
-                setLoading(false); // 成功后结束加载
-            }, 
+            onSuccess: async (blobs) => {
+                // 生成唯一ID
+                const id = Date.now().toString();
+                
+                // 将 Blob 转换为 Base64
+                const outputs = await Promise.all(blobs.map(async (blob) => {
+                    return {
+                        type: blob.type,
+                        data: await blobToBase64(blob)
+                    };
+                }));
+                
+                // 存储到全局状态
+                viewComfyStateDispatcher({
+                    type: ActionType.ADD_GENERATION_RESULT,
+                    payload: { 
+                        id, 
+                        outputs,
+                        pageType: 'image_generation'
+                    }
+                });
+                
+                setLoading(false);
+            },
             onError: (error) => {
-                setLoading(false); // 错误时结束加载
+                setLoading(false);
                 const errorDialog = apiErrorHandler.apiErrorToDialog(error);
                 setErrorAlertDialog({
                     open: true,
@@ -169,25 +170,25 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
         });
     }
 
-    const onSetResults = (data: Blob[]) => {
-        const timestamp = Date.now();
-        const newGeneration = data.map((output) => ({ outputs: output, url: URL.createObjectURL(output) }));
-        SetResults((prevResults) => ({
-            [timestamp]: newGeneration,
-            ...prevResults
-        }));
+    // 清除队列
+    const handleClearQueue = () => {
+        // 只清除当前页面类型的结果
+        viewComfyStateDispatcher({
+            type: ActionType.CLEAR_GENERATION_RESULTS,
+            payload: { pageType: 'image_generation' }
+        });
     };
 
-    useEffect(() => {
-        return () => {
-            for (const generation of Object.values(results)) {
-                for (const output of generation) {
-                    URL.revokeObjectURL(output.url);
-                }
-            }
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // 中断生成
+    const handleInterrupt = async () => {
+        try {
+            await fetch("/api/comfy/interrupt", {
+                method: "POST",
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const onSelectChange = (data: IViewComfy) => {
         // 确保只选择 image_generation 类型的工作流
@@ -199,6 +200,11 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
             payload: { ...data }
         });
     }
+
+    // 获取当前页面类型的生成结果
+    const filteredResults = Object.entries(viewComfyState.generationResults)
+        .filter(([id, result]) => result.pageType === 'image_generation')
+        .sort(([idA, a], [idB, b]) => b.timestamp - a.timestamp);
 
     if (!viewComfyState.currentViewComfy) {
         return <>
@@ -248,7 +254,7 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                     </div>
                     <div className="relative h-full min-h-[50vh] rounded-xl bg-muted/50 px-1 lg:col-span-2">
                         <ScrollArea className="relative flex h-full w-full flex-col">
-                            {(Object.keys(results).length === 0) && !loading && (
+                            {(filteredResults.length === 0) && !loading && (
                                 <>  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
                                     <PreviewOutputsImageGallery viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON} />
                                 </div>
@@ -264,48 +270,59 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                             ) : (
                                 <div className="flex-1 h-full p-4 flex overflow-y-auto">
                                     <div className="flex flex-col w-full h-full">
-                                        {Object.entries(results).map(([timestamp, generation], index, array) => (
-                                            <div className="flex flex-col gap-4 w-full h-full" key={timestamp}>
-                                                <div className="flex flex-wrap w-full h-full gap-4" key={timestamp}>
-                                                    {generation.map((output) => (
-                                                        <Fragment key={output.url}>
+                                        {filteredResults.map(([id, result]) => (
+                                            <div className="flex flex-col gap-4 w-full h-full" key={id}>
+                                                <div className="flex flex-wrap w-full h-full gap-4">
+                                                    {result.outputs.map((output, index) => (
+                                                        <Fragment key={`${id}-${index}`}>
                                                             <div
-                                                                key={output.url}
+                                                                key={`${id}-${index}`}
                                                                 className="flex items-center justify-center px-4 sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1rem)]"
                                                             >
-                                                                {(output.outputs.type.startsWith('image/')) && (
-                                                                    <BlurFade key={output.url} delay={0.25} inView className="flex items-center justify-center w-full h-full">
+                                                                {output.type.startsWith('image/') && (
+                                                                    <BlurFade 
+                                                                        key={`${id}-${index}`} 
+                                                                        delay={0.25} 
+                                                                        inView 
+                                                                        // 只有未播放过动画的才播放
+                                                                        animate={!output.animated}
+                                                                        onAnimationComplete={() => {
+                                                                            // 动画完成后标记为已播放
+                                                                            viewComfyStateDispatcher({
+                                                                                type: ActionType.SET_RESULT_ANIMATED,
+                                                                                payload: { id, index }
+                                                                            });
+                                                                        }}
+                                                                        className="flex items-center justify-center w-full h-full"
+                                                                    >
                                                                         <img
-                                                                            src={output.url}
-                                                                            alt={`${output.url}`}
+                                                                            src={output.data}
+                                                                            alt={`Generated image ${index}`}
                                                                             className={cn("max-w-full max-h-full w-auto h-auto object-contain rounded-md transition-all hover:scale-105")}
                                                                         />
                                                                     </BlurFade>
                                                                 )}
-                                                                {(output.outputs.type.startsWith('video/')) && (
+                                                                {output.type.startsWith('video/') && (
                                                                     <video
-                                                                        key={output.url}
+                                                                        key={`${id}-${index}`}
                                                                         className="max-w-full max-h-full w-auto h-auto object-contain rounded-md"
                                                                         autoPlay
                                                                         loop
-
                                                                     >
                                                                         <track default kind="captions" srcLang="en" src="SUBTITLE_PATH" />
-                                                                        <source src={output.url} />
+                                                                        <source src={output.data} />
                                                                     </video>
                                                                 )}
                                                             </div>
-                                                            {(output.outputs.type.startsWith('text/')) && (
+                                                            {output.type.startsWith('text/') && (
                                                                 <pre className="whitespace-pre-wrap break-words text-sm bg-white rounded-md w-full">
-                                                                    {URL.createObjectURL(output.outputs) && (
-                                                                        <object
-                                                                            data={output.url}
-                                                                            type={output.outputs.type}
-                                                                            className="w-full"
-                                                                        >
-                                                                            Unable to display text content
-                                                                        </object>
-                                                                    )}
+                                                                    <object
+                                                                        data={output.data}
+                                                                        type={output.type}
+                                                                        className="w-full"
+                                                                    >
+                                                                        Unable to display text content
+                                                                    </object>
                                                                 </pre>
                                                             )}
                                                         </Fragment>
@@ -313,7 +330,7 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                                                 </div>
                                                 <hr className={
                                                     `w-full py-4 
-                                                ${index !== array.length - 1 ? 'border-gray-300' : 'border-transparent'}
+                                                ${id !== filteredResults[filteredResults.length - 1][0] ? 'border-gray-300' : 'border-transparent'}
                                                 `}
                                                 />
                                             </div>
