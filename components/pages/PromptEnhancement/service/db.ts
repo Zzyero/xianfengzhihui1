@@ -22,7 +22,7 @@ const STORES = {
 export interface Message {
   id: string;               // 消息ID
   sessionId: string;        // 所属会话ID
-  role: 'user' | 'assistant'; // 消息角色
+  role: 'user' | 'assistant' | 'system'; // 消息角色
   content: string;          // 消息内容
   timestamp: Date;          // 时间戳
 }
@@ -153,60 +153,11 @@ const db = {
    */
   addMessage: async (message: Message): Promise<IDBValidKey> => {
     return executeOperation<IDBValidKey>(STORES.MESSAGES, 'readwrite', async store => {
-      // 先检查是否已存在相同ID的消息
-      const existingMessageRequest = store.get(message.id);
-      
+      // 添加消息
       return new Promise((resolve, reject) => {
-        existingMessageRequest.onsuccess = () => {
-          if (existingMessageRequest.result) {
-            // 消息已存在，直接返回ID
-            console.log('消息已存在，跳过添加:', message.id);
-            resolve(message.id);
-            return;
-          }
-          
-          // 尝试检查是否有内容相同的消息（针对同一会话、相同角色）
-          const index = store.index('sessionId');
-          const sessionMessagesRequest = index.getAll(message.sessionId);
-          
-          sessionMessagesRequest.onsuccess = () => {
-            const sessionMessages = sessionMessagesRequest.result as Message[];
-            
-            // 检查是否有相同内容的消息
-            const duplicateMessage = sessionMessages.find(m => 
-              m.role === message.role && 
-              m.content === message.content &&
-              // 只检查最近3分钟内的消息，避免误判历史消息
-              (new Date().getTime() - new Date(m.timestamp).getTime() < 3 * 60 * 1000)
-            );
-            
-            if (duplicateMessage) {
-              // 发现内容相同的最近消息，跳过添加
-              console.log('发现相似消息，跳过添加:', duplicateMessage.id);
-              resolve(duplicateMessage.id);
-              return;
-            }
-            
-            // 没有找到重复消息，添加新消息
-            const addRequest = store.add(message);
-            addRequest.onsuccess = () => resolve(addRequest.result);
-            addRequest.onerror = () => reject(addRequest.error);
-          };
-          
-          sessionMessagesRequest.onerror = () => {
-            // 查询失败，直接尝试添加消息
-            const addRequest = store.add(message);
-            addRequest.onsuccess = () => resolve(addRequest.result);
-            addRequest.onerror = () => reject(addRequest.error);
-          };
-        };
-        
-        existingMessageRequest.onerror = () => {
-          // 查询失败，直接尝试添加消息
-          const addRequest = store.add(message);
-          addRequest.onsuccess = () => resolve(addRequest.result);
-          addRequest.onerror = () => reject(addRequest.error);
-        };
+        const addRequest = store.add(message);
+        addRequest.onsuccess = () => resolve(addRequest.result);
+        addRequest.onerror = () => reject(addRequest.error);
       });
     });
   },

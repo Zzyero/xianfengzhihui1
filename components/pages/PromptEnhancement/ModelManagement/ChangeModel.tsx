@@ -318,7 +318,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
   };
 
   return (
-    <>
+    <div className="model-management">
       <Toaster position="top-center" richColors />
       
       {/* 模型选择按钮 */}
@@ -485,7 +485,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
           )}
         </DialogContent>
       </Dialog>
-    </>
+      </div>
   );
 };
 

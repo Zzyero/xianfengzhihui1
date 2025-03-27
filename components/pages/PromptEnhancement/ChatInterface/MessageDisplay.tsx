@@ -7,12 +7,12 @@ import remarkGfm from 'remark-gfm';
 import { Message } from '../service/db';
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import '../styles/MessageDisplay.css';
 import { Copy } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Components } from 'react-markdown';
 import { Code } from 'lucide-react';
+import '../styles/MessageDisplay.css';
 
 interface MessageDisplayProps {
   message: Message;
@@ -221,49 +221,51 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
   };
   
   return (
-    <div className={cn(
-      "message",
-      isUser ? "user-message" : "assistant-message"
-    )}>
-      <div className="message-avatar">
-        <Avatar>
-          <div className="avatar-content">
-            {isUser ? '用户' : 'AI'}
-          </div>
-        </Avatar>
-      </div>
-      
-      <div className="message-content">
-        {isUser ? (
-          // 用户消息始终以纯文本形式显示
-          <div className="plain-text">
-            {message.content.split("\n").map((line, i) => (
-              <React.Fragment key={i}>
-                {line}
-                {i < message.content.split("\n").length - 1 && <br />}
-              </React.Fragment>
-            ))}
-          </div>
-        ) : (
-          // AI助手消息使用Markdown解析
-          <div className="markdown-content">
-            <ReactMarkdown 
-              rehypePlugins={[rehypeRaw]} 
-              remarkPlugins={[remarkGfm]}
-              components={customComponents}
-              skipHtml={true}
-              unwrapDisallowed={true}
-            >
-              {message.content.replace(/<think>[\s\S]*?<\/think>/g, '')}
-            </ReactMarkdown>
-          </div>
-        )}
+    <div className="message-display-wrapper">
+      <div className={cn(
+        "message",
+        isUser ? "user-message" : "assistant-message"
+      )}>
+        <div className="message-avatar">
+          <Avatar>
+            <div className="avatar-content">
+              {isUser ? '用户' : 'AI'}
+            </div>
+          </Avatar>
+        </div>
         
-        {showTimestamp && (
-          <div className="message-timestamp">
-            {new Date(message.timestamp).toLocaleTimeString()}
-          </div>
-        )}
+        <div className="message-content">
+          {isUser ? (
+            // 用户消息始终以纯文本形式显示
+            <div className="plain-text">
+              {message.content.split("\n").map((line, i) => (
+                <React.Fragment key={i}>
+                  {line}
+                  {i < message.content.split("\n").length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </div>
+          ) : (
+            // AI助手消息使用Markdown解析
+            <div className="markdown-content">
+              <ReactMarkdown 
+                rehypePlugins={[rehypeRaw]} 
+                remarkPlugins={[remarkGfm]}
+                components={customComponents}
+                skipHtml={true}
+                unwrapDisallowed={true}
+              >
+                {message.content.replace(/<think>[\s\S]*?<\/think>/g, '')}
+              </ReactMarkdown>
+            </div>
+          )}
+          
+          {showTimestamp && (
+            <div className="message-timestamp">
+              {new Date(message.timestamp).toLocaleTimeString()}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
