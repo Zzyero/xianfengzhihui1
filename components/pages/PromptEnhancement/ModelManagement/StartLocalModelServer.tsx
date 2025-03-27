@@ -169,7 +169,6 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
       }
     } catch (error: any) {
       console.error('加载模型失败:', error);
-      toast.error(`加载模型失败: ${error.message || '未知错误'}`);
     } finally {
       setIsModelLoading(false);
     }

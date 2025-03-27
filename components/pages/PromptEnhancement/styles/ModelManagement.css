@@ -128,7 +128,8 @@
 }
 
 /* ===== 主题变量 ===== */
-:root {
+/* 使用命名空间隔离样式，避免全局污染 */
+.model-management {
   /* 颜色 */
   --primary-color: #2563eb;
   --primary-color-alpha: rgba(37, 99, 235, 0.2);
@@ -140,7 +141,7 @@
   --background: #ffffff;
   --hover-background: #f9fafb;
   --selected-background: #eff6ff;
-  --dialog-background: #ffffff;
+  --model-dialog-background: #ffffff;
   --input-background: #ffffff;
   --input-border-color: #d1d5db;
   --label-color: #374151;
@@ -148,12 +149,12 @@
 
   /* 阴影 */
   --dialog-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-                   0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* 深色主题 */
 @media (prefers-color-scheme: dark) {
-  :root {
+  .model-management {
     --primary-color: #3b82f6;
     --primary-color-alpha: rgba(59, 130, 246, 0.2);
     --error-color: #ef4444;
@@ -164,7 +165,7 @@
     --background: #1f2937;
     --hover-background: #374151;
     --selected-background: #1e3a8a;
-    --dialog-background: #1f2937;
+    --model-dialog-background: #1f2937;
     --input-background: #111827;
     --input-border-color: #4b5563;
     --label-color: #e5e7eb;

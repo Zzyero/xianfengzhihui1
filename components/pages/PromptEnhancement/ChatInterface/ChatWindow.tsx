@@ -52,7 +52,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       setShouldAutoScroll(false);
     } 
     // 接近底部，重新启用自动滚动
-    else if (distanceFromBottom < 1 && !shouldAutoScroll) {
+    else if (distanceFromBottom < 4 && !shouldAutoScroll) {
       console.log("用户已接近底部，重新启用自动滚动");
       setShouldAutoScroll(true);
     }
