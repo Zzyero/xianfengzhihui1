@@ -37,7 +37,7 @@ interface ApiModelOptions {
  */
 interface LocalModelOptions {
   model: Model;
-  prompt: string;
+  messages: Message[];
   callbacks: ModelResponseCallbacks;
   signal?: AbortSignal; // 添加AbortSignal用于取消请求
   customPrompt?: string; // 添加自定义提示词参数
@@ -272,12 +272,12 @@ class ModelService {
     }
   }
 
-  /**
+/**
    * 调用本地模型（使用Python后端）
    * @param options 调用选项
    */
   static async callLocalModel(options: LocalModelOptions): Promise<void> {
-    const { model, prompt, callbacks, signal, customPrompt } = options;
+    const { model, messages, callbacks, signal, customPrompt } = options;
 
     try {
       // 调用开始回调
@@ -285,16 +285,44 @@ class ModelService {
 
       // 设置默认参数
       let modelPath = model.path || '';
-      // 使用自定义提示词或原始提示
-      let promptContent = customPrompt ? `${customPrompt}\n\n${prompt}` : prompt;
-      let stream = true; // 默认使用流式输出
+      
+      // 添加系统提示词
+      let processedMessages = [...messages];
+      
+      // 如果有自定义提示词，添加系统消息
+      if (customPrompt && customPrompt.trim()) {
+        // 检查是否已有系统消息
+        const hasSystemMessage = processedMessages.some(msg => msg.role === 'system');
+        
+        if (hasSystemMessage) {
+          // 更新现有的系统消息
+          for (let i = 0; i < processedMessages.length; i++) {
+            if (processedMessages[i].role === 'system') {
+              processedMessages[i].content = customPrompt;
+              break;
+            }
+          }
+        } else {
+          // 添加新的系统消息作为第一条消息
+          const timestamp = new Date();
+          const systemMessage: Message = {
+            id: `system_${timestamp.getTime()}`,
+            sessionId: messages.length > 0 ? messages[0].sessionId : '',
+            role: 'system',
+            content: customPrompt,
+            timestamp: timestamp
+          };
+          processedMessages.unshift(systemMessage);
+        }
+      }
+      
+      // 参数处理
       let localParams: Record<string, any> = {};
 
       // 如果有自定义参数，解析并使用
       if (model.parameters) {
         try {
           const customParams = JSON.parse(model.parameters);
-          if (customParams.stream !== undefined) stream = customParams.stream;
           // 提取其他参数
           const validKeys = ['temperature', 'top_p', 'top_k', 'max_tokens', 'repeat_penalty', 'stop'];
           validKeys.forEach(key => {
@@ -310,11 +338,16 @@ class ModelService {
       // 后端API URL
       const apiUrl = 'http://localhost:5000/api/generate';
       
+      // 格式化消息为后端需要的格式
+      const formattedMessages = processedMessages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+      
       // 构建请求体
       const requestBody = {
-        modelpath: modelPath, // 传递模型路径
-        prompt: promptContent,
-        stream: stream,
+        modelpath: modelPath, // 明确传递模型路径
+        messages: formattedMessages, // 传递消息历史
         temperature: localParams.temperature || 0.7,
         top_p: localParams.top_p || 0.9,
         top_k: localParams.top_k || 50,
@@ -323,94 +356,82 @@ class ModelService {
         stop: localParams.stop || undefined
       };
 
-      // 流式响应处理
-      if (stream) {
-        let fullContent = '';
+      console.log('发送到后端的请求体:', requestBody);
 
-        // 创建读取流
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(requestBody),
-          signal: signal, // 使用信号来支持取消
+      // 设置信号监听器，当信号触发时调用中断API
+      if (signal) {
+        signal.addEventListener('abort', async () => {
+          console.log('检测到中断信号，发送中断请求到服务器');
+          await this.abortLocalModelRequest();
         });
-        //获得请求id以便取消请求
-        const request_id = response.headers.get('X-Request-ID');
-
-        if (!response.ok) {
-          throw new Error(`本地模型服务请求失败: ${response.status}`);
-        }
-
-        // 获取响应流
-        const reader = response.body?.getReader();
-        if (!reader) {
-          throw new Error('无法创建响应流读取器');
-        }
-
-        // 处理流式响应
-        const decoder = new TextDecoder();
-        let done = false;
-        
-        while (!done) {
-          // 检查是否已取消
-          if (signal?.aborted) {
-            // 发送取消请求
-            this.abortLocalModelRequest(request_id || '');
-            throw new Error('请求已取消');
-          }
-          
-          const { value, done: readerDone } = await reader.read();
-          done = readerDone;
-          
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          // 后端返回的是每行一个JSON，需要分行处理
-          const lines = chunk.split('\n').filter(line => line.trim());
-          
-          for (const line of lines) {
-            try {
-              const data = JSON.parse(line);
-              if (data.response) {
-                fullContent += data.response;
-                callbacks.onUpdate?.(fullContent);
-              } else if (data.error) {
-                throw new Error(data.error);
-              }
-            } catch (e) {
-              console.warn('解析响应失败:', e);
-            }
-          }
-        }
-
-        // 调用完成回调
-        callbacks.onComplete?.(fullContent);
-      } else {
-        // 非流式调用
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(requestBody),
-          signal: signal, // 使用信号来支持取消
-        });
-
-        if (!response.ok) {
-          throw new Error(`本地模型服务请求失败: ${response.status}`);
-        }
-
-        const responseData = await response.json();
-        
-        if (responseData.error) {
-          throw new Error(responseData.error);
-        }
-        
-        const fullContent = responseData.response || '';
-        callbacks.onComplete?.(fullContent);
       }
+
+      let fullContent = '';
+
+      // 创建读取流
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody),
+        signal: signal, // 使用信号来支持取消
+      });
+
+      if (!response.ok) {
+        throw new Error(`本地模型服务请求失败: ${response.status}`);
+      }
+
+      // 获取响应流
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('无法创建响应流读取器');
+      }
+
+      // 处理流式响应
+      const decoder = new TextDecoder();
+      let done = false;
+      
+      while (!done) {
+        // 检查是否已取消
+        if (signal?.aborted) {
+          // 发送取消请求
+          console.log('检测到中断信号，发送中断请求');
+          await this.abortLocalModelRequest();
+          throw new Error('请求已取消');
+        }
+        
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        // 后端返回的是每行一个JSON，需要分行处理
+        const lines = chunk.split('\n').filter(line => line.trim());
+        
+        for (const line of lines) {
+          try {
+            const data = JSON.parse(line);
+            if (data.response) {
+              fullContent += data.response;
+              callbacks.onUpdate?.(fullContent);
+            } else if (data.status === "terminated") {
+              // 处理服务器返回的终止消息
+              console.log('服务器终止了生成:', data.message);
+              callbacks.onComplete?.(fullContent);
+              return; // 直接返回，不再继续处理
+            } else if (data.error) {
+              throw new Error(data.error);
+            }
+          } catch (e) {
+            console.warn('解析响应失败:', e);
+          }
+        }
+      }
+
+      // 调用完成回调
+      callbacks.onComplete?.(fullContent);
     } catch (error: any) {
       // 检查是否是取消的错误
       if (error.name === 'AbortError' || (signal && signal.aborted)) {
@@ -424,27 +445,54 @@ class ModelService {
     }
   }
 
-  /**
-   * 取消本地模型的请求
-   * @param request_id 请求id
+    /**
+   * 中断本地模型的生成过程
    */
-  private static async abortLocalModelRequest(request_id: string): Promise<void> {
-    try {
-      const response = await fetch('http://localhost:5000/api/abort', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ request_id: request_id })
-      });
-      
-      if (!response.ok) {
-        console.error('取消本地模型请求失败:', await response.text());
+    public static async abortLocalModelRequest(): Promise<void> {
+      const maxRetries = 3; // 最大重试次数
+      let retryCount = 0;
+      let success = false;
+  
+      while (retryCount < maxRetries && !success) {
+        try {
+          console.log(`发送中断请求到服务器 (尝试 ${retryCount + 1}/${maxRetries})`);
+          
+          const response = await fetch('http://localhost:5000/api/abort', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({}), // 空请求体
+            // 设置较短的超时时间
+            signal: AbortSignal.timeout(5000)
+          });
+          
+          const result = await response.json();
+          console.log('服务器响应:', result);
+          
+          if (response.ok) {
+            console.log('成功发送中断信号:', result.message);
+            success = true;
+            break; // 请求成功，跳出循环
+          } else {
+            console.error('发送中断信号失败:', result.message || '未知错误');
+            retryCount++;
+          }
+        } catch (error) {
+          console.error(`发送中断请求失败 (尝试 ${retryCount + 1}/${maxRetries}):`, error);
+          retryCount++;
+          // 短暂延迟后重试
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
       }
-    } catch (error) {
-      console.error('取消本地模型请求失败:', error);
+  
+      if (!success) {
+        console.error(`在 ${maxRetries} 次尝试后仍无法中断生成过程`);
+        throw new Error('无法中断生成过程，请尝试刷新页面');
+      }
+      
+      return;
     }
-  }
 }
 
 export default ModelService; 

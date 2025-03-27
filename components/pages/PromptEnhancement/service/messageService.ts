@@ -185,10 +185,13 @@ class MessageService {
           customPrompt // 传递自定义提示词
         });
       } else if (model.type === 'local') {
-        // 调用本地模型
+        // 获取历史消息以提供上下文
+        const historyMessages = await db.getMessagesBySession(currentSessionId);
+        
+        // 调用本地模型，传递历史消息
         await ModelService.callLocalModel({
           model,
-          prompt: content,
+          messages: historyMessages,
           callbacks: modelCallbacks,
           signal: controller.signal,
           customPrompt // 传递自定义提示词
@@ -259,6 +262,8 @@ class MessageService {
       };
 
       await db.saveSession(newSession);
+      // 记录目前的会话
+      db.saveLastUsedSessionId(newSession.id)
       return newSession.id;
     } catch (error) {
       console.error('创建会话失败:', error);

@@ -347,13 +347,31 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   const handleStopGeneration = (): void => {
     if (!activeSessionId) return;
     
+    // 立即将生成状态设置为false，提供视觉反馈
+    setIsGenerating(false);
+    toast.info('正在停止生成...');
+    
     // 取消当前会话的生成
     MessageService.cancelGeneration(activeSessionId);
     
-    setIsGenerating(false);
-    toast.info('生成已停止');
+    // 对于本地模型，确保中断请求发送到服务器
+    if (selectedModel && selectedModel.includes('local')) {
+      // 使用import动态导入模块，避免循环依赖
+      import('./modelService').then(async ({ default: ModelService }) => {
+        try {
+          console.log('正在向服务器发送中断请求...');
+          await ModelService.abortLocalModelRequest();
+          console.log('中断本地模型请求已发送');
+          toast.success('生成已停止');
+        } catch (error) {
+          console.error('发送中断请求失败:', error);
+          toast.error('停止生成时出现问题，请尝试刷新页面');
+        }
+      });
+    } else {
+      toast.success('生成已停止');
+    }
   };
-
   // ===== 模板操作 =====
   /**
    * 处理添加模板
