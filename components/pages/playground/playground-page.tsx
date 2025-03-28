@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import {
-    Settings
+    Settings,
+    ChevronDown
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -33,49 +34,39 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
     const { viewComfyState, viewComfyStateDispatcher } = useViewComfy();
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     const [errorAlertDialog, setErrorAlertDialog] = useState<{ open: boolean, errorTitle: string | undefined, errorDescription: React.JSX.Element, onClose: () => void }>({ open: false, errorTitle: undefined, errorDescription: <></>, onClose: () => { } });
-
+    
     //获取视图配置
     useEffect(() => {
         if (viewMode) {
             const fetchViewComfy = async () => {
                 try {
                     const response = await fetch("/api/playground");
-
                     if (!response.ok) {
-                        const responseError: ResponseError =
-                            await response.json();
-                        throw responseError;
+                        const error = await response.json() as ResponseError;
+                        throw error;
                     }
-                    const data = await response.json();
+                    const data = await response.json() as IViewComfy;
                     
                     // 过滤只获取 image_generation 类型的工作流
                     const imageGenerationWorkflows = {
-                        ...data.viewComfyJSON,
-                        workflows: data.viewComfyJSON.workflows.filter(
-                            (workflow: any) => workflow.type === 'image_generation'
-                        )
+                        ...data,
+                        type: 'image_generation' as const  // 使用const断言来固定类型
                     };
                     
-                    viewComfyStateDispatcher({ type: ActionType.INIT_VIEW_COMFY, payload: imageGenerationWorkflows });
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                } catch (error: any) {
-                    if (error.errorType) {
-                        const responseError =
-                            apiErrorHandler.apiErrorToDialog(error);
-                        setErrorAlertDialog({
-                            open: true,
-                            errorTitle: responseError.title,
-                            errorDescription: <>{responseError.description}</>,
-                            onClose: () => { },
-                        });
-                    } else {
-                        setErrorAlertDialog({
-                            open: true,
-                            errorTitle: "Error",
-                            errorDescription: <>{error.message}</>,
-                            onClose: () => { },
-                        });
-                    }
+                    viewComfyStateDispatcher({
+                        type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
+                        payload: imageGenerationWorkflows
+                    });
+                } catch (error) {
+                    const errorDialog = apiErrorHandler.apiErrorToDialog(error as ResponseError);
+                    setErrorAlertDialog({
+                        open: true,
+                        errorTitle: errorDialog.title,
+                        errorDescription: <>{errorDialog.description}</>,
+                        onClose: () => {
+                            setErrorAlertDialog(prev => ({ ...prev, open: false }));
+                        }
+                    });
                 }
             };
             fetchViewComfy();
@@ -103,7 +94,28 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
         }
     }, [viewComfyState.viewComfys, viewComfyState.currentViewComfy, viewComfyStateDispatcher]);
 
+    //提交表单
     const { doPost } = usePostPlayground();
+    
+    // 中断生成
+    const handleInterrupt = async () => {
+        try {
+            await fetch("/api/comfy/interrupt", {
+                method: "POST",
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    // 清空队列
+    const handleClearQueue = () => {
+        // 只清除当前页面类型的结果
+        viewComfyStateDispatcher({
+            type: ActionType.CLEAR_GENERATION_RESULTS,
+            payload: { pageType: 'image_generation' }
+        });
+    };
 
     function onSubmit(data: IViewComfyWorkflow) {
         //获取输入
@@ -161,45 +173,28 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                 setErrorAlertDialog({
                     open: true,
                     errorTitle: errorDialog.title,
-                    errorDescription: <> {errorDialog.description} </>,
+                    errorDescription: <>{errorDialog.description}</>,
                     onClose: () => {
-                        setErrorAlertDialog({ open: false, errorTitle: undefined, errorDescription: <></>, onClose: () => { } });
+                        setErrorAlertDialog(prev => ({ ...prev, open: false }));
+                        setLoading(false);
                     }
                 });
             }
         });
     }
 
-    // 清除队列
-    const handleClearQueue = () => {
-        // 只清除当前页面类型的结果
-        viewComfyStateDispatcher({
-            type: ActionType.CLEAR_GENERATION_RESULTS,
-            payload: { pageType: 'image_generation' }
-        });
-    };
-
-    // 中断生成
-    const handleInterrupt = async () => {
-        try {
-            await fetch("/api/comfy/interrupt", {
-                method: "POST",
-            });
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
+    //选择变更
     const onSelectChange = (data: IViewComfy) => {
         // 确保只选择 image_generation 类型的工作流
         if (data.type !== 'image_generation') {
             return;
         }
-        return viewComfyStateDispatcher({
+        
+        viewComfyStateDispatcher({
             type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
-            payload: { ...data }
+            payload: data
         });
-    }
+    };
 
     // 获取当前页面类型的生成结果
     const filteredResults = Object.entries(viewComfyState.generationResults)
@@ -225,7 +220,11 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                     />
                 </div>
                 <div className="md:hidden w-full flex pl-4 gap-x-2">
-                    <WorkflowSwitcher viewComfys={viewComfyState.viewComfys} currentViewComfy={viewComfyState.currentViewComfy} onSelectChange={onSelectChange} />
+                    <WorkflowSwitcher 
+                        viewComfys={viewComfyState.viewComfys.filter(workflow => workflow.type === 'image_generation')} 
+                        currentViewComfy={viewComfyState.currentViewComfy} 
+                        onSelectChange={onSelectChange} 
+                    />
                     <Drawer>
                         <DrawerTrigger asChild>
                             <Button variant="ghost" size="icon" className="md:hidden self-bottom w-[85px] gap-1">
@@ -234,7 +233,11 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                             </Button>
                         </DrawerTrigger>
                         <DrawerContent className="max-h-[80vh] gap-4 px-4 h-full">
-                            <PlaygroundForm viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON} onSubmit={onSubmit} loading={loading} />
+                            <PlaygroundForm 
+                                viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON || {}} 
+                                onSubmit={onSubmit} 
+                                loading={loading} 
+                            />
                         </DrawerContent>
                     </Drawer>
                 </div>
@@ -249,14 +252,21 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                                 />
                             </div>
                         )}
-                        {viewComfyState.currentViewComfy && <PlaygroundForm viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON} onSubmit={onSubmit} loading={loading} />}
-
+                        <ScrollArea className="w-full h-full">
+                            {viewComfyState.currentViewComfy && 
+                                <PlaygroundForm 
+                                    viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON || {}} 
+                                    onSubmit={onSubmit} 
+                                    loading={loading} 
+                                />
+                            }
+                        </ScrollArea>
                     </div>
                     <div className="relative h-full min-h-[50vh] rounded-xl bg-muted/50 px-1 lg:col-span-2">
                         <ScrollArea className="relative flex h-full w-full flex-col">
                             {(filteredResults.length === 0) && !loading && (
                                 <>  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
-                                    <PreviewOutputsImageGallery viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON} />
+                                    <PreviewOutputsImageGallery viewComfyJSON={viewComfyState.currentViewComfy?.viewComfyJSON || {}} />
                                 </div>
                                     <Badge variant="outline" className="absolute right-3 top-3">
                                         输出
