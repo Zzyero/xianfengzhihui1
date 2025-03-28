@@ -1,0 +1,316 @@
+/* 模板管理样式 */
+
+/* ===== 模板栏容器 ===== */
+.template-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-height: 3rem;
+  overflow: hidden;
+}
+
+/* ===== 模板列表容器 ===== */
+.template-list {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  margin-right: 1rem;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  max-width: calc(100% - 100px);
+}
+
+.template-list::-webkit-scrollbar {
+  height: 4px;
+}
+
+.template-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.template-list::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 2px;
+}
+
+/* ===== 模板项 ===== */
+.template-item {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.template-button {
+  height: 2rem;
+  padding: 0 0.75rem;
+  width: auto;
+  min-width: 5rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s ease;
+  color: #000;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  background-color: #fff;
+}
+
+.template-button:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.template-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* 激活状态样式 */
+.template-button.active {
+  background-color: #3b82f6;
+  border-color: #2563eb;
+  color: #fff;
+  font-weight: 500;
+}
+
+.template-button.active:hover {
+  background-color: #2563eb;
+  border-color: #1d4ed8;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 删除模式样式 */
+.template-button.delete-mode {
+  border-width: 2px;
+  border-style: dashed;
+  border-color: #ef4444;
+  color: #000;
+}
+
+.template-button.delete-mode:hover {
+  border-width: 2px;
+  border-style: dashed;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.template-button.delete-mode.selected {
+  border-width: 2px;
+  border-style: solid;
+  border-color: #ef4444;
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+/* 编辑模式样式 */
+.template-button.edit-mode {
+  border-width: 2px; 
+  border-style: dotted;
+  border-color: #2563eb;
+}
+  
+.template-button.edit-mode:hover {
+  border-width: 2px;
+  border-style: solid;
+  border-color: #2563eb;
+  color: #2563eb;
+  background-color: #dbeafe;
+}
+
+/* 新建模式样式 */
+
+
+.template-button.create-mode:hover {
+  border-width: 2px;
+  border-style: solid;
+  border-color: #22c55e;
+  color: #22c55e;
+  background-color: #dcfce7;
+}
+
+/* ===== 更多模板按钮 ===== */
+.more-templates-button {
+  height: 2rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  color: #000;
+}
+
+.more-templates-button:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+/* ===== 模板下拉项 ===== */
+.template-dropdown-item {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #000;
+  transition: background-color 0.2s;
+}
+
+.template-dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+/* 下拉项激活状态 */
+.template-dropdown-item.active {
+  background-color: #dbeafe;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.template-dropdown-item.active:hover {
+  background-color: #bfdbfe;
+}
+
+/* ===== 控制按钮组 ===== */
+.template-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: #fff;
+  padding-left: 0.5rem;
+  border-left: 1px solid #f3f4f6;
+  height: 2rem;
+  flex-shrink: 0;
+}
+
+/* 控制按钮 */
+.control-button {
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  padding: 0 !important;
+  border-radius: 0.25rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280 !important;
+  margin-left: 0 !important;
+  background-color: #fff !important;
+  flex-shrink: 0 !important;
+}
+
+.control-button:hover {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+.control-button.active {
+  background-color: #dbeafe !important;
+}
+
+/* 特定按钮激活状态 */
+.control-button.create-active {
+  color: #22c55e !important;
+  background-color: #dcfce7 !important;
+}
+
+.control-button.edit-active {
+  color: #2563eb !important;
+  background-color: #dbeafe !important;
+}
+
+.control-button.delete-active {
+  color: #ef4444 !important;
+  background-color: #fee2e2 !important;
+}
+
+/* 加载状态 */
+.loading-templates {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* ===== 模板编辑对话框 ===== */
+.template-dialog {
+  max-width: 32rem;
+}
+
+.template-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.template-form .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.template-form .form-field label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.template-form .form-field input, 
+.template-form .form-field textarea {
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  background-color: #fff;
+  color: #000;
+}
+
+.template-form .form-field input:focus, 
+.template-form .form-field textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.template-form .form-field textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.template-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* 响应式调整 - 确保在小屏幕上控制按钮不会被挤掉 */
+@media (max-width: 640px) {
+  .template-bar {
+    flex-wrap: nowrap;
+  }
+  
+  .template-list {
+    max-width: calc(100% - 100px);
+  }
+  
+  .template-controls {
+    padding-left: 0.5rem;
+    border-left: 1px solid #f3f4f6;
+  }
+}

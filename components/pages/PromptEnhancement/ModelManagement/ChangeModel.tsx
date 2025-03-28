@@ -1,0 +1,492 @@
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle,DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import EditModel from "./EditApiModel";
+import EditLocalModel from "./EditLocalModel";
+import StartLocalModelServer from "./StartLocalModelServer";
+import { Cpu, Trash, Edit } from "lucide-react";
+import "../styles/ModelManagement.css";
+import db, { Model } from "../service/db";
+import { Toaster, toast } from "sonner";
+
+/**
+ * 模型选择按钮组件属性接口
+ */
+interface ChangeModelProps {
+  selectedModel: string;
+  setSelectedModel: (modelId: string) => void;
+}
+
+/**
+ * 模型选择按钮组件
+ * 提供模型选择、管理功能，支持API模型和本地模型
+ * 
+ * @param {Object} props - 组件属性
+ * @param {string} props.selectedModel - 当前选中的模型
+ * @param {Function} props.setSelectedModel - 设置选中模型的函数
+ * @returns {JSX.Element} 模型选择按钮组件
+ */
+const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedModel }): JSX.Element => {
+  // ===== 状态管理 =====
+  const [isModelDialogOpen, setIsModelDialogOpen] = useState<boolean>(false);  // 模型选择对话框状态
+  const [showAddApiModel, setShowAddApiModel] = useState<boolean>(false);      // 添加API模型面板显示状态
+  const [showAddLocalModel, setShowAddLocalModel] = useState<boolean>(false);  // 添加本地模型面板显示状态
+  const [editingModel, setEditingModel] = useState<Model | null>(null);        // 正在编辑的模型
+  const [modelType, setModelType] = useState<'api' | 'local'>("api");          // 当前选择的模型类型
+  const [apiModels, setApiModels] = useState<Model[]>([]);                     // API模型列表
+  const [localModels, setLocalModels] = useState<Model[]>([]);                 // 本地模型列表
+  const [isLoading, setIsLoading] = useState<boolean>(true);                   // 加载状态
+  const [selectedModelName, setSelectedModelName] = useState<string>("");      // 当前选中模型名称
+
+  /**
+   * 加载模型数据
+   */
+  const loadModels = async () => {
+    setIsLoading(true);
+    try {
+      // 初始化默认模型（如果数据库为空）
+      await db.initDefaultModels();
+
+      // 加载API模型
+      const apiModelsData = await db.getAllModels('api');
+      setApiModels(apiModelsData);
+
+      // 加载本地模型
+      const localModelsData = await db.getAllModels('local');
+      setLocalModels(localModelsData);
+      // 获取所有模型列表
+      const allModels = [...apiModelsData, ...localModelsData];
+      // 查找当前选中模型并更新名称
+      if (selectedModel) {
+        // 根据模型ID查找对应的模型对象
+        const currentModel = await allModels.find(m => m.id === selectedModel);
+        if (currentModel) {
+          // 使用模型的名称属性作为显示名称
+          setSelectedModelName(currentModel.name);
+          // 更新当前选择的模型类型
+          setModelType(currentModel.type);
+        } else {
+          setSelectedModelName("未选择模型");
+        }
+      } else {
+        setSelectedModelName("未选择模型");
+      }
+    } catch (error) {
+      console.error('加载模型失败:', error);
+      toast.error('加载模型配置失败');
+      setSelectedModelName("加载失败");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 组件挂载和selectedModel变化时加载模型
+  useEffect(() => {
+    loadModels();
+  }, [selectedModel]); // 当selectedModel变化时重新加载
+
+  /**
+   * 处理模型选择
+   * @param {string} modelName - 选中的模型名字
+   */
+  const handleModelSelect = (modelName: string) => {
+    // 避免重复选择当前模型
+    if (modelName === selectedModel) {
+      return;
+    }
+    
+    // 查找选中的模型
+    const allModels = [...apiModels, ...localModels];
+    const model = allModels.find(m => m.id === modelName);
+    
+    if (model) {
+      // 更新选中模型
+      setSelectedModel(modelName);
+      // 如果是API模型，则关闭对话框
+      if (model.type === 'api') {
+        setIsModelDialogOpen(false);
+      }
+      // 如果是本地模型，保持对话框打开
+    } else {
+      toast.error('选择的模型无效');
+    }
+  };
+
+  /**
+   * 处理添加API模型
+   * @param model 新模型数据
+   */
+  const handleAddApiModel = async (model: Omit<Model, 'id' | 'timestamp'> & { id?: string }) => {
+    try {
+      // 如果是编辑模式，保留原有ID
+      const isEditing = !!editingModel;
+      // 使用编辑模式下的原始ID，或者生成新ID
+      const modelId = isEditing ? editingModel.id : `${model.type}-${Date.now()}`;
+      
+      // 构建完整的模型对象
+      const newModel: Model = {
+        ...model,
+        id: modelId,
+        timestamp: new Date()
+      };
+      
+      // 保存到数据库
+      await db.saveModel(newModel);
+      
+      // 重新加载模型列表
+      await loadModels();
+      
+      // 显示成功消息
+      toast.success(isEditing ? 'API模型更新成功' : 'API模型添加成功');
+      
+      // 重置编辑状态
+      setShowAddApiModel(false);
+      setEditingModel(null);
+      
+      // 切换到API选项卡
+      setModelType('api');
+    } catch (error) {
+      console.error(editingModel ? '更新API模型失败:' : '添加API模型失败:', error);
+      toast.error(editingModel ? '更新API模型失败' : '添加API模型失败');
+    }
+  };
+
+  /**
+   * 处理添加本地模型
+   * @param model 新模型数据
+   */
+  const handleAddLocalModel = async (model: Omit<Model, 'id' | 'timestamp'> & { id?: string }) => {
+    try {
+      // 如果是编辑模式，保留原有ID
+      const isEditing = !!editingModel;
+      // 使用编辑模式下的原始ID，或者生成新ID
+      const modelId = isEditing ? editingModel.id : `${model.type}-${Date.now()}`;
+      
+      // 构建完整的模型对象
+      const newModel: Model = {
+        ...model,
+        id: modelId,
+        timestamp: new Date()
+      };
+      
+      // 保存到数据库
+      await db.saveModel(newModel);
+      
+      // 重新加载模型列表
+      await loadModels();
+      
+      // 显示成功消息
+      toast.success(isEditing ? '本地模型更新成功' : '本地模型添加成功');
+      
+      // 重置编辑状态
+      setShowAddLocalModel(false);
+      setEditingModel(null);
+      
+      // 切换到本地模型选项卡
+      setModelType('local');
+    } catch (error) {
+      console.error(editingModel ? '更新本地模型失败:' : '添加本地模型失败:', error);
+      toast.error(editingModel ? '更新本地模型失败' : '添加本地模型失败');
+    }
+  };
+
+  /**
+   * 处理编辑模型
+   * @param {string} modelId - 要编辑的模型ID
+   * @param {React.MouseEvent} e - 事件对象
+   */
+  const handleEditModel = async (modelId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // 防止触发模型选择
+    
+    try {
+      // 查找模型
+      const allModels = [...apiModels, ...localModels];
+      const model = allModels.find(m => m.id === modelId);
+      
+      if (!model) {
+        toast.error('找不到指定的模型');
+        return;
+      }
+      
+      // 设置编辑模式
+      setEditingModel(model);
+      
+      // 根据模型类型打开相应的编辑面板
+      if (model.type === 'api') {
+        setModelType('api');
+        setShowAddApiModel(true);
+      } else {
+        setModelType('local');
+        setShowAddLocalModel(true);
+      }
+    } catch (error) {
+      console.error('编辑模型失败:', error);
+      toast.error('编辑模型失败');
+    }
+  };
+
+  /**
+   * 处理删除模型
+   * @param {string} modelId - 要删除的模型ID
+   * @param {React.MouseEvent} e - 事件对象
+   */
+  const handleDeleteModel = async (modelId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // 防止触发模型选择
+    
+    try {
+      // 检查是否为当前选中的模型
+      if (modelId === selectedModel) {
+        toast.error('无法删除当前正在使用的模型');
+        return;
+      }
+      
+      // 查找要删除的模型
+      const allModels = [...apiModels, ...localModels];
+      const modelToDelete = allModels.find(m => m.id === modelId);
+      
+      if (!modelToDelete) {
+        toast.error('找不到要删除的模型');
+        return;
+      }
+      
+      // 删除模型
+      await db.deleteModel(modelId);
+      
+      // 重新加载模型列表
+      await loadModels();
+      
+      // 保持在当前选项卡
+      setModelType(modelToDelete.type);
+      
+      toast.success('模型已删除');
+    } catch (error) {
+      console.error('删除模型失败:', error);
+      toast.error('删除模型失败');
+    }
+  };
+
+  // 当对话框关闭时，重置编辑状态
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsModelDialogOpen(open);
+    if (!open) {
+      setEditingModel(null);
+      setShowAddApiModel(false);
+      setShowAddLocalModel(false);
+      
+      // 根据当前选中的模型类型设置选项卡
+      const allModels = [...apiModels, ...localModels];
+      const currentModel = allModels.find(m => m.id === selectedModel);
+      if (currentModel) {
+        setModelType(currentModel.type);
+      }
+    }
+  };
+
+  // 取消添加/编辑API模型
+  const handleCancelApiModelEdit = () => {
+    setShowAddApiModel(false);
+    setEditingModel(null);
+  };
+
+  // 取消添加/编辑本地模型
+  const handleCancelLocalModelEdit = () => {
+    setShowAddLocalModel(false);
+    setEditingModel(null);
+  };
+
+  // 处理选项卡切换
+  const handleTabChange = (value: string) => {
+    // 只有在非编辑模式下才允许切换选项卡
+    if (!showAddApiModel && !showAddLocalModel) {
+      setModelType(value as 'api' | 'local');
+    }
+  };
+
+  // 处理添加API模型按钮点击
+  const handleAddApiModelClick = () => {
+    setModelType('api');
+    setShowAddApiModel(true);
+  };
+
+  // 处理添加本地模型按钮点击
+  const handleAddLocalModelClick = () => {
+    setModelType('local');
+    setShowAddLocalModel(true);
+  };
+
+  return (
+    <div className="model-management">
+      <Toaster position="top-center" richColors />
+      
+      {/* 模型选择按钮 */}
+      <Button
+        variant="outline"
+        size="sm"
+        className="new-chat-button flex items-center gap-1"
+        onClick={() => setIsModelDialogOpen(true)}
+      >
+        <span>模型: {selectedModelName}</span>
+      </Button>
+
+      {/* 模型选择对话框 */}
+      <Dialog open={isModelDialogOpen} onOpenChange={handleDialogOpenChange}>
+        <DialogContent className="model-dialog-content">
+          <DialogHeader>
+            <DialogTitle>
+              {editingModel && editingModel.type === 'api' ? '编辑API模型' : 
+               editingModel && editingModel.type === 'local' ? '编辑本地模型' : 
+               showAddApiModel ? '添加API模型' : 
+               showAddLocalModel ? '添加本地模型' : 
+               '选择模型'}
+            </DialogTitle>
+            {!showAddApiModel && !showAddLocalModel && (
+              <DialogDescription>
+                选择一个模型来处理您的请求。您可以添加API模型（如OpenAI、阿里云通义千问等）或本地模型。
+              </DialogDescription>
+            )}
+          </DialogHeader>
+
+          {showAddApiModel ? (
+            <EditModel
+              onAdd={handleAddApiModel}
+              onCancel={handleCancelApiModelEdit}
+              initialData={editingModel || undefined}
+            />
+          ) : showAddLocalModel ? (
+            <EditLocalModel
+              onAdd={handleAddLocalModel}
+              onCancel={handleCancelLocalModelEdit}
+              initialData={editingModel || undefined}
+            />
+          ) : (
+            <Tabs value={modelType} onValueChange={handleTabChange} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="api">API 模型</TabsTrigger>
+                <TabsTrigger value="local">本地模型</TabsTrigger>
+              </TabsList>
+
+              {/* API模型列表 */}
+              <TabsContent value="api" className="space-y-4">
+                {apiModels.length === 0 ? (
+                  <div className="text-center py-4">暂无API模型，请添加</div>
+                ) : (
+                  <RadioGroup value={selectedModel} className="space-y-2">
+                    {apiModels.map((model) => (
+                      <div
+                        key={model.id}
+                        className={`model-item ${model.id === selectedModel ? 'selected' : ''}`}
+                        onClick={() => handleModelSelect(model.id)}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center">
+                            <RadioGroupItem value={model.id} id={model.id} />
+                            <Label htmlFor={model.id} className="ml-2 cursor-pointer">
+                              {model.name}
+                            </Label>
+                          </div>
+                          <div className="flex items-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="edit-button"
+                              onClick={(e) => handleEditModel(model.id, e)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="delete-button"
+                              onClick={(e) => handleDeleteModel(model.id, e)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        {model.id === selectedModel && (
+                          <div className="model-details">
+                            <p><strong>API模型ID:</strong> {model.apiId || model.id}</p>
+                            <p><strong>URL:</strong> {model.url || '未设置'}</p>
+                            <p><strong>API Key:</strong> {model.apiKey ? '******************' : '未设置'}</p>
+                            {model.parameters && <p><strong>参数:</strong> {model.parameters}</p>}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </RadioGroup>
+                )}
+                <Button variant="secondary" className="w-full" onClick={handleAddApiModelClick}>
+                  添加API模型
+                </Button>
+              </TabsContent>
+
+              {/* 本地模型列表 */}
+              <TabsContent value="local" className="space-y-4">
+                {/* 本地模型服务控制 */}
+                <div className="mb-4 p-4 bg-gray-50 rounded-md">
+                  <div className="text-sm font-medium mb-2">本地模型服务</div>
+                  <StartLocalModelServer selectedModel={selectedModel} />
+                </div>
+
+                {localModels.length === 0 ? (
+                  <div className="text-center py-4">暂无本地模型，请添加</div>
+                ) : (
+                  <RadioGroup value={selectedModel} className="space-y-2">
+                    {localModels.map((model) => (
+                      <div
+                        key={model.id}
+                        className={`model-item ${model.id === selectedModel ? 'selected' : ''}`}
+                        onClick={() => handleModelSelect(model.id)}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center">
+                            <RadioGroupItem value={model.id} id={model.id} />
+                            <Label htmlFor={model.id} className="ml-2 cursor-pointer">
+                              {model.name}
+                            </Label>
+                          </div>
+                          <div className="flex items-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="edit-button"
+                              onClick={(e) => handleEditModel(model.id, e)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="delete-button"
+                              onClick={(e) => handleDeleteModel(model.id, e)}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        {model.id === selectedModel && (
+                          <div className="model-details">
+                            <p><strong>路径:</strong> {model.path || '未设置'}</p>
+                            {model.parameters && <p><strong>参数:</strong> {model.parameters}</p>}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </RadioGroup>
+                )}
+                <Button variant="secondary" className="w-full" onClick={handleAddLocalModelClick}>
+                  添加本地模型
+                </Button>
+              </TabsContent>
+            </Tabs>
+          )}
+        </DialogContent>
+      </Dialog>
+      </div>
+  );
+};
+
+export default ChangeModel; 
