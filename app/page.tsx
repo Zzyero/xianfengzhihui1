@@ -11,14 +11,18 @@ import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import { PromptLibrary } from "@/components/prompt-library/prompt-library";
 import { PromptLibraryService } from '@/lib/services/prompt-library-service';
-import type { PromptItem } from '@/components/prompt-library/types';
+import type { PromptItem, PromptParameters } from '@/components/prompt-library/types';
 import { Loader } from "@/components/loader";
+import { PanelRightOpen } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 // export const description =
 //     "An AI playground with a sidebar navigation and a main content area. The playground has a header with a settings drawer and a share button. The sidebar has navigation links and a user menu. The main content area shows a form to configure the model and messages."
 
 // 主页
-export default function Page() {
+export default function Home() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
     // 是否启用视图模式
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     // 当前标签 
@@ -28,85 +32,132 @@ export default function Page() {
     // 提示词库数据
     const [prompts, setPrompts] = useState<PromptItem[]>([]);
     // 加载状态
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     // 错误状态
     const [error, setError] = useState<string | null>(null);
+    const [showSidebar, setShowSidebar] = useState(true);
+    const [showForm, setShowForm] = useState(false);
+    const [editingPrompt, setEditingPrompt] = useState<Partial<PromptItem> | null>(null);
+
+    // 检查URL参数并设置当前标签和编辑状态
+    useEffect(() => {
+        const fromPrompt = searchParams?.get('from') === 'prompt';
+        const editId = searchParams?.get('edit');
+        
+        if (fromPrompt) {
+            setCurrentTab(TabValue.PromptLibrary);
+        }
+        
+        if (editId) {
+            const promptToEdit = prompts.find(p => p.id === editId);
+            if (promptToEdit) {
+                // 移除 model 参数
+                const { parameters, ...rest } = promptToEdit;
+                const { model, ...filteredParams } = parameters;
+                setEditingPrompt({
+                    ...rest,
+                    parameters: filteredParams
+                });
+                setShowForm(true);
+            }
+        }
+    }, [searchParams, prompts]);
 
     // 加载提示词库数据
     useEffect(() => {
         const loadPrompts = async () => {
             try {
-                setLoading(true);
-                const loadedPrompts = await PromptLibraryService.getPrompts();
-                setPrompts(loadedPrompts);
+                setIsLoading(true);
+                const data = await PromptLibraryService.getPrompts();
+                setPrompts(data);
                 setError(null);
-            } catch (err) {
-                console.error('加载提示词库失败:', err);
-                setError('加载提示词库失败，请刷新页面重试');
+            } catch (error) {
+                console.error('加载提示词失败:', error);
+                setError('加载提示词失败，请刷新页面重试');
             } finally {
-                setLoading(false);
+                setIsLoading(false);
             }
         };
         loadPrompts();
     }, []);
 
     // 处理提示词的增删改
-    const handleAddPrompt = async (prompt: Partial<PromptItem>) => {
+    const handleAdd = async (prompt: Partial<PromptItem>) => {
         try {
-            // 生成新的提示词对象
-            const newPrompt: PromptItem = {
-                ...prompt as PromptItem,
-                id: Date.now().toString(), // 使用时间戳作为临时ID
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+            setIsLoading(true);
+            const filteredParams: PromptParameters = {
+                steps: prompt.parameters?.steps || '',
+                sampler: prompt.parameters?.sampler || '',
+                seed: prompt.parameters?.seed || '',
+                scheduler: prompt.parameters?.scheduler || '',
+                denoise: prompt.parameters?.denoise || '',
+                cfg: prompt.parameters?.cfg,
+                negative: prompt.parameters?.negative
             };
             
-            const newPrompts = [...prompts, newPrompt];
-            setPrompts(newPrompts);
-            
-            // 保存到服务器
-            const success = await PromptLibraryService.savePrompts(newPrompts);
-            if (!success) {
-                console.error('保存提示词到服务器失败');
+            await PromptLibraryService.addPrompt({
+                ...prompt,
+                parameters: filteredParams
+            });
+            const updatedPrompts = await PromptLibraryService.getPrompts();
+            setPrompts(updatedPrompts);
+            setShowForm(false);
+            setEditingPrompt(null);
+            // 如果是从其他页面跳转来的，返回原页面
+            const fromPrompt = searchParams?.get('from') === 'prompt';
+            if (fromPrompt) {
+                router.back();
             }
-        } catch (err) {
-            console.error('添加提示词失败:', err);
+        } catch (error) {
+            console.error('添加提示词失败:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const handleEditPrompt = async (id: string, prompt: Partial<PromptItem>) => {
+    const handleEdit = async (id: string, prompt: Partial<PromptItem>) => {
         try {
-            const newPrompts = prompts.map(p => 
-                p.id === id ? { 
-                    ...p, 
-                    ...prompt, 
-                    updatedAt: new Date().toISOString() 
-                } : p
-            );
-            setPrompts(newPrompts);
+            setIsLoading(true);
+            const filteredParams: PromptParameters = {
+                steps: prompt.parameters?.steps || '',
+                sampler: prompt.parameters?.sampler || '',
+                seed: prompt.parameters?.seed || '',
+                scheduler: prompt.parameters?.scheduler || '',
+                denoise: prompt.parameters?.denoise || '',
+                cfg: prompt.parameters?.cfg,
+                negative: prompt.parameters?.negative
+            };
             
-            // 保存到服务器
-            const success = await PromptLibraryService.savePrompts(newPrompts);
-            if (!success) {
-                console.error('保存提示词到服务器失败');
+            await PromptLibraryService.updatePrompt(id, {
+                ...prompt,
+                parameters: filteredParams
+            });
+            const updatedPrompts = await PromptLibraryService.getPrompts();
+            setPrompts(updatedPrompts);
+            setShowForm(false);
+            setEditingPrompt(null);
+            // 如果是从其他页面跳转来的，返回原页面
+            const fromPrompt = searchParams?.get('from') === 'prompt';
+            if (fromPrompt) {
+                router.back();
             }
-        } catch (err) {
-            console.error('编辑提示词失败:', err);
+        } catch (error) {
+            console.error('更新提示词失败:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const handleDeletePrompt = async (id: string) => {
+    const handleDelete = async (id: string) => {
         try {
-            const newPrompts = prompts.filter(p => p.id !== id);
-            setPrompts(newPrompts);
-            
-            // 保存到服务器
-            const success = await PromptLibraryService.savePrompts(newPrompts);
-            if (!success) {
-                console.error('保存提示词到服务器失败');
-            }
-        } catch (err) {
-            console.error('删除提示词失败:', err);
+            setIsLoading(true);
+            await PromptLibraryService.deletePrompt(id);
+            const updatedPrompts = await PromptLibraryService.getPrompts();
+            setPrompts(updatedPrompts);
+        } catch (error) {
+            console.error('删除提示词失败:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -181,7 +232,7 @@ export default function Page() {
                                     <h1 className="text-2xl font-bold">提示词库</h1>
                                 </div>
                                 <div className="flex-1 p-4 overflow-auto">
-                                    {loading ? (
+                                    {isLoading ? (
                                         <div className="flex items-center justify-center h-full">
                                             <Loader />
                                         </div>
@@ -192,9 +243,9 @@ export default function Page() {
                                     ) : (
                                         <PromptLibrary
                                             prompts={prompts}
-                                            onAdd={handleAddPrompt}
-                                            onEdit={handleEditPrompt}
-                                            onDelete={handleDeletePrompt}
+                                            onAdd={handleAdd}
+                                            onEdit={handleEdit}
+                                            onDelete={handleDelete}
                                             isSidebar={false}
                                         />
                                     )}
@@ -218,6 +269,32 @@ export default function Page() {
                 </div>
             </div>
             <Toaster />
+            {/* 提示词库侧边栏 */}
+            <div className={`
+                ${showSidebar ? 'translate-x-0' : 'translate-x-full'}
+                fixed top-0 right-0 h-full w-80 bg-background border-l
+                transform transition-transform duration-200 ease-in-out
+                lg:relative lg:translate-x-0 z-20
+            `}>
+                <PromptLibrary
+                    prompts={prompts}
+                    onAdd={handleAdd}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    isSidebar={true}
+                    showForm={showForm}
+                    setShowForm={setShowForm}
+                    editingPrompt={editingPrompt}
+                    setEditingPrompt={setEditingPrompt}
+                />
+            </div>
+            {/* 移动端遮罩层 */}
+            {showSidebar && (
+                <div 
+                    className="fixed inset-0 bg-black/20 z-10 lg:hidden"
+                    onClick={() => setShowSidebar(false)}
+                />
+            )}
         </ViewComfyProvider>
     )
 }

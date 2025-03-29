@@ -3,12 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Search, Plus, Edit, Trash, Upload, Download, X, Image, FileUp, FileText } from "lucide-react";
+import { Search, Plus, Edit, Trash, Upload, Download, X, Image, FileUp, FileText, ArrowLeft } from "lucide-react";
 import type { PromptItem, PromptTag } from './types';
 import { PromptForm } from './prompt-form';
 import { PromptLibraryService } from '@/lib/services/prompt-library-service';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useRouter } from 'next/navigation';
 
 interface PromptLibraryProps {
   prompts: PromptItem[];
@@ -16,12 +17,25 @@ interface PromptLibraryProps {
   onEdit?: (id: string, prompt: Partial<PromptItem>) => void;
   onDelete?: (id: string) => void;
   isSidebar?: boolean;
+  showForm?: boolean;
+  setShowForm?: (show: boolean) => void;
+  editingPrompt?: Partial<PromptItem> | null;
+  setEditingPrompt?: (prompt: Partial<PromptItem> | null) => void;
 }
 
-export function PromptLibrary({ prompts, onAdd, onEdit, onDelete, isSidebar = false }: PromptLibraryProps) {
+export function PromptLibrary({ 
+  prompts, 
+  onAdd, 
+  onEdit, 
+  onDelete, 
+  isSidebar = false,
+  showForm = false,
+  setShowForm = () => {},
+  editingPrompt = null,
+  setEditingPrompt = () => {}
+}: PromptLibraryProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [showForm, setShowForm] = useState(false);
-  const [editingPrompt, setEditingPrompt] = useState<Partial<PromptItem>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageFileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -363,163 +377,178 @@ export function PromptLibrary({ prompts, onAdd, onEdit, onDelete, isSidebar = fa
     </div>
   );
 
+  // 处理卡片点击，跳转到详情页
+  const handleCardClick = (promptId: string) => {
+    router.push(`/prompt-library/${promptId}`);
+  };
+
+  const handleBackHome = () => {
+    router.push('/');
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleParseImageClick = () => {
+    imageFileInputRef.current?.click();
+  };
+
   const content = (
     <>
-      <div className={`flex items-center justify-between mb-4 ${isSidebar ? 'flex-col gap-2' : ''}`}>
-        <div className={`flex items-center gap-2 ${isSidebar ? 'w-full' : 'flex-1'}`}>
-          <Search className="w-5 h-5 text-gray-400" />
-          <Input
-            placeholder="搜索提示词或标签..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-sm"
-          />
-        </div>
-        <div className={`flex gap-2 ${isSidebar ? 'w-full justify-between' : ''}`}>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            className="hidden"
-            onChange={handleImport}
-          />
-          <input
-            ref={imageFileInputRef}
-            type="file"
-            accept=".png"
-            className="hidden"
-            onChange={handleParsePngImage}
-          />
-          <Button
-            variant="outline"
-            size={isSidebar ? "sm" : "default"}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            导入
-          </Button>
-          <Button
-            variant="outline"
-            size={isSidebar ? "sm" : "default"}
-            onClick={() => imageFileInputRef.current?.click()}
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            解析图片
-          </Button>
-          <Button 
-            size={isSidebar ? "sm" : "default"}
-            onClick={() => {
-              setEditingPrompt({});
-            setShowForm(true);
-            }}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            添加
-          </Button>
-        </div>
-      </div>
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+      `}</style>
 
-      <div className={`grid gap-4 ${isSidebar ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
-        {filteredPrompts.map((prompt) => (
-          <Card key={prompt.id} className="p-4">
-            <div 
-              className="aspect-video relative mb-3 overflow-hidden cursor-pointer"
-              onDoubleClick={() => prompt.imageUrl && handleImageDoubleClick(prompt.imageUrl)}
+      <div className="flex flex-col space-y-4">
+        {!isSidebar && (
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              className="mr-2"
+              onClick={handleBackHome}
             >
-              {/* 提示文字，只在图片加载前显示 */}
-              {!loadedImages[prompt.id] && !imageErrors[prompt.id] && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400 text-xs z-10">
-                  加载中...
-                </div>
-              )}
-              
-              {/* 双击提示，始终显示但半透明 */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/10 text-white text-xs z-20 opacity-0 hover:opacity-100 transition-opacity">
-                双击查看大图
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              返回主页
+            </Button>
+          </div>
+        )}
+
+        <div className={`flex items-center justify-between ${isSidebar ? 'flex-col gap-2' : ''}`}>
+          <div className={`flex items-center gap-2 ${isSidebar ? 'w-full' : 'flex-1'}`}>
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="搜索提示词或标签..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8"
+              />
+            </div>
+            <Button variant="outline" onClick={() => setShowForm(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              添加
+            </Button>
+          </div>
+
+          <div className={`flex items-center gap-2 ${isSidebar ? 'w-full' : ''}`}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={handleImport}
+            />
+            <input
+              ref={imageFileInputRef}
+              type="file"
+              accept=".png"
+              className="hidden"
+              onChange={handleParsePngImage}
+            />
+            <Button variant="outline" onClick={handleImportClick}>
+              <Upload className="w-4 h-4 mr-2" />
+              导入
+            </Button>
+            <Button variant="outline" onClick={handleParseImageClick}>
+              <FileUp className="w-4 h-4 mr-2" />
+              解析图片
+            </Button>
+          </div>
+        </div>
+
+        <div className={`grid gap-4 ${
+          isSidebar 
+            ? 'grid-cols-1' 
+            : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+        }`}>
+          {filteredPrompts.map((prompt) => (
+            <Card 
+              key={prompt.id} 
+              className="p-4 flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => handleCardClick(prompt.id)}
+            >
+              <div 
+                className="relative mb-3 overflow-hidden bg-white rounded-lg p-2"
+                style={{ minHeight: '200px' }}
+              >
+                {!loadedImages[prompt.id] && !imageErrors[prompt.id] && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400 text-xs z-10">
+                    加载中...
+                  </div>
+                )}
+                
+                {imageErrors[prompt.id] ? (
+                  <PlaceholderImage />
+                ) : (
+                  <div className="relative w-full" style={{ paddingTop: '75%' }}>
+                    <img
+                      src={prompt.imageUrl}
+                      alt={prompt.prompt}
+                      className="absolute inset-0 w-full h-full object-contain transition-transform hover:scale-105"
+                      loading="lazy"
+                      onError={() => handleImageError(prompt.id)}
+                      onLoad={() => handleImageLoad(prompt.id)}
+                    />
+                  </div>
+                )}
               </div>
               
-              {imageErrors[prompt.id] ? (
-                <PlaceholderImage />
-              ) : (
-              <img
-                src={prompt.imageUrl}
-                alt={prompt.prompt}
-                  className="rounded-lg object-cover w-full h-full transition-transform hover:scale-105"
-                  loading="lazy"
-                  onError={() => handleImageError(prompt.id)}
-                  onLoad={() => handleImageLoad(prompt.id)}
-                  style={{ position: 'relative', zIndex: 5 }}
-                />
-              )}
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mb-3">
-              {prompt.tags.map((tag) => (
-                <Badge
-                  key={tag.id}
-                  variant="secondary"
-                  style={{ backgroundColor: tag.color }}
-                  className="cursor-pointer hover:opacity-80"
-                  onClick={() => handleTagClick(tag.name)}
-                >
-                  {tag.name}
-                </Badge>
-              ))}
-            </div>
-
-            <div className="mb-3 text-sm">
-              {Object.entries(prompt.parameters).map(([key, value]) => (
-                <div key={key} className="flex justify-between">
-                  <span className="text-gray-500">{key}:</span>
-                  <span>{value}</span>
+              <div className="flex-1">
+                <div className="flex flex-wrap gap-1">
+                  {prompt.tags.map((tag) => (
+                    <Badge
+                      key={tag.id}
+                      variant="secondary"
+                      style={{ backgroundColor: tag.color }}
+                      className="text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTagClick(tag.name);
+                      }}
+                    >
+                      {tag.name}
+                    </Badge>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            </Card>
+          ))}
+        </div>
 
-            <p className="text-sm mb-3 line-clamp-3">{prompt.prompt}</p>
+        <PromptForm
+          open={showForm}
+          onClose={() => {
+            setShowForm(false);
+            setEditingPrompt(undefined);
+          }}
+          onSubmit={(prompt) => {
+            if (editingPrompt?.id) {
+              onEdit?.(editingPrompt.id, prompt);
+            } else {
+              onAdd?.(prompt);
+            }
+            setShowForm(false);
+          }}
+          initialData={editingPrompt}
+          title={editingPrompt ? "编辑提示词" : "添加提示词"}
+        />
 
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  setEditingPrompt(prompt);
-                  setShowForm(true);
-                }}
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onDelete?.(prompt.id)}
-              >
-                <Trash className="w-4 h-4" />
-              </Button>
-            </div>
-          </Card>
-        ))}
+        <ImagePreviewDialog />
       </div>
-
-      <PromptForm
-        open={showForm}
-        onClose={() => {
-          setShowForm(false);
-          setEditingPrompt(undefined);
-        }}
-        onSubmit={(prompt) => {
-          if (editingPrompt?.id) {
-            onEdit?.(editingPrompt.id, prompt);
-          } else {
-            onAdd?.(prompt);
-          }
-          setShowForm(false);
-        }}
-        initialData={editingPrompt}
-        title={editingPrompt ? "编辑提示词" : "添加提示词"}
-      />
-
-      <ImagePreviewDialog />
     </>
   );
 
