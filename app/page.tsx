@@ -10,10 +10,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import { PromptLibrary } from "@/components/prompt-library/prompt-library";
 import { PromptLibraryService } from '@/lib/services/prompt-library-service';
-import type { PromptItem } from '@/components/prompt-library/types';
+import type { PromptItem, PromptParameters } from '@/components/prompt-library/types';
 import { Loader } from "@/components/loader";
 import { PanelRightOpen } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 // export const description =
 //     "An AI playground with a sidebar navigation and a main content area. The playground has a header with a settings drawer and a share button. The sidebar has navigation links and a user menu. The main content area shows a form to configure the model and messages."
@@ -21,6 +21,7 @@ import { useSearchParams } from 'next/navigation';
 // 主页
 export default function Home() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     // 是否启用视图模式
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     // 当前标签 
@@ -34,14 +35,32 @@ export default function Home() {
     // 错误状态
     const [error, setError] = useState<string | null>(null);
     const [showSidebar, setShowSidebar] = useState(true);
+    const [showForm, setShowForm] = useState(false);
+    const [editingPrompt, setEditingPrompt] = useState<Partial<PromptItem> | null>(null);
 
-    // 检查URL参数并设置当前标签
+    // 检查URL参数并设置当前标签和编辑状态
     useEffect(() => {
-        const fromPrompt = searchParams.get('from') === 'prompt';
+        const fromPrompt = searchParams?.get('from') === 'prompt';
+        const editId = searchParams?.get('edit');
+        
         if (fromPrompt) {
             setCurrentTab(TabValue.PromptLibrary);
         }
-    }, [searchParams]);
+        
+        if (editId) {
+            const promptToEdit = prompts.find(p => p.id === editId);
+            if (promptToEdit) {
+                // 移除 model 参数
+                const { parameters, ...rest } = promptToEdit;
+                const { model, ...filteredParams } = parameters;
+                setEditingPrompt({
+                    ...rest,
+                    parameters: filteredParams
+                });
+                setShowForm(true);
+            }
+        }
+    }, [searchParams, prompts]);
 
     // 加载提示词库数据
     useEffect(() => {
@@ -65,9 +84,29 @@ export default function Home() {
     const handleAdd = async (prompt: Partial<PromptItem>) => {
         try {
             setIsLoading(true);
-            await PromptLibraryService.addPrompt(prompt);
+            const filteredParams: PromptParameters = {
+                steps: prompt.parameters?.steps || '',
+                sampler: prompt.parameters?.sampler || '',
+                seed: prompt.parameters?.seed || '',
+                scheduler: prompt.parameters?.scheduler || '',
+                denoise: prompt.parameters?.denoise || '',
+                cfg: prompt.parameters?.cfg,
+                negative: prompt.parameters?.negative
+            };
+            
+            await PromptLibraryService.addPrompt({
+                ...prompt,
+                parameters: filteredParams
+            });
             const updatedPrompts = await PromptLibraryService.getPrompts();
             setPrompts(updatedPrompts);
+            setShowForm(false);
+            setEditingPrompt(null);
+            // 如果是从其他页面跳转来的，返回原页面
+            const fromPrompt = searchParams?.get('from') === 'prompt';
+            if (fromPrompt) {
+                router.back();
+            }
         } catch (error) {
             console.error('添加提示词失败:', error);
         } finally {
@@ -78,9 +117,29 @@ export default function Home() {
     const handleEdit = async (id: string, prompt: Partial<PromptItem>) => {
         try {
             setIsLoading(true);
-            await PromptLibraryService.updatePrompt(id, prompt);
+            const filteredParams: PromptParameters = {
+                steps: prompt.parameters?.steps || '',
+                sampler: prompt.parameters?.sampler || '',
+                seed: prompt.parameters?.seed || '',
+                scheduler: prompt.parameters?.scheduler || '',
+                denoise: prompt.parameters?.denoise || '',
+                cfg: prompt.parameters?.cfg,
+                negative: prompt.parameters?.negative
+            };
+            
+            await PromptLibraryService.updatePrompt(id, {
+                ...prompt,
+                parameters: filteredParams
+            });
             const updatedPrompts = await PromptLibraryService.getPrompts();
             setPrompts(updatedPrompts);
+            setShowForm(false);
+            setEditingPrompt(null);
+            // 如果是从其他页面跳转来的，返回原页面
+            const fromPrompt = searchParams?.get('from') === 'prompt';
+            if (fromPrompt) {
+                router.back();
+            }
         } catch (error) {
             console.error('更新提示词失败:', error);
         } finally {
@@ -163,6 +222,10 @@ export default function Home() {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     isSidebar={true}
+                    showForm={showForm}
+                    setShowForm={setShowForm}
+                    editingPrompt={editingPrompt}
+                    setEditingPrompt={setEditingPrompt}
                 />
             </div>
             {/* 移动端遮罩层 */}

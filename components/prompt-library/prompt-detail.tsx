@@ -40,6 +40,12 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
     }
   };
 
+  // 处理编辑按钮点击
+  const handleEditClick = () => {
+    // 返回主页并传递编辑状态参数
+    router.push(`/?from=prompt&edit=${prompt.id}`);
+  };
+
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <div className="flex items-center mb-4">
@@ -55,7 +61,7 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => onEdit?.(prompt.id, prompt)}
+            onClick={handleEditClick}
           >
             <Edit className="w-4 h-4 mr-2" />
             编辑

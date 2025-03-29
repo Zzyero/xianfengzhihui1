@@ -17,25 +17,25 @@ interface PromptLibraryProps {
   onEdit?: (id: string, prompt: Partial<PromptItem>) => void;
   onDelete?: (id: string) => void;
   isSidebar?: boolean;
+  showForm?: boolean;
+  setShowForm?: (show: boolean) => void;
+  editingPrompt?: Partial<PromptItem> | null;
+  setEditingPrompt?: (prompt: Partial<PromptItem> | null) => void;
 }
 
-export function PromptLibrary({ prompts, onAdd, onEdit, onDelete, isSidebar = false }: PromptLibraryProps) {
+export function PromptLibrary({ 
+  prompts, 
+  onAdd, 
+  onEdit, 
+  onDelete, 
+  isSidebar = false,
+  showForm = false,
+  setShowForm = () => {},
+  editingPrompt = null,
+  setEditingPrompt = () => {}
+}: PromptLibraryProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [showForm, setShowForm] = useState(false);
-  const [editingPrompt, setEditingPrompt] = useState<Partial<PromptItem>>({
-    tags: [],
-    parameters: {
-      steps: '',
-      sampler: '',
-      seed: '',
-      scheduler: '',
-      denoise: '',
-      negative: '',
-    },
-    prompt: '',
-    promptEn: '',
-  });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageFileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);

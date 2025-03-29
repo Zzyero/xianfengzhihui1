@@ -6,13 +6,12 @@ export interface PromptTag {
 
 export interface PromptParameters {
   steps: string;
-  cfg?: string;
   sampler: string;
   seed: string;
   scheduler: string;
   denoise: string;
+  cfg?: string;
   negative?: string;
-  model?: string;
   [key: string]: string | undefined;
 }
 
