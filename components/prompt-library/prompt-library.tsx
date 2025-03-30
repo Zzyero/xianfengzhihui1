@@ -414,19 +414,6 @@ export function PromptLibrary({
       `}</style>
 
       <div className="flex flex-col space-y-4">
-        {!isSidebar && (
-          <div className="flex items-center">
-            <Button
-              variant="ghost"
-              className="mr-2"
-              onClick={handleBackHome}
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              返回主页
-            </Button>
-          </div>
-        )}
-
         <div className={`flex items-center justify-between ${isSidebar ? 'flex-col gap-2' : ''}`}>
           <div className={`flex items-center gap-2 ${isSidebar ? 'w-full' : 'flex-1'}`}>
             <div className="relative flex-1">

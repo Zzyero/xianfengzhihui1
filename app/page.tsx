@@ -26,7 +26,15 @@ export default function Home() {
     // 是否启用视图模式
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     // 当前标签 
-    const [currentTab, setCurrentTab] = useState(viewMode ? TabValue.Playground : TabValue.WorkflowApi);
+    const [currentTab, setCurrentTab] = useState(() => {
+        // 从 URL 参数获取来源
+        const fromPrompt = searchParams?.get('from') === 'prompt';
+        if (fromPrompt) {
+            return TabValue.PromptLibrary;
+        }
+        // 否则使用默认值
+        return viewMode ? TabValue.Playground : TabValue.WorkflowApi;
+    });
     // 部署窗口显示状态
     const [deployWindow, setDeployWindow] = useState<boolean>(false);
     // 提示词库数据
@@ -39,14 +47,9 @@ export default function Home() {
     const [showForm, setShowForm] = useState(false);
     const [editingPrompt, setEditingPrompt] = useState<Partial<PromptItem> | null>(null);
 
-    // 检查URL参数并设置当前标签和编辑状态
+    // 检查URL参数并设置编辑状态
     useEffect(() => {
-        const fromPrompt = searchParams?.get('from') === 'prompt';
         const editId = searchParams?.get('edit');
-        
-        if (fromPrompt) {
-            setCurrentTab(TabValue.PromptLibrary);
-        }
         
         if (editId) {
             const promptToEdit = prompts.find(p => p.id === editId);
@@ -202,7 +205,6 @@ export default function Home() {
     }, [isPromptEnhanceActive]);
 
     return (
-        // 主布局
         <ViewComfyProvider>
             <div className="flex flex-col h-screen w-full overflow-x-auto overflow-y-hidden">
                 {/* 顶部导航 */}
@@ -247,6 +249,10 @@ export default function Home() {
                                             onEdit={handleEdit}
                                             onDelete={handleDelete}
                                             isSidebar={false}
+                                            showForm={showForm}
+                                            setShowForm={setShowForm}
+                                            editingPrompt={editingPrompt}
+                                            setEditingPrompt={setEditingPrompt}
                                         />
                                     )}
                                 </div>
@@ -269,25 +275,6 @@ export default function Home() {
                 </div>
             </div>
             <Toaster />
-            {/* 提示词库侧边栏 */}
-            <div className={`
-                ${showSidebar ? 'translate-x-0' : 'translate-x-full'}
-                fixed top-0 right-0 h-full w-80 bg-background border-l
-                transform transition-transform duration-200 ease-in-out
-                lg:relative lg:translate-x-0 z-20
-            `}>
-                <PromptLibrary
-                    prompts={prompts}
-                    onAdd={handleAdd}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    isSidebar={true}
-                    showForm={showForm}
-                    setShowForm={setShowForm}
-                    editingPrompt={editingPrompt}
-                    setEditingPrompt={setEditingPrompt}
-                />
-            </div>
             {/* 移动端遮罩层 */}
             {showSidebar && (
                 <div 
