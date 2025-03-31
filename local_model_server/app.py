@@ -77,13 +77,25 @@ def load_model(model_name: str, model_path: str):
 
     logger.info(f"正在加载模型: {model_path}")
     try:
+        # 处理路径格式
+        if model_path.startswith('../') or model_path.startswith('./'):
+            # 将相对路径转换为绝对路径
+            absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__), model_path))
+            logger.info(f"将相对路径 '{model_path}' 转换为绝对路径 '{absolute_path}'")
+            model_path = absolute_path
+        
+        # 检查路径是否存在
+        if not os.path.exists(model_path):
+            raise ValueError(f"模型路径不存在: {model_path}")
+            
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
         model = AutoModelForCausalLM.from_pretrained(
             model_path,
             torch_dtype=torch.float16 if device == "cuda" else torch.float32,
             device_map="auto" if device == "cuda" else None,
-            low_cpu_mem_usage=True if device == "cuda" else False
+            low_cpu_mem_usage=True if device == "cuda" else False,
+            trust_remote_code=True
         )
 
         model_cache[model_path] = model
