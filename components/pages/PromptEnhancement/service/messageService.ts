@@ -185,13 +185,10 @@ class MessageService {
           customPrompt // 传递自定义提示词
         });
       } else if (model.type === 'local') {
-        // 获取历史消息以提供上下文
-        const historyMessages = await db.getMessagesBySession(currentSessionId);
-        
         // 调用本地模型，传递历史消息
         await ModelService.callLocalModel({
           model,
-          messages: historyMessages,
+          prompt: content,
           callbacks: modelCallbacks,
           signal: controller.signal,
           customPrompt // 传递自定义提示词

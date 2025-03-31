@@ -1,3 +1,10 @@
+// 添加全局声明
+declare global {
+  interface Window {
+    __IS_STOPPING_GENERATION__?: boolean;
+  }
+}
+
 import { useState, useEffect, createContext, useContext } from 'react';
 import { Message, Template, ChatSession } from '../service/db';
 import db from '../service/db';
@@ -347,6 +354,15 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   const handleStopGeneration = (): void => {
     if (!activeSessionId) return;
     
+    // 检查是否已经在停止过程中
+    if (window.__IS_STOPPING_GENERATION__) {
+      console.log('已有中断操作正在进行，跳过重复请求');
+      return;
+    }
+    
+    // 设置全局标志，防止重复调用
+    window.__IS_STOPPING_GENERATION__ = true;
+    
     // 立即将生成状态设置为false，提供视觉反馈
     setIsGenerating(false);
     toast.info('正在停止生成...');
@@ -366,10 +382,15 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
         } catch (error) {
           console.error('发送中断请求失败:', error);
           toast.error('停止生成时出现问题，请尝试刷新页面');
+        } finally {
+          // 不管成功失败，一定要清除标志
+          window.__IS_STOPPING_GENERATION__ = false;
         }
       });
     } else {
       toast.success('生成已停止');
+      // 不要忘记清除标志
+      window.__IS_STOPPING_GENERATION__ = false;
     }
   };
   // ===== 模板操作 =====

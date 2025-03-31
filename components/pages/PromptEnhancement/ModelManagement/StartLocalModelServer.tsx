@@ -1,10 +1,10 @@
 // 导入必要的React核心模块
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // 导入UI组件
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Loader2, AlertCircle, CheckCircle, Download, X, Server } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle, Download, X } from "lucide-react";
 
 // 导入数据库服务和模型服务
 import db, { Model } from "../service/db";
@@ -19,7 +19,8 @@ import "../styles/ModelManagement.css";
 interface ServerStatus {
   status: 'idle' | 'checking' | 'running' | 'stopped' | 'starting';
   info?: string;
-  models?: string[]; // 加载的模型路径列表
+  models?: string[] | string; // 加载的模型路径列表或单个路径
+  loading?: boolean; // 表示模型是否已加载，true表示已加载，false表示未加载
 }
 
 /**
@@ -27,22 +28,47 @@ interface ServerStatus {
  */
 interface StartLocalModelServerProps {
   selectedModel?: string; // 当前选中的模型ID
+  onClose?: () => void; // 关闭表单的回调函数
+}
+
+/**
+ * 创建一个防抖函数
+ * @param fn 要执行的函数
+ * @param delay 延迟时间
+ */
+function debounce<T extends (...args: any[]) => any>(fn: T, delay: number): (...args: Parameters<T>) => void {
+  let timer: NodeJS.Timeout | null = null;
+  
+  return function(...args: Parameters<T>) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
 }
 
 /**
  * 启动本地模型服务组件
  * 提供本地模型服务控制、模型加载和卸载功能
  */
-const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedModel }) => {
+const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ 
+  selectedModel, 
+  onClose 
+}) => {
   // ===== 状态管理 =====
-  const [localModels, setLocalModels] = useState<Model[]>([]);                      // 本地模型列表
-  const [serverStatus, setServerStatus] = useState<ServerStatus>({                  // 服务器状态
+  const [localModels, setLocalModels] = useState<Model[]>([]);              // 本地模型列表
+  const [serverStatus, setServerStatus] = useState<ServerStatus>({          // 服务器状态
     status: 'idle',
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);                        // 加载状态
+  const [isLoading, setIsLoading] = useState<boolean>(true);                // 加载状态
   const [selectedLocalModel, setSelectedLocalModel] = useState<Model | null>(null); // 选中的本地模型
-  const [isModelLoading, setIsModelLoading] = useState<boolean>(false);             // 模型加载状态
-  const [isModelUnloading, setIsModelUnloading] = useState<boolean>(false);         // 模型卸载状态
+  const [isModelLoading, setIsModelLoading] = useState<boolean>(false);     // 模型加载状态
+  const [isModelUnloading, setIsModelUnloading] = useState<boolean>(false); // 模型卸载状态
+  
+  // 使用ref跟踪请求状态，防止重复请求
+  const isCheckingServerStatus = useRef<boolean>(false);
+  const lastCheckTime = useRef<number>(0);
+  const checkInterval = useRef<NodeJS.Timeout | null>(null);
 
   /**
    * 加载本地模型列表
@@ -71,12 +97,36 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
    * 检查本地模型服务是否运行
    */
   const checkServerStatus = async () => {
+    // 防止重复请求：如果当前有检查正在进行，直接返回
+    if (isCheckingServerStatus.current) {
+      console.log('跳过重复的服务器状态检查，因为已有一个检查正在进行');
+      return false;
+    }
+    
+    // 防止频繁请求：如果距离上次检查不足5秒，则跳过
+    const now = Date.now();
+    if (now - lastCheckTime.current < 5000) {
+      console.log(`跳过频繁的服务器状态检查，距上次检查仅${now - lastCheckTime.current}ms`);
+      return false;
+    }
+    
+    // 设置检查状态标志和时间戳
+    isCheckingServerStatus.current = true;
+    lastCheckTime.current = now;
+    
+    // 生成唯一请求ID
+    const requestId = `status_${now}`;
+    console.log(`开始检查服务器状态 [ID:${requestId}]`);
+    
     setServerStatus({ status: 'checking' });
+    
     try {
       const response = await fetch('http://localhost:5000/api/system', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'X-Request-ID': requestId, // 添加请求ID头
+          'Cache-Control': 'no-cache' // 禁用缓存
         },
         // 设置超时
         signal: AbortSignal.timeout(3000),
@@ -84,52 +134,37 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
 
       if (response.ok) {
         const data = await response.json();
+        // 确保models始终是数组
+        const models = data.loaded_models 
+          ? (Array.isArray(data.loaded_models) ? data.loaded_models : [data.loaded_models]) 
+          : [];
+        
+        // 根据是否有加载的模型来设置loading状态
+        const hasLoadedModel = models && models.length > 0;
+        
         setServerStatus({
           status: 'running',
           info: data.cuda || '服务正在运行',
-          models: data.loaded_models || [],
+          models: models,
+          loading: hasLoadedModel // 有加载的模型时为true，否则为false
         });
+        
+        console.log(`服务器状态检查完成 [ID:${requestId}]: 运行中，已加载模型: ${hasLoadedModel}`);
+        isCheckingServerStatus.current = false;
         return true;
       } else {
+        console.log(`服务器状态检查完成 [ID:${requestId}]: 已停止`);
         setServerStatus({ status: 'stopped' });
+        isCheckingServerStatus.current = false;
         return false;
       }
     } catch (error) {
-      console.error('检查服务状态失败:', error);
+      console.error(`检查服务状态失败 [ID:${requestId}]:`, error);
       setServerStatus({ status: 'stopped' });
+      isCheckingServerStatus.current = false;
       return false;
     }
   };
-
-  /**
-   * 启动本地模型服务(手动启动)
-   */
-  // const startServer = async () => {
-  //   // 检查是否有本地模型
-  //   if (localModels.length === 0) {
-  //     toast.error('没有可用的本地模型，请先添加模型');
-  //     return;
-  //   }
-
-  //   // 设置状态为启动中
-  //   setServerStatus({ status: 'starting' });
-  //   toast.info('请在local_model_server.py中启动app.py');
-
-  //   try {
-  //     // 检查服务是否已启动
-  //     const isRunning = await checkServerStatus();
-      
-  //     if (isRunning) {
-  //       toast.success('本地模型服务已启动');
-  //     } else {
-  //       toast.error('启动本地模型服务失败');
-  //     }
-  //   } catch (error) {
-  //     console.error('启动服务失败:', error);
-  //     toast.error('启动本地模型服务失败');
-  //     setServerStatus({ status: 'stopped' });
-  //   }
-  // };
   
   /**
    * 加载选中的模型
@@ -145,10 +180,18 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
       return;
     }
     
+    // 防止重复操作：如果当前有加载操作正在进行，直接返回
+    if (isModelLoading) {
+      console.log('跳过重复的模型加载请求，因为已有一个加载操作正在进行');
+      return;
+    }
+    
     // 设置加载中状态
     setIsModelLoading(true);
     
     try {
+      console.log(`开始加载模型: ${selectedLocalModel.name}, 路径: ${selectedLocalModel.path}`);
+      
       // 调用模型服务加载模型
       const result = await ModelService.operateLocalModel(
         LocalModelOperation.START, 
@@ -156,12 +199,18 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
         selectedLocalModel.name
       );
       
-      // 更新服务状态
-      await checkServerStatus();
+      console.log(`模型加载请求结果:`, result);
       
-      // 只显示服务器返回的消息，避免重复提示
+      // 更新服务状态 (在短暂延迟后检查，给服务器一些时间完全设置模型)
+      setTimeout(async () => {
+        await checkServerStatus();
+      }, 1000);
+      
+      // 显示服务器返回的消息
       if (result.status === 'success') {
         toast.success(result.message);
+        // 操作成功后退出表单
+        if (onClose) onClose();
       } else if (result.status === 'warning') {
         toast.warning(result.message);
       } else {
@@ -169,6 +218,7 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
       }
     } catch (error: any) {
       console.error('加载模型失败:', error);
+      toast.error(`加载模型失败: ${error.message || '未知错误'}`);
     } finally {
       setIsModelLoading(false);
     }
@@ -178,57 +228,73 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
    * 卸载当前加载的模型
    */
   const unloadModel = async () => {
+    // 防止重复操作：如果当前有卸载操作正在进行，直接返回
+    if (isModelUnloading) {
+      console.log('跳过重复的模型卸载请求，因为已有一个卸载操作正在进行');
+      return;
+    }
+    
     // 设置卸载中状态
     setIsModelUnloading(true);
     
     try {
-      // 确定要卸载的模型
-      if (selectedLocalModel && selectedLocalModel.path && serverStatus.models?.includes(selectedLocalModel.path)) {
-        // 如果已选择模型且该模型已加载，则卸载这个模型
-        const result = await ModelService.operateLocalModel(
-          LocalModelOperation.DELETE, 
-          selectedLocalModel.path,
-          selectedLocalModel.name
-        );
-        
-        // 更新服务状态
-        await checkServerStatus();
-        
-        // 显示服务器返回的消息
-        if (result.status === 'success') {
-          toast.success(result.message);
-          // 清除选择
-          setSelectedLocalModel(null);
-        } else if (result.status === 'warning') {
-          toast.warning(result.message);
+      // 获取需要卸载的模型路径
+      let modelPath: string | undefined;
+      let modelName: string = '未知模型';
+      
+      if (serverStatus.models) {
+        // 如果选中的模型已加载，优先卸载选中的模型
+        if (selectedLocalModel?.path && 
+            (Array.isArray(serverStatus.models) 
+              ? serverStatus.models.includes(selectedLocalModel.path)
+              : serverStatus.models === selectedLocalModel.path)) {
+          modelPath = selectedLocalModel.path;
+          modelName = selectedLocalModel.name;
         } else {
-          toast.error(result.message);
+          // 否则卸载第一个已加载的模型
+          modelPath = Array.isArray(serverStatus.models) 
+            ? serverStatus.models[0] 
+            : serverStatus.models;
+            
+          // 尝试从本地模型列表中找到模型名称
+          const modelInfo = localModels.find(m => m.path === modelPath);
+          if (modelInfo) {
+            modelName = modelInfo.name;
+          }
         }
-      } else if (serverStatus.models && serverStatus.models.length > 0) {
-        // 如果未选择模型或选择的模型未加载，但有其他已加载模型，则卸载第一个已加载模型
-        const modelPath = serverStatus.models[0];
-        const modelInfo = localModels.find(m => m.path === modelPath);
-        const modelName = modelInfo?.name || '未知模型';
-        
-        const result = await ModelService.operateLocalModel(
-          LocalModelOperation.DELETE, 
-          modelPath,
-          modelName
-        );
-        
-        // 更新服务状态
-        await checkServerStatus();
-        
-        // 显示服务器返回的消息
-        if (result.status === 'success') {
-          toast.success(result.message);
-        } else if (result.status === 'warning') {
-          toast.warning(result.message);
-        } else {
-          toast.error(result.message);
-        }
-      } else {
+      }
+      
+      if (!modelPath) {
         toast.warning('没有已加载的模型可卸载');
+        setIsModelUnloading(false);
+        return;
+      }
+      
+      console.log(`开始卸载模型: ${modelName}, 路径: ${modelPath}`);
+      
+      // 调用卸载API
+      const result = await ModelService.operateLocalModel(
+        LocalModelOperation.DELETE, 
+        modelPath,
+        modelName
+      );
+      
+      console.log(`模型卸载请求结果:`, result);
+      
+      // 更新服务状态 (在短暂延迟后检查，给服务器一些时间完全释放资源)
+      setTimeout(async () => {
+        await checkServerStatus();
+      }, 2000);
+      
+      // 显示结果
+      if (result.status === 'success') {
+        toast.success(result.message);
+        // 操作成功后退出表单
+        if (onClose) onClose();
+      } else if (result.status === 'warning') {
+        toast.warning(result.message);
+      } else {
+        toast.error(result.message);
       }
     } catch (error: any) {
       console.error('卸载模型失败:', error);
@@ -238,7 +304,6 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
     }
   };
   
-
   // 当选中的模型ID变化时，更新选中的本地模型
   useEffect(() => {
     if (selectedModel && localModels.length > 0) {
@@ -251,14 +316,26 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
 
   // 组件挂载时加载模型和检查服务状态
   useEffect(() => {
+    // 加载本地模型列表
     loadLocalModels();
+    
+    // 初始检查服务状态
     checkServerStatus();
     
-    // 定时检查服务状态
-    const intervalId = setInterval(checkServerStatus, 30000); // 每30秒检查一次
+    // 创建防抖的检查函数
+    const debouncedCheck = debounce(checkServerStatus, 500);
+    
+    // 设置定时检查服务状态
+    checkInterval.current = setInterval(() => {
+      debouncedCheck();
+    }, 30000); // 每30秒检查一次
     
     return () => {
-      clearInterval(intervalId);
+      // 清理定时器
+      if (checkInterval.current) {
+        clearInterval(checkInterval.current);
+        checkInterval.current = null;
+      }
     };
   }, []);
 
@@ -277,41 +354,16 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
     }
   };
 
-  // 获取按钮文本
-  // const getButtonText = () => {
-  //   switch (serverStatus.status) {
-  //     case 'checking':
-  //       return '检查中...';
-  //     case 'starting':
-  //       return '启动中...';
-  //     case 'running':
-  //       return '服务运行中';
-  //     case 'stopped':
-  //     case 'idle':
-  //     default:
-  //       return '手动启动服务';
-  //   }
-  // };
-
-  // 获取按钮禁用状态
-  const isButtonDisabled = () => {
-    return serverStatus.status === 'checking' || 
-           serverStatus.status === 'starting' || 
-           serverStatus.status === 'running' ||
-           localModels.length === 0;
-  };
-  
-  // 检查模型是否已加载
-  const isModelLoaded = () => {
-    if (!selectedLocalModel || !selectedLocalModel.path) return false;
-    return serverStatus.models?.includes(selectedLocalModel.path) || false;
-  };
-
   // 获取已加载模型的显示信息
   const getLoadedModelsInfo = () => {
-    if (!serverStatus.models || serverStatus.models.length === 0) {
+    if (!serverStatus.models || (Array.isArray(serverStatus.models) && serverStatus.models.length === 0)) {
       return '无已加载模型';
     }
+    
+    // 确保models是数组
+    const modelsList = Array.isArray(serverStatus.models) 
+      ? serverStatus.models 
+      : [serverStatus.models];
     
     // 尝试将路径映射到模型名称
     const modelPathToName = new Map<string, string>();
@@ -322,7 +374,7 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
     });
     
     // 显示格式: 模型名称 (路径)
-    return serverStatus.models.map(path => {
+    return modelsList.map((path: string) => {
       const name = modelPathToName.get(path) || '未知模型';
       return `${name} (${path})`;
     }).join(', ');
@@ -330,6 +382,7 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
 
   return (
     <div className="local-model-server">
+      {/* 服务状态信息 */}
       <div className="server-status-container mb-4">
         <div className="flex items-center gap-2 mb-2">
           {renderStatusIcon()}
@@ -344,33 +397,25 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
           </div>
         )}
         
-        {serverStatus.status === 'running'  && (
+        {serverStatus.status === 'running' && (
           <div className="text-xs text-gray-500">
-            {!(!serverStatus.models || serverStatus.models.length === 0) &&(<div className="font-medium mb-1">已加载模型:</div>)}
-            <div>{getLoadedModelsInfo()}</div>
+            {serverStatus.models && (
+              <>
+                <div className="font-medium mb-1">已加载模型:</div>
+                <div>{getLoadedModelsInfo()}</div>
+              </>
+            )}
+            {!serverStatus.models && <div>无已加载模型</div>}
           </div>
         )}
       </div>
-      
-      {/* <Button 
-        variant={serverStatus.status === 'running' ? "secondary" : "default"}
-        className="w-full mb-4"
-        disabled={true}
-      >
-        {serverStatus.status === 'checking' || serverStatus.status === 'starting' ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : serverStatus.status !== 'running' ? (
-          <Server className="mr-2 h-4 w-4" />
-        ) : null}
-        {getButtonText()}
-      </Button> */}
       
       {/* 模型加载和卸载按钮 */}
       {serverStatus.status === 'running' && (
         <div className="model-operations grid grid-cols-2 gap-2">
           <Button
             variant="outline"
-            disabled={isModelLoading || isModelLoaded() || !selectedLocalModel}
+            disabled={isModelLoading || serverStatus.loading || !selectedLocalModel}
             onClick={loadModel}
             className="flex-1"
           >
@@ -384,7 +429,7 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
           
           <Button
             variant="outline"
-            disabled={isModelUnloading || !serverStatus.models || serverStatus.models.length === 0}
+            disabled={isModelUnloading || !serverStatus.loading}
             onClick={unloadModel}
             className="flex-1"
           >
@@ -407,13 +452,14 @@ const StartLocalModelServer: React.FC<StartLocalModelServerProps> = ({ selectedM
         </div>
       )}
       
+      {/* 提示信息 */}
       {localModels.length === 0 && !isLoading && (
         <div className="text-xs text-amber-500 mt-2">
           未找到本地模型，请先添加模型才能启动服务
         </div>
       )}
       
-      {serverStatus.status === 'running' && !selectedLocalModel && (!serverStatus.models || serverStatus.models.length === 0) && (
+      {serverStatus.status === 'running' && !selectedLocalModel && !serverStatus.models && (
         <div className="text-xs text-amber-500 mt-2">
           请选择一个本地模型以进行加载操作
         </div>
