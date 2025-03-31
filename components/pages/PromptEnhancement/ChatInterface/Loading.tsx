@@ -1,6 +1,4 @@
-/**
- * 内联加载组件 - 不依赖外部CSS和组件
- */
+"use client";
 import React, { useEffect, useState } from 'react';
 const Loading = () => {
   const [tipIndex, setTipIndex] = useState(0);

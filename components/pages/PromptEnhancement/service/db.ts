@@ -1,9 +1,3 @@
-/**
- * IndexedDB数据库工具类
- * 用于管理聊天记录、会话、模板数据和模型配置的存储与检索
- * 支持OpenAI API调用的模型配置存储
- */
-
 // 数据库名称和版本
 const DB_NAME = 'promptEnhancementDB';
 const DB_VERSION = 4; // 增加版本号以支持应用设置存储
@@ -47,10 +41,8 @@ export interface Template {
 export interface Model {
   id: string;               // 模型ID 数据库标识
   name: string;             // 模型名称 - 用于界面显示给用户
-  type: 'api' | 'local';    // 模型类型：API或本地
-  url?: string;             // API URL（API模型）
-  apiKey?: string;          // API密钥（API模型）
-  path?: string;            // 模型路径（本地模型）
+  url?: string;             // API URL
+  apiKey?: string;          // API密钥
   parameters?: string;      // 其他参数
   apiId?: string;           // API调用的模型标识符
   timestamp: Date;          // 创建/更新时间
@@ -410,9 +402,9 @@ const db = {
   
   /**
    * 获取所有模型
-   * @param type 可选，模型类型筛选
+   * @param type 可选，模型类型筛选（仅支持'api'）
    */
-  getAllModels: async (type?: 'api' | 'local'): Promise<Model[]> => {
+  getAllModels: async (type?: 'api'): Promise<Model[]> => {
     return executeOperation<Model[]>(STORES.MODELS, 'readonly', store => {
       return new Promise((resolve, reject) => {
         let request: IDBRequest;
@@ -498,7 +490,7 @@ const db = {
     });
   },
 
- /**
+  /**
    * 保存最后使用的会话ID
    * @param sessionId 会话ID
    */
@@ -540,7 +532,7 @@ const db = {
 
   /**
    * 初始化默认模型
-   * 如果数据库中没有模型，则添加默认的模型配置
+   * 如果数据库中没有模型，则添加默认的API模型配置
    */
   async initDefaultModels(): Promise<void> {
     try {

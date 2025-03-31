@@ -1,10 +1,4 @@
-// 添加全局声明
-declare global {
-  interface Window {
-    __IS_STOPPING_GENERATION__?: boolean;
-  }
-}
-
+"use client";
 import { useState, useEffect, createContext, useContext } from 'react';
 import { Message, Template, ChatSession } from '../service/db';
 import db from '../service/db';
@@ -353,45 +347,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
    */
   const handleStopGeneration = (): void => {
     if (!activeSessionId) return;
-    
-    // 检查是否已经在停止过程中
-    if (window.__IS_STOPPING_GENERATION__) {
-      console.log('已有中断操作正在进行，跳过重复请求');
-      return;
-    }
-    
-    // 设置全局标志，防止重复调用
-    window.__IS_STOPPING_GENERATION__ = true;
-    
-    // 立即将生成状态设置为false，提供视觉反馈
-    setIsGenerating(false);
-    toast.info('正在停止生成...');
-    
-    // 取消当前会话的生成
     MessageService.cancelGeneration(activeSessionId);
-    
-    // 对于本地模型，确保中断请求发送到服务器
-    if (selectedModel && selectedModel.includes('local')) {
-      // 使用import动态导入模块，避免循环依赖
-      import('./modelService').then(async ({ default: ModelService }) => {
-        try {
-          console.log('正在向服务器发送中断请求...');
-          await ModelService.abortLocalModelRequest();
-          console.log('中断本地模型请求已发送');
-          toast.success('生成已停止');
-        } catch (error) {
-          console.error('发送中断请求失败:', error);
-          toast.error('停止生成时出现问题，请尝试刷新页面');
-        } finally {
-          // 不管成功失败，一定要清除标志
-          window.__IS_STOPPING_GENERATION__ = false;
-        }
-      });
-    } else {
-      toast.success('生成已停止');
-      // 不要忘记清除标志
-      window.__IS_STOPPING_GENERATION__ = false;
-    }
   };
   // ===== 模板操作 =====
   /**
@@ -502,21 +458,13 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
           setSelectedModel(lastUsedModelId);
           console.log(`使用上次选择的模型: ${models.find(m => m.id === lastUsedModelId)?.name}`);
         } else {
-          // 如果没有最后使用的模型ID，尝试使用API模型列表中的第一个
+          // 如果没有最后使用的模型ID，使用API模型列表中的第一个
           const apiModels = await db.getAllModels('api');
           if (apiModels.length > 0) {
             // 使用第一个API模型作为默认
             setSelectedModel(apiModels[0].id);
             // 保存为最后使用的模型
             await db.saveLastUsedModelId(apiModels[0].id);
-          } else {
-            // 尝试加载本地模型
-            const localModels = await db.getAllModels('local');
-            if (localModels.length > 0) {
-              setSelectedModel(localModels[0].id);
-              // 保存为最后使用的模型
-              await db.saveLastUsedModelId(localModels[0].id);
-            }
           }
         }
         

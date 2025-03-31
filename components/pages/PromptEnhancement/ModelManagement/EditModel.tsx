@@ -1,3 +1,4 @@
+"use client";
 // 导入必要的React核心模块
 import { useState } from "react";
 

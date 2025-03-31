@@ -38,6 +38,3 @@ powershell_venv
 *.tsbuildinfo
 next-env.d.ts
 *.Identifier
-
-# local_model
-local_model/

@@ -1,10 +1,8 @@
 "use client";
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, StopCircle } from 'lucide-react';
-import { cn } from "@/lib/utils";
 import '../styles/ChatInterface.css';
 import db from '../service/db'; // 导入数据库工具
 

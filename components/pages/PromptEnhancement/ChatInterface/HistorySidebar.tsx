@@ -1,14 +1,14 @@
+"use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { History, Search, MessageSquare, Trash, Edit, Star, Save } from "lucide-react";
+import { Search, MessageSquare, Trash, Edit, Star, Save } from "lucide-react";
 import { Input } from "@/components/ui/input";
 // 导入样式文件
 import '../styles/HistorySidebar.css';
 // 导入数据库工具类和类型定义
 import db, { ChatSession } from '../service/db';
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface HistorySidebarProps {

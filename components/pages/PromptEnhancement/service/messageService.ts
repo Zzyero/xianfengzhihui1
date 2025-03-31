@@ -1,9 +1,4 @@
-/**
- * 消息处理服务
- * 处理消息的保存、加载和聊天会话管理
- */
-
-import db, { Message, ChatSession, Model } from "./db";
+import db, { Message, ChatSession } from "./db";
 import ModelService, { ModelResponseCallbacks } from "./modelService";
 
 /**
@@ -171,31 +166,17 @@ class MessageService {
         }
       };
 
-      // 根据模型类型调用不同的API
-      if (model.type === 'api') {
-        // 获取历史消息以提供上下文
-        const historyMessages = await db.getMessagesBySession(currentSessionId);
-        
-        // 调用API模型
-        await ModelService.callApiModel({
-          model,
-          messages: historyMessages,
-          callbacks: modelCallbacks,
-          signal: controller.signal,
-          customPrompt // 传递自定义提示词
-        });
-      } else if (model.type === 'local') {
-        // 调用本地模型，传递历史消息
-        await ModelService.callLocalModel({
-          model,
-          prompt: content,
-          callbacks: modelCallbacks,
-          signal: controller.signal,
-          customPrompt // 传递自定义提示词
-        });
-      } else {
-        throw new Error(`不支持的模型类型: ${model.type}`);
-      }
+      // 获取历史消息以提供上下文
+      const historyMessages = await db.getMessagesBySession(currentSessionId);
+      
+      // 调用API模型
+      await ModelService.callApiModel({
+        model,
+        messages: historyMessages,
+        callbacks: modelCallbacks,
+        signal: controller.signal,
+        customPrompt // 传递自定义提示词
+      });
     } catch (error: any) {
       console.error('发送消息失败:', error);
       callbacks.onError?.(new Error(error.message || '发送消息失败'));

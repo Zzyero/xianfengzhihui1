@@ -1,11 +1,4 @@
-// components/pages/PromptEnhancement/Data/DataTransfer.jsx
 "use client";
-
-/**
- * 数据导入导出组件
- * 提供导入和导出应用数据的功能
- * 支持会话、模板、模型配置等数据的备份和恢复
- */
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
