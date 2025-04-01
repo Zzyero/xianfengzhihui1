@@ -1,28 +1,70 @@
 {
   "prompts": [
     {
-      "prompt": "",
-      "promptEn": "XUER Qing dynasty Dresses,1girl,solo,long hair,smile,brown hair,black hair,hair ornament,long sleeves,holding,standing,full body,flower,hair flower,wide sleeves,hand on hip,chinese clothes,floral print,holding umbrella,realistic,oil-paper umbrella，east asian architecture,night,depth of field,blurry background,looking away,chinese clothes,floral print,smoke,realistic,\nhighly detailed,ultra-high resolution,32K UHD,sharp    focus,best-quality,masterpiece,The outline of a woman,double exposure,\nunconventional supreme masterpiece,masterful details,temperate atmosphere,\ncinematic photo This is a poster about the Qing and Han Dynasties，It has a realistic picture effect，The picture is messy and extremely rich in details，(The theme text of the poster is: \"XUER\":1.2)，One line apart,(the subtitle below reads: \"Qing and Han Dynasties\":1.2),\n\n",
+      "tags": [],
       "parameters": {
-        "steps": "25",
+        "steps": "20",
         "sampler": "euler",
-        "seed": "555176039573955",
+        "seed": "1102277200849674",
         "scheduler": "simple",
         "denoise": "1",
+        "cfg": "7",
+        "negative": ""
+      },
+      "prompt": "一个男人正在",
+      "promptEn": "a man happy says something",
+      "imageUrl": "/images/prompts/1742303960665.png",
+      "id": "1742303962200",
+      "createdAt": "2025-03-18T13:19:22.200Z",
+      "updatedAt": "2025-03-29T23:40:54.106Z"
+    },
+    {
+      "tags": [],
+      "parameters": {
+        "steps": "35",
+        "cfg": "",
+        "sampler": "euler",
+        "seed": "109270284300615",
+        "scheduler": "simple",
+        "denoise": "1",
+        "model": "/comfyui/liblibai-models/models/4d23592a53e541688b95f8f4578af1c61e323170.safetensors",
+        "negative": ""
+      },
+      "prompt": "",
+      "promptEn": "sanguo a man happiles doing something",
+      "imageUrl": "/images/prompts/1742366555196.png",
+      "id": "1742366556584",
+      "createdAt": "2025-03-19T06:42:36.584Z",
+      "updatedAt": "2025-03-19T06:42:36.584Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "\nErase, remove",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "seed": "",
+        "scheduler": "normal",
+        "denoise": "1.0",
         "cfg": "",
         "negative": ""
       },
       "tags": [
         {
-          "id": "1743491813768",
-          "name": "sdfsdfs",
-          "color": "#aafe56"
+          "id": "1743497162987",
+          "name": "万物消除",
+          "color": "#4d577c"
+        },
+        {
+          "id": "1743497184330",
+          "name": "哒哒哒",
+          "color": "#f4ce0"
         }
       ],
-      "imageUrl": "/images/prompts/1743491797917.png",
-      "id": "1743491799863",
-      "createdAt": "2025-04-01T07:16:39.863Z",
-      "updatedAt": "2025-04-01T07:16:54.819Z"
+      "imageUrl": "/images/prompts/1743497048062.png",
+      "id": "1743497049380",
+      "createdAt": "2025-04-01T08:44:09.380Z",
+      "updatedAt": "2025-04-01T08:46:25.375Z"
     }
   ]
 }

@@ -191,17 +191,17 @@ export function ViewComfyForm(args: {
                                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                         // @ts-ignore
                                         if (field.inputs.length > 0) {
-                                            if (editMode) {
-                                                return (
-                                                    // 编辑模式下的输入字段组
-                                                    <fieldset className="grid gap-4 rounded-lg border p-4">
-                                                        <legend className="-ml-1 px-1 text-sm font-medium">
-                                                            {
-                                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                                                // @ts-ignore
-                                                                field.title
-                                                            }
-                                                            {/* 删除按钮 */}
+                                            return (
+                                                // 编辑模式和非编辑模式都显示带边框的 fieldset
+                                                <fieldset className="grid gap-4 rounded-lg border p-4">
+                                                    <legend className="-ml-1 px-1 text-sm font-medium">
+                                                        {
+                                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                            // @ts-ignore
+                                                            field.title
+                                                        }
+                                                        {/* 编辑模式下显示删除按钮 */}
+                                                        {editMode && (
                                                             <Button
                                                                 size="icon"
                                                                 variant="ghost"
@@ -210,16 +210,8 @@ export function ViewComfyForm(args: {
                                                             >
                                                                 <Trash2 className="size-5" />
                                                             </Button>
-                                                        </legend>
-                                                        {/* 嵌套输入字段 */}
-                                                        <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
-                                                    </fieldset>
-                                                )
-                                            }
-
-                                            return (
-                                                // 非编辑模式下的输入字段组
-                                                <fieldset className="grid gap-4">
+                                                        )}
+                                                    </legend>
                                                     <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
                                                 </fieldset>
                                             )
