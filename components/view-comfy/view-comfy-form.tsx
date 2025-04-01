@@ -191,8 +191,20 @@ export function ViewComfyForm(args: {
                                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                         // @ts-ignore
                                         if (field.inputs.length > 0) {
+                                            // 检查是否是文本编码器或上传图片组件
+                                            const isSpecialComponent = field.title === "CLIP文本编码器" || field.title === "上传图片";
+                                            
+                                            if (isSpecialComponent) {
+                                                // 特殊组件不显示圆角方框
+                                                return (
+                                                    <div className="grid gap-4">
+                                                        <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
+                                                    </div>
+                                                );
+                                            }
+
+                                            // 其他组件显示圆角方框
                                             return (
-                                                // 编辑模式和非编辑模式都显示带边框的 fieldset
                                                 <fieldset className="grid gap-4 rounded-lg border p-4">
                                                     <legend className="-ml-1 px-1 text-sm font-medium">
                                                         {
@@ -214,7 +226,7 @@ export function ViewComfyForm(args: {
                                                     </legend>
                                                     <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
                                                 </fieldset>
-                                            )
+                                            );
                                         }
                                         return undefined;
                                     })}

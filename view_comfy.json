@@ -5253,6 +5253,60 @@
               }
             ],
             "key": "6-CLIPTextEncode"
+          },
+          {
+            "title": "LoRA加载器",
+            "inputs": [
+              {
+                "title": "Lora_name",
+                "placeholder": "Lora_name",
+                "value": "laiqingde2-000029.safetensors",
+                "workflowPath": [
+                  "93",
+                  "inputs",
+                  "lora_name"
+                ],
+                "helpText": "Helper Text",
+                "valueType": "string",
+                "validations": {
+                  "required": true
+                },
+                "key": "93-inputs-lora_name"
+              },
+              {
+                "title": "Strength_model",
+                "placeholder": "Strength_model",
+                "value": 0.2,
+                "workflowPath": [
+                  "93",
+                  "inputs",
+                  "strength_model"
+                ],
+                "helpText": "Helper Text",
+                "valueType": "float",
+                "validations": {
+                  "required": true
+                },
+                "key": "93-inputs-strength_model"
+              },
+              {
+                "title": "Strength_clip",
+                "placeholder": "Strength_clip",
+                "value": 1,
+                "workflowPath": [
+                  "93",
+                  "inputs",
+                  "strength_clip"
+                ],
+                "helpText": "Helper Text",
+                "valueType": "number",
+                "validations": {
+                  "required": true
+                },
+                "key": "93-inputs-strength_clip"
+              }
+            ],
+            "key": "93-LoraLoader"
           }
         ],
         "advancedInputs": [
@@ -5651,60 +5705,6 @@
               }
             ],
             "key": "64-SaveImage"
-          },
-          {
-            "title": "LoRA加载器",
-            "inputs": [
-              {
-                "title": "Lora_name",
-                "placeholder": "Lora_name",
-                "value": "laiqingde2-000029.safetensors",
-                "workflowPath": [
-                  "93",
-                  "inputs",
-                  "lora_name"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "string",
-                "validations": {
-                  "required": true
-                },
-                "key": "93-inputs-lora_name"
-              },
-              {
-                "title": "Strength_model",
-                "placeholder": "Strength_model",
-                "value": 0.2,
-                "workflowPath": [
-                  "93",
-                  "inputs",
-                  "strength_model"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "float",
-                "validations": {
-                  "required": true
-                },
-                "key": "93-inputs-strength_model"
-              },
-              {
-                "title": "Strength_clip",
-                "placeholder": "Strength_clip",
-                "value": 1,
-                "workflowPath": [
-                  "93",
-                  "inputs",
-                  "strength_clip"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "number",
-                "validations": {
-                  "required": true
-                },
-                "key": "93-inputs-strength_clip"
-              }
-            ],
-            "key": "93-LoraLoader"
           }
         ],
         "type": "image_generation",
