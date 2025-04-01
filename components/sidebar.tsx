@@ -81,7 +81,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                         />
                         <SidebarButton 
                             icon={<BookOpen className="size-5" />}
-                            label="提示词库"
+                            label="画廊"
                             isActive={currentTab === TabValue.PromptLibrary}
                             onClick={() => onTabChange(TabValue.PromptLibrary)}
                             isSmallScreen={isSmallScreen}
@@ -120,7 +120,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                         />
                         <SidebarButton 
                             icon={<BookOpen className="size-5" />}
-                            label="提示词库"
+                            label="画廊"
                             isActive={currentTab === TabValue.PromptLibrary}
                             onClick={() => onTabChange(TabValue.PromptLibrary)}
                             isSmallScreen={isSmallScreen}

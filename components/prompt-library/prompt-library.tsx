@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Search, Plus, Edit, Trash, Upload, Download, X, Image, FileUp, FileText, ArrowLeft } from "lucide-react";
-import type { PromptItem, PromptTag } from './types';
+import type { PromptItem, PromptTag, PartialPromptItem } from './types';
 import { PromptForm } from './prompt-form';
 import { PromptLibraryService } from '@/lib/services/prompt-library-service';
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,14 +13,15 @@ import { useRouter } from 'next/navigation';
 
 interface PromptLibraryProps {
   prompts: PromptItem[];
-  onAdd?: (prompt: Partial<PromptItem>) => void;
-  onEdit?: (id: string, prompt: Partial<PromptItem>) => void;
+  onAdd?: (prompt: PartialPromptItem) => void;
+  onEdit?: (id: string, prompt: PartialPromptItem) => void;
   onDelete?: (id: string) => void;
   isSidebar?: boolean;
   showForm?: boolean;
   setShowForm?: (show: boolean) => void;
-  editingPrompt?: Partial<PromptItem> | null;
-  setEditingPrompt?: (prompt: Partial<PromptItem> | null) => void;
+  editingPrompt?: PartialPromptItem | null;
+  setEditingPrompt?: (prompt: PartialPromptItem | null) => void;
+  setPrompts: (prompts: PromptItem[]) => void;
 }
 
 export function PromptLibrary({ 
@@ -32,7 +33,8 @@ export function PromptLibrary({
   showForm = false,
   setShowForm = () => {},
   editingPrompt = null,
-  setEditingPrompt = () => {}
+  setEditingPrompt = () => {},
+  setPrompts
 }: PromptLibraryProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,6 +46,7 @@ export function PromptLibrary({
   const [parsedPrompt, setParsedPrompt] = useState<string | null>(null);
   const [parsedPromptEn, setParsedPromptEn] = useState<string | null>(null);
   const [parsedParameters, setParsedParameters] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   // 添加控制台输出来调试
   useEffect(() => {
@@ -88,6 +91,23 @@ export function PromptLibrary({
       }
     }
   };
+
+  // 创建新的提示词表单
+  const createNewPrompt = (extractedPrompt: string, extractedNegative: string, params: Record<string, string>, imageUrl: string): PartialPromptItem => ({
+    prompt: '',  // 中文版本留空
+    promptEn: extractedPrompt,
+    parameters: {
+      steps: params.steps || '',
+      sampler: params.sampler || '',
+      seed: params.seed || '',
+      scheduler: params.scheduler || '',
+      denoise: params.denoise || '',
+      cfg: params.cfg || '',
+      negative: extractedNegative || '',
+    },
+    tags: [],  // 标签留空
+    imageUrl: imageUrl  // 使用保存后的图片路径
+  });
 
   // 解析ComfyUI PNG图片
   const handleParsePngImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -213,16 +233,7 @@ export function PromptLibrary({
               setParsedPromptEn(extractedPrompt);
               
               // 创建新的提示词表单
-              setEditingPrompt({
-                prompt: '',  // 中文版本留空
-                promptEn: extractedPrompt,
-                parameters: {
-                  ...params,
-                  negative: extractedNegative, // 添加负向提示词作为参数
-                },
-                tags: [],  // 标签留空
-                imageUrl: imageUrl  // 使用保存后的图片路径
-              });
+              setEditingPrompt(createNewPrompt(extractedPrompt, extractedNegative, params, imageUrl));
               
               // 显示表单
               setShowForm(true);
@@ -394,6 +405,70 @@ export function PromptLibrary({
     imageFileInputRef.current?.click();
   };
 
+  const handleDeleteClick = async (id: string) => {
+    const confirmed = window.confirm('确定要删除这个提示词吗？');
+    if (confirmed && onDelete) {
+      onDelete(id);
+    }
+  };
+
+  // 处理编辑提示词
+  const handleEdit = async (id: string, prompt: PartialPromptItem) => {
+    try {
+      setIsLoading(true);
+      const fullPrompt: Partial<PromptItem> = {
+        ...prompt,
+        imageUrl: prompt.imageUrl || editingPrompt?.imageUrl, // 保留原有图片URL
+        parameters: prompt.parameters ? {
+          steps: prompt.parameters.steps || '',
+          sampler: prompt.parameters.sampler || '',
+          seed: prompt.parameters.seed || '',
+          scheduler: prompt.parameters.scheduler || '',
+          denoise: prompt.parameters.denoise || '',
+          cfg: prompt.parameters.cfg,
+          negative: prompt.parameters.negative,
+        } : undefined
+      };
+      await PromptLibraryService.updatePrompt(id, fullPrompt);
+      const updatedPrompts = await PromptLibraryService.getPrompts();
+      setPrompts(updatedPrompts);
+      setShowForm(false);
+      setEditingPrompt(null);
+    } catch (error) {
+      console.error('更新提示词失败:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 处理添加提示词
+  const handleAdd = async (prompt: PartialPromptItem) => {
+    try {
+      setIsLoading(true);
+      const fullPrompt: Partial<PromptItem> = {
+        ...prompt,
+        parameters: prompt.parameters ? {
+          steps: prompt.parameters.steps || '',
+          sampler: prompt.parameters.sampler || '',
+          seed: prompt.parameters.seed || '',
+          scheduler: prompt.parameters.scheduler || '',
+          denoise: prompt.parameters.denoise || '',
+          cfg: prompt.parameters.cfg,
+          negative: prompt.parameters.negative,
+        } : undefined
+      };
+      await PromptLibraryService.addPrompt(fullPrompt);
+      const updatedPrompts = await PromptLibraryService.getPrompts();
+      setPrompts(updatedPrompts);
+      setShowForm(false);
+      setEditingPrompt(null);
+    } catch (error) {
+      console.error('添加提示词失败:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const content = (
     <>
       <style jsx global>{`
@@ -418,13 +493,13 @@ export function PromptLibrary({
           <div className={`flex items-center gap-2 ${isSidebar ? 'w-full' : 'flex-1'}`}>
             <div className="relative flex-1">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="搜索提示词或标签..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+          <Input
+            placeholder="搜索提示词或标签..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8"
-              />
-            </div>
+          />
+        </div>
             <Button variant="outline" onClick={() => setShowForm(true)}>
               <Plus className="w-4 h-4 mr-2" />
               添加
@@ -432,13 +507,13 @@ export function PromptLibrary({
           </div>
 
           <div className={`flex items-center gap-2 ${isSidebar ? 'w-full' : ''}`}>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              className="hidden"
-              onChange={handleImport}
-            />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={handleImport}
+          />
             <input
               ref={imageFileInputRef}
               type="file"
@@ -447,22 +522,22 @@ export function PromptLibrary({
               onChange={handleParsePngImage}
             />
             <Button variant="outline" onClick={handleImportClick}>
-              <Upload className="w-4 h-4 mr-2" />
-              导入
-            </Button>
+            <Upload className="w-4 h-4 mr-2" />
+            导入
+          </Button>
             <Button variant="outline" onClick={handleParseImageClick}>
               <FileUp className="w-4 h-4 mr-2" />
               解析图片
-            </Button>
-          </div>
+          </Button>
         </div>
+      </div>
 
         <div className={`grid gap-4 ${
           isSidebar 
             ? 'grid-cols-1' 
             : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
         }`}>
-          {filteredPrompts.map((prompt) => (
+        {filteredPrompts.map((prompt) => (
             <Card 
               key={prompt.id} 
               className="p-4 flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
@@ -482,56 +557,55 @@ export function PromptLibrary({
                   <PlaceholderImage />
                 ) : (
                   <div className="relative w-full" style={{ paddingTop: '75%' }}>
-                    <img
-                      src={prompt.imageUrl}
-                      alt={prompt.prompt}
+              <img
+                src={prompt.imageUrl}
+                alt={prompt.prompt}
                       className="absolute inset-0 w-full h-full object-contain transition-transform hover:scale-105"
                       loading="lazy"
                       onError={() => handleImageError(prompt.id)}
                       onLoad={() => handleImageLoad(prompt.id)}
-                    />
+              />
                   </div>
                 )}
-              </div>
-              
+            </div>
+            
               <div className="flex-1">
                 <div className="flex flex-wrap gap-1">
-                  {prompt.tags.map((tag) => (
-                    <Badge
-                      key={tag.id}
-                      variant="secondary"
-                      style={{ backgroundColor: tag.color }}
+              {prompt.tags.map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant="secondary"
+                  style={{ backgroundColor: tag.color }}
                       className="text-xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleTagClick(tag.name);
                       }}
-                    >
-                      {tag.name}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
+            </div>
+          </Card>
+        ))}
+      </div>
 
-        <PromptForm
-          open={showForm}
-          onClose={() => {
-            setShowForm(false);
-            setEditingPrompt(undefined);
-          }}
-          onSubmit={(prompt) => {
-            if (editingPrompt?.id) {
-              onEdit?.(editingPrompt.id, prompt);
-            } else {
-              onAdd?.(prompt);
-            }
-            setShowForm(false);
-          }}
-          initialData={editingPrompt}
-          title={editingPrompt ? "编辑提示词" : "添加提示词"}
+      <PromptForm
+        open={showForm}
+        onClose={() => {
+          setShowForm(false);
+            setEditingPrompt(null);
+        }}
+        onSubmit={(prompt) => {
+          if (editingPrompt?.id) {
+            handleEdit(editingPrompt.id, prompt);
+          } else {
+            handleAdd(prompt);
+          }
+        }}
+        initialData={editingPrompt}
+          title={editingPrompt?.id ? "编辑提示词" : "添加提示词"}
         />
 
         <ImagePreviewDialog />
