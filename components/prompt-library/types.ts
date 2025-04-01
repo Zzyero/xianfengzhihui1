@@ -24,4 +24,10 @@ export interface PromptItem {
   tags: PromptTag[];
   createdAt: string;
   updatedAt?: string;
-} 
+}
+
+export type PartialPromptParameters = Partial<PromptParameters>;
+
+export type PartialPromptItem = Partial<Omit<PromptItem, 'parameters'>> & {
+  parameters?: PartialPromptParameters;
+}; 

@@ -10,45 +10,51 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import type { PromptItem, PromptTag } from './types';
+import type { PartialPromptItem, PromptTag } from './types';
 import { ImageUpload } from './image-upload';
 
 interface PromptFormProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (prompt: Partial<PromptItem>) => void;
-  initialData?: Partial<PromptItem>;
+  onSubmit: (prompt: PartialPromptItem) => void;
+  initialData?: PartialPromptItem | null;
   title: string;
 }
 
-export function PromptForm({ open, onClose, onSubmit, initialData, title }: PromptFormProps) {
-  const [formData, setFormData] = useState<Partial<PromptItem>>(initialData || {
-    tags: [],
-    parameters: {},
+export function PromptForm({
+  open,
+  onClose,
+  onSubmit,
+  initialData,
+  title
+}: PromptFormProps) {
+  const [formData, setFormData] = useState<PartialPromptItem>(() => ({
     prompt: '',
-  });
+    promptEn: '',
+    parameters: {
+      steps: '',
+      sampler: '',
+      seed: '',
+      scheduler: '',
+      denoise: '',
+      cfg: '',
+      negative: '',
+    },
+    tags: [],
+    imageUrl: '',
+  }));
 
   const [newTag, setNewTag] = useState('');
   const [newParamKey, setNewParamKey] = useState('');
   const [newParamValue, setNewParamValue] = useState('');
 
   useEffect(() => {
-    if (open) {
-      if (initialData?.id) {
-        setFormData(initialData);
-      } else {
-        setFormData({
-          tags: [],
-          parameters: initialData?.parameters || {},
-          prompt: initialData?.prompt || '',
-          promptEn: initialData?.promptEn || '',
-          imageUrl: initialData?.imageUrl || '',
-        });
-      }
-      setNewTag('');
-      setNewParamKey('');
-      setNewParamValue('');
+    if (open && initialData) {
+      setFormData(initialData);
     }
+    setNewTag('');
+    setNewParamKey('');
+    setNewParamValue('');
   }, [open, initialData]);
 
   const handleAddTag = () => {
@@ -80,19 +86,14 @@ export function PromptForm({ open, onClose, onSubmit, initialData, title }: Prom
     }
   };
 
-  const handleSubmit = () => {
-    onSubmit({
-      ...formData,
-      id: formData.id || Date.now().toString(),
-      createdAt: formData.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-    onClose();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -191,7 +192,7 @@ export function PromptForm({ open, onClose, onSubmit, initialData, title }: Prom
                   value={formData.prompt || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, prompt: e.target.value }))}
                   placeholder="输入中文提示词"
-                  rows={4}
+                  rows={3}
                 />
               </div>
               <div>
@@ -200,13 +201,13 @@ export function PromptForm({ open, onClose, onSubmit, initialData, title }: Prom
                   value={formData.promptEn || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, promptEn: e.target.value }))}
                   placeholder="输入英文提示词"
-                  rows={4}
+                  rows={3}
                 />
               </div>
             </div>
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="sticky bottom-0 bg-white border-t pt-4">
           <Button type="button" variant="outline" onClick={onClose}>
             取消
           </Button>

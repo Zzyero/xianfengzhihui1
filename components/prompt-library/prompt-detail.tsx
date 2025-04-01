@@ -33,16 +33,20 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
   };
 
   // 处理删除操作
-  const handleDeleteClick = () => {
-    if (window.confirm('确定要删除这个提示词吗？')) {
-      onDelete?.(prompt.id);
-      router.push('/?from=prompt');
+  const handleDeleteClick = async () => {
+    const confirmed = window.confirm('确定要删除这个提示词吗？');
+    if (confirmed && onDelete) {
+        try {
+            await onDelete(prompt.id);
+            router.push('/?from=prompt');
+        } catch (error) {
+            console.error('删除提示词失败:', error);
+        }
     }
   };
 
   // 处理编辑按钮点击
   const handleEditClick = () => {
-    // 返回主页并传递编辑状态参数
     router.push(`/?from=prompt&edit=${prompt.id}`);
   };
 

@@ -1,78 +1,28 @@
 {
   "prompts": [
     {
-      "tags": [],
-      "parameters": {
-        "steps": "20",
-        "cfg": "",
-        "sampler": "euler",
-        "seed": "1102277200849674",
-        "scheduler": "simple",
-        "denoise": "1",
-        "negative": ""
-      },
       "prompt": "",
-      "promptEn": "a man happy says something",
-      "imageUrl": "/images/prompts/1742303960665.png",
-      "id": "1742303962200",
-      "createdAt": "2025-03-18T13:19:22.200Z",
-      "updatedAt": "2025-03-18T13:19:22.200Z"
-    },
-    {
-      "tags": [],
+      "promptEn": "XUER Qing dynasty Dresses,1girl,solo,long hair,smile,brown hair,black hair,hair ornament,long sleeves,holding,standing,full body,flower,hair flower,wide sleeves,hand on hip,chinese clothes,floral print,holding umbrella,realistic,oil-paper umbrella，east asian architecture,night,depth of field,blurry background,looking away,chinese clothes,floral print,smoke,realistic,\nhighly detailed,ultra-high resolution,32K UHD,sharp    focus,best-quality,masterpiece,The outline of a woman,double exposure,\nunconventional supreme masterpiece,masterful details,temperate atmosphere,\ncinematic photo This is a poster about the Qing and Han Dynasties，It has a realistic picture effect，The picture is messy and extremely rich in details，(The theme text of the poster is: \"XUER\":1.2)，One line apart,(the subtitle below reads: \"Qing and Han Dynasties\":1.2),\n\n",
       "parameters": {
         "steps": "25",
-        "cfg": "",
-        "sampler": "dpmpp_2m",
-        "seed": "936361400359807",
-        "scheduler": "simple",
-        "denoise": "1",
-        "model": "/comfyui/liblibai-models/models/6ce0161689b3853acaa03779ec93eafe75a02f4ced659bee03f50797806fa2fa.safetensors",
-        "negative": ""
-      },
-      "prompt": "",
-      "promptEn": "a man happiles doing something",
-      "imageUrl": "/images/prompts/1742346933923.png",
-      "id": "1742346939371",
-      "createdAt": "2025-03-19T01:15:39.371Z",
-      "updatedAt": "2025-03-19T01:15:39.371Z"
-    },
-    {
-      "tags": [],
-      "parameters": {
-        "steps": "35",
-        "cfg": "",
         "sampler": "euler",
-        "seed": "109270284300615",
+        "seed": "555176039573955",
         "scheduler": "simple",
         "denoise": "1",
-        "model": "/comfyui/liblibai-models/models/4d23592a53e541688b95f8f4578af1c61e323170.safetensors",
-        "negative": ""
-      },
-      "prompt": "",
-      "promptEn": "sanguo a man happiles doing something",
-      "imageUrl": "/images/prompts/1742366555196.png",
-      "id": "1742366556584",
-      "createdAt": "2025-03-19T06:42:36.584Z",
-      "updatedAt": "2025-03-19T06:42:36.584Z"
-    },
-    {
-      "tags": [],
-      "parameters": {
-        "steps": "15",
         "cfg": "",
-        "sampler": "euler",
-        "seed": "66",
-        "scheduler": "simple",
-        "denoise": "1",
         "negative": ""
       },
-      "prompt": "",
-      "promptEn": "Five-grid comics,The author column says \"CunKai\"\n\nThe first frame: Scene: Classroom, Characters: Xiao Ming, Xiao Hong, Dialogue: Xiao Ming (secretly looking at Xiao Hong): (thinking in my heart) Xiao Hong is so cute, I must find a chance to confess to her.\n\nScene: Classroom hallway, Characters: Xiao Ming, Xiao Gang, Dialogue: Xiao Gang: Xiao Ming, why are you always absent-minded recently? Is there something on your mind? Xiao Ming: Ah, you found out, I fell in love with Xiao Hong.\n\nThird Space: Scene: Playground, Characters: Xiao Ming, Xiao Hua, Dialogue: Xiao Hua: Xiao Ming, be brave, go and confess to Xiao Hong! Xiao Ming: But I'm afraid of being rejected, what should I do?\n\nFourth Space: Scene: Library, Characters: Xiao Ming, Xiao Hong, Dialogue: Xiao Ming (hands Xiao Hong a love letter): Xiao Hong, this is for you, please tell me what you think after reading it. Xiao Hong (blushes): Okay, I'll read it carefully.\n\nScene: Classroom, Characters: Xiao Ming, Xiao Hong, Dialogue: Xiao Hong (laughs): Xiao Ming, I promise to be your girlfriend, let's work together! Xiao Ming (excited): Really? That's great, I'll be good to you!",
-      "imageUrl": "/images/prompts/1743130310981.png",
-      "id": "1743130313273",
-      "createdAt": "2025-03-28T02:51:53.273Z",
-      "updatedAt": "2025-03-28T02:51:53.273Z"
+      "tags": [
+        {
+          "id": "1743491813768",
+          "name": "sdfsdfs",
+          "color": "#aafe56"
+        }
+      ],
+      "imageUrl": "/images/prompts/1743491797917.png",
+      "id": "1743491799863",
+      "createdAt": "2025-04-01T07:16:39.863Z",
+      "updatedAt": "2025-04-01T07:16:54.819Z"
     }
   ]
 }

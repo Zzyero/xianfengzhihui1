@@ -10,7 +10,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import { PromptLibrary } from "@/components/prompt-library/prompt-library";
 import { PromptLibraryService } from '@/lib/services/prompt-library-service';
-import type { PromptItem, PromptParameters } from '@/components/prompt-library/types';
+import type { PromptItem, PartialPromptItem, PromptParameters } from '@/components/prompt-library/types';
 import { Loader } from "@/components/loader";
 import { PanelRightOpen } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -44,26 +44,29 @@ export default function Home() {
     const [error, setError] = useState<string | null>(null);
     const [showSidebar, setShowSidebar] = useState(true);
     const [showForm, setShowForm] = useState(false);
-    const [editingPrompt, setEditingPrompt] = useState<Partial<PromptItem> | null>(null);
+    const [editingPrompt, setEditingPrompt] = useState<PartialPromptItem | null>(null);
 
     // 检查URL参数并设置编辑状态
     useEffect(() => {
+        const fromPrompt = searchParams?.get('from') === 'prompt';
         const editId = searchParams?.get('edit');
         
-        if (editId) {
-            const promptToEdit = prompts.find(p => p.id === editId);
-            if (promptToEdit) {
-                // 移除 model 参数
-                const { parameters, ...rest } = promptToEdit;
-                const { model, ...filteredParams } = parameters;
-                setEditingPrompt({
-                    ...rest,
-                    parameters: filteredParams
-                });
+        if (fromPrompt && editId) {
+            // 如果是从提示词详情页返回，并且有编辑ID
+            const prompt = prompts.find(p => p.id === editId);
+            if (prompt) {
+                setEditingPrompt(prompt);
                 setShowForm(true);
             }
+            // 清除URL参数
+            router.replace('/');
+        } else if (fromPrompt) {
+            // 如果只是从提示词详情页返回，切换到提示词库标签
+            setCurrentTab(TabValue.PromptLibrary);
+            // 清除URL参数
+            router.replace('/');
         }
-    }, [searchParams, prompts]);
+    }, [searchParams, prompts, router]);
 
     // 加载提示词库数据
     useEffect(() => {
@@ -83,33 +86,29 @@ export default function Home() {
         loadPrompts();
     }, []);
 
-    // 处理提示词的增删改
-    const handleAdd = async (prompt: Partial<PromptItem>) => {
+    // 处理添加提示词
+    const handleAdd = async (prompt: PartialPromptItem) => {
         try {
             setIsLoading(true);
-            const filteredParams: PromptParameters = {
-                steps: prompt.parameters?.steps || '',
-                sampler: prompt.parameters?.sampler || '',
-                seed: prompt.parameters?.seed || '',
-                scheduler: prompt.parameters?.scheduler || '',
-                denoise: prompt.parameters?.denoise || '',
-                cfg: prompt.parameters?.cfg,
-                negative: prompt.parameters?.negative
-            };
-            
-            await PromptLibraryService.addPrompt({
+            const fullPrompt: Partial<PromptItem> = {
                 ...prompt,
-                parameters: filteredParams
-            });
+                parameters: prompt.parameters ? {
+                    steps: prompt.parameters.steps || '',
+                    sampler: prompt.parameters.sampler || '',
+                    seed: prompt.parameters.seed || '',
+                    scheduler: prompt.parameters.scheduler || '',
+                    denoise: prompt.parameters.denoise || '',
+                    cfg: prompt.parameters.cfg,
+                    negative: prompt.parameters.negative,
+                } : undefined
+            };
+            await PromptLibraryService.addPrompt(fullPrompt);
             const updatedPrompts = await PromptLibraryService.getPrompts();
             setPrompts(updatedPrompts);
             setShowForm(false);
             setEditingPrompt(null);
-            // 如果是从其他页面跳转来的，返回原页面
-            const fromPrompt = searchParams?.get('from') === 'prompt';
-            if (fromPrompt) {
-                router.back();
-            }
+            // 清除URL参数
+            router.replace('/');
         } catch (error) {
             console.error('添加提示词失败:', error);
         } finally {
@@ -117,32 +116,29 @@ export default function Home() {
         }
     };
 
-    const handleEdit = async (id: string, prompt: Partial<PromptItem>) => {
+    // 处理编辑提示词
+    const handleEdit = async (id: string, prompt: PartialPromptItem) => {
         try {
             setIsLoading(true);
-            const filteredParams: PromptParameters = {
-                steps: prompt.parameters?.steps || '',
-                sampler: prompt.parameters?.sampler || '',
-                seed: prompt.parameters?.seed || '',
-                scheduler: prompt.parameters?.scheduler || '',
-                denoise: prompt.parameters?.denoise || '',
-                cfg: prompt.parameters?.cfg,
-                negative: prompt.parameters?.negative
-            };
-            
-            await PromptLibraryService.updatePrompt(id, {
+            const fullPrompt: Partial<PromptItem> = {
                 ...prompt,
-                parameters: filteredParams
-            });
+                parameters: prompt.parameters ? {
+                    steps: prompt.parameters.steps || '',
+                    sampler: prompt.parameters.sampler || '',
+                    seed: prompt.parameters.seed || '',
+                    scheduler: prompt.parameters.scheduler || '',
+                    denoise: prompt.parameters.denoise || '',
+                    cfg: prompt.parameters.cfg,
+                    negative: prompt.parameters.negative,
+                } : undefined
+            };
+            await PromptLibraryService.updatePrompt(id, fullPrompt);
             const updatedPrompts = await PromptLibraryService.getPrompts();
             setPrompts(updatedPrompts);
             setShowForm(false);
             setEditingPrompt(null);
-            // 如果是从其他页面跳转来的，返回原页面
-            const fromPrompt = searchParams?.get('from') === 'prompt';
-            if (fromPrompt) {
-                router.back();
-            }
+            // 清除URL参数
+            router.replace('/');
         } catch (error) {
             console.error('更新提示词失败:', error);
         } finally {
@@ -184,7 +180,7 @@ export default function Home() {
                         {currentTab === TabValue.PromptLibrary && (
                             <div className="flex flex-col h-full">
                                 <div className="flex justify-between items-center p-4 border-b">
-                                    <h1 className="text-2xl font-bold">提示词库</h1>
+                                    <h1 className="text-2xl font-bold">画廊</h1>
                                 </div>
                                 <div className="flex-1 p-4 overflow-auto">
                                     {isLoading ? (
@@ -206,6 +202,7 @@ export default function Home() {
                                             setShowForm={setShowForm}
                                             editingPrompt={editingPrompt}
                                             setEditingPrompt={setEditingPrompt}
+                                            setPrompts={setPrompts}
                                         />
                                     )}
                                 </div>
