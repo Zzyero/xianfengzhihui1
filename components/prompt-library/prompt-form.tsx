@@ -207,7 +207,7 @@ export function PromptForm({
             </div>
           </div>
         </div>
-        <DialogFooter className="sticky bottom-0 bg-white border-t pt-4">
+        <DialogFooter className="sticky bottom-0 bg-white dark:bg-background border-t dark:border-input pt-4">
           <Button type="button" variant="outline" onClick={onClose}>
             取消
           </Button>

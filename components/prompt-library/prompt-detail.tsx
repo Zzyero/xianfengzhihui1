@@ -82,7 +82,7 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
 
       <Card className="p-6">
         <div 
-          className="relative mb-6 overflow-hidden bg-white rounded-lg p-2 cursor-pointer"
+          className="relative mb-6 overflow-hidden bg-white dark:bg-background rounded-lg p-2 cursor-pointer"
           onClick={() => handleImageDoubleClick(prompt.imageUrl)}
         >
           <img
@@ -113,21 +113,21 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
 
           <div>
             <h2 className="text-lg font-semibold mb-2">中文提示词</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{prompt.prompt}</p>
+            <p className="text-gray-700 dark:text-muted-foreground whitespace-pre-wrap">{prompt.prompt}</p>
           </div>
 
           <div>
             <h2 className="text-lg font-semibold mb-2">英文提示词</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{prompt.promptEn}</p>
+            <p className="text-gray-700 dark:text-muted-foreground whitespace-pre-wrap">{prompt.promptEn}</p>
           </div>
 
           <div>
             <h2 className="text-lg font-semibold mb-2">参数设置</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries(prompt.parameters).map(([key, value]) => (
-                <div key={key} className="flex justify-between p-2 bg-gray-50 rounded">
-                  <span className="text-gray-600 font-medium">{key}:</span>
-                  <span className="text-gray-800">{value}</span>
+                <div key={key} className="flex justify-between p-2 bg-gray-50 dark:bg-muted dark:text-foreground rounded">
+                  <span className="text-gray-600 dark:text-muted-foreground font-medium">{key}:</span>
+                  <span className="text-gray-800 dark:text-foreground">{value}</span>
                 </div>
               ))}
             </div>
