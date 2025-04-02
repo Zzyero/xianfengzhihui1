@@ -9,6 +9,15 @@
   --code-text: #333;
 }
 
+/* 暗色模式变量 */
+.dark .message-display-wrapper {
+  --text-primary: #FFFFFF;
+  --text-secondary: #A3A3A3;
+  --border-color: #2d2d2d;
+  --code-block-bg: rgba(255, 255, 255, 0.05);
+  --code-text: #e0e0e0;
+}
+
 /* 消息显示组件样式 */
 .message-display-wrapper .message {
   display: flex;
@@ -44,8 +53,17 @@
   color: #fff;
 }
 
+/* 暗色模式下的头像样式 */
+.dark .message-display-wrapper .avatar-content {
+  background-color: #3b82f6;
+}
+
 .message-display-wrapper .user-message .avatar-content {
   background-color: #6b7280;
+}
+
+.dark .message-display-wrapper .user-message .avatar-content {
+  background-color: #4b5563;
 }
 
 .message-display-wrapper .message-content {
@@ -62,9 +80,19 @@
   color: #000;
 }
 
+.dark .message-display-wrapper .user-message .message-content {
+  background-color: #1e3a8a;
+  color: #fff;
+}
+
 .message-display-wrapper .assistant-message .message-content {
   background-color: #f3f4f6;
   color: #000;
+}
+
+.dark .message-display-wrapper .assistant-message .message-content {
+  background-color: #374151;
+  color: #fff;
 }
 
 /* 时间戳样式 */
@@ -74,6 +102,10 @@
   opacity: 0.7;
   color: #000;
   text-align: right;
+}
+
+.dark .message-display-wrapper .message-timestamp {
+  color: #d1d5db;
 }
 
 /* Markdown 内容样式 */
@@ -245,6 +277,10 @@
   overflow-wrap: break-word; /* 确保长词自动换行 */
   width: 100%;
   max-width: 100%;
+}
+
+.dark .message-display-wrapper .markdown-content pre code {
+  color: var(--code-text);
 }
 
 .message-display-wrapper .markdown-content table {

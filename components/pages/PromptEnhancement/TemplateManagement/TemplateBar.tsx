@@ -426,7 +426,7 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
                 value={templateForm.name}
                 onChange={(e) => setTemplateForm({...templateForm, name: e.target.value})}
                 placeholder="输入模板名称"
-                style={{color: '#111827', backgroundColor: 'white'}}
+                className="dark:bg-background dark:text-foreground dark:border-input"
               />
             </div>
             
@@ -437,8 +437,7 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
                 value={templateForm.content}
                 onChange={(e) => setTemplateForm({...templateForm, content: e.target.value})}
                 placeholder="输入模板内容"
-                className="h-32"
-                style={{color: '#111827', backgroundColor: 'white'}}
+                className="h-32 dark:bg-background dark:text-foreground dark:border-input"
               />
             </div>
           </div>

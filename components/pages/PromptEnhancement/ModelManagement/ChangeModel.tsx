@@ -325,7 +325,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       <Button
         variant="outline"
         size="sm"
-        className="new-chat-button flex items-center gap-1"
+        className="new-chat-button flex items-center gap-1 dark:bg-background dark:border-input dark:text-foreground"
         onClick={() => setIsModelDialogOpen(true)}
       >
         <span>模型: {selectedModelName}</span>
@@ -333,7 +333,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
 
       {/* 模型选择对话框 */}
       <Dialog open={isModelDialogOpen} onOpenChange={handleDialogOpenChange}>
-        <DialogContent className="model-dialog-content">
+        <DialogContent className="model-dialog-content dark:bg-background dark:border-input dark:text-foreground">
           <DialogHeader>
             <DialogTitle>
               {editingModel && editingModel.type === 'api' ? '编辑API模型' : 
@@ -426,7 +426,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
               {/* 本地模型列表 */}
               <TabsContent value="local" className="space-y-4">
                 {/* 本地模型服务控制 */}
-                <div className="mb-4 p-4 bg-gray-50 rounded-md">
+                <div className="mb-4 p-4 bg-gray-50 dark:bg-background dark:border dark:border-input rounded-md">
                   <div className="text-sm font-medium mb-2">本地模型服务</div>
                   <StartLocalModelServer selectedModel={selectedModel} />
                 </div>
