@@ -74,7 +74,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                         />
                         <SidebarButton
                             icon={<Bot className="size-5" />}
-                            label="智能PS"
+                            label="智能修图"
                             isActive={currentTab === TabValue.SmartPS}
                             onClick={() => onTabChange(TabValue.SmartPS)}
                             isSmallScreen={isSmallScreen}
@@ -113,7 +113,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                         />
                         <SidebarButton
                             icon={<Bot className="size-5" />}
-                            label="智能PS"
+                            label="智能修图"
                             isActive={currentTab === TabValue.SmartPS}
                             onClick={() => onTabChange(TabValue.SmartPS)}
                             isSmallScreen={isSmallScreen}
