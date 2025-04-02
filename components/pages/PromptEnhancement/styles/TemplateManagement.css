@@ -17,6 +17,12 @@
   overflow: hidden;
 }
 
+/* 暗色模式下的模板栏 */
+.dark .template-bar {
+  background-color: hsl(222.2 84% 4.9%);
+  border-color: hsl(217.2 32.6% 17.5%);
+}
+
 /* ===== 模板列表容器 ===== */
 .template-list {
   flex: 1;
@@ -65,11 +71,25 @@
   background-color: #fff;
 }
 
+/* 暗色模式下的模板按钮 */
+.dark .template-button {
+  background-color: hsl(240 3.7% 15.9%); /* muted */
+  border-color: hsl(217.2 32.6% 17.5%);
+  color: hsl(215.4 16.3% 56.9%); /* muted-foreground */
+}
+
 .template-button:hover {
   background-color: #f3f4f6;
   border-color: #d1d5db;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 暗色模式下的按钮悬停状态 */
+.dark .template-button:hover {
+  background-color: hsl(240 5.9% 10%); /* muted/90 */
+  border-color: hsl(215.4 16.3% 56.9%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .template-button:active {
@@ -83,6 +103,12 @@
   border-color: #2563eb;
   color: #fff;
   font-weight: 500;
+}
+
+/* 暗色模式下的激活按钮 */
+.dark .template-button.active {
+  background-color: #2563eb;
+  border-color: #1d4ed8;
 }
 
 .template-button.active:hover {
@@ -157,9 +183,22 @@
   color: #000;
 }
 
+/* 暗色模式下的更多模板按钮 */
+.dark .more-templates-button {
+  background-color: hsl(240 3.7% 15.9%) !important; /* muted */
+  border-color: hsl(217.2 32.6% 17.5%);
+  color: hsl(215.4 16.3% 56.9%) !important; /* muted-foreground */
+}
+
 .more-templates-button:hover {
   background-color: #f3f4f6;
   border-color: #d1d5db;
+}
+
+/* 暗色模式下的更多模板按钮悬停状态 */
+.dark .more-templates-button:hover {
+  background-color: hsl(240 5.9% 10%) !important; /* muted/90 */
+  border-color: hsl(215.4 16.3% 56.9%);
 }
 
 /* ===== 模板下拉项 ===== */
@@ -171,8 +210,18 @@
   transition: background-color 0.2s;
 }
 
+/* 暗色模式下的下拉项 */
+.dark .template-dropdown-item {
+  color: hsl(215.4 16.3% 56.9%);
+}
+
 .template-dropdown-item:hover {
   background-color: #f3f4f6;
+}
+
+/* 暗色模式下的下拉项悬停状态 */
+.dark .template-dropdown-item:hover {
+  background-color: hsl(240 5.9% 10%);
 }
 
 /* 下拉项激活状态 */
@@ -182,8 +231,19 @@
   font-weight: 500;
 }
 
+/* 暗色模式下的下拉项激活状态 */
+.dark .template-dropdown-item.active {
+  background-color: #1e3a8a;
+  color: hsl(210 40% 98%);
+}
+
 .template-dropdown-item.active:hover {
   background-color: #bfdbfe;
+}
+
+/* 暗色模式下的下拉项激活悬停状态 */
+.dark .template-dropdown-item.active:hover {
+  background-color: #1e40af;
 }
 
 /* ===== 控制按钮组 ===== */
@@ -196,6 +256,12 @@
   border-left: 1px solid #f3f4f6;
   height: 2rem;
   flex-shrink: 0;
+}
+
+/* 暗色模式下的控制按钮组 */
+.dark .template-controls {
+  background-color: hsl(222.2 84% 4.9%);
+  border-left: 1px solid hsl(217.2 32.6% 17.5%);
 }
 
 /* 控制按钮 */
@@ -213,13 +279,31 @@
   flex-shrink: 0 !important;
 }
 
+/* 暗色模式下的控制按钮 */
+.dark .control-button {
+  background-color: hsl(240 3.7% 15.9%) !important; /* muted */
+  color: hsl(215.4 16.3% 56.9%) !important; /* muted-foreground */
+  border-color: hsl(217.2 32.6% 17.5%) !important;
+}
+
 .control-button:hover {
   background-color: #f3f4f6 !important;
   color: #111827 !important;
 }
 
+/* 暗色模式下的控制按钮悬停状态 */
+.dark .control-button:hover {
+  background-color: hsl(240 5.9% 10%) !important; /* muted/90 */
+  color: hsl(210 40% 98%) !important;
+}
+
 .control-button.active {
   background-color: #dbeafe !important;
+}
+
+/* 暗色模式下的控制按钮激活状态 */
+.dark .control-button.active {
+  background-color: #1e3a8a !important;
 }
 
 /* 特定按钮激活状态 */
@@ -313,4 +397,22 @@
     padding-left: 0.5rem;
     border-left: 1px solid #f3f4f6;
   }
+}
+
+/* 模板下拉内容 */
+.more-templates-content {
+  z-index: 50;
+  min-width: 8rem;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* 暗色模式下的模板下拉内容 */
+.dark .more-templates-content {
+  background-color: hsl(240 3.7% 15.9%);
+  border-color: hsl(217.2 32.6% 17.5%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
 }

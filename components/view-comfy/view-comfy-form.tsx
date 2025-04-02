@@ -30,9 +30,29 @@ import {
 } from "@/components/ui/collapsible"
 import { useState, useEffect } from "react";
 import { getComfyUIRandomSeed, cn } from "@/lib/utils";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { Eraser } from "lucide-react"
+import { MaskEditor } from "@/components/ui/mask-editor";
+import { Loader2, Save } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 interface IInputForm extends IInputField {
     id: string;
+    valueKey?: string;
 }
 
 // ViewComfyForm 组件的主要功能：
@@ -80,11 +100,45 @@ export function ViewComfyForm(args: {
                                             control={form.control}
                                             name="description"
                                             render={({ field }) => (
-                                                <FormItem key="description" className="ml-0.5">
+                                                <FormItem>
                                                     <FormLabel>描述</FormLabel>
                                                     <FormControl>
-                                                        <Textarea placeholder="描述工作流的功能" {...field} />
+                                                        <Textarea
+                                                            placeholder="描述"
+                                                            className={TEXT_AREA_STYLE}
+                                                            {...field}
+                                                        />
                                                     </FormControl>
+                                                    <FormDescription>
+                                                        工作流的描述
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="type"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>工作流类型</FormLabel>
+                                                    <Select
+                                                        onValueChange={field.onChange}
+                                                        defaultValue={field.value || "image_generation"}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="选择工作流类型" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value="image_generation">生图</SelectItem>
+                                                            <SelectItem value="smart_ps">智能PS</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormDescription>
+                                                        选择工作流的类型，不同类型的工作流会在不同的页面显示
+                                                    </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -94,24 +148,21 @@ export function ViewComfyForm(args: {
                                             control={form.control}
                                             name="textOutputEnabled"
                                             render={({ field }) => (
-                                                <FormItem key="textOutputEnabled" className="">
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                                     <FormControl>
-                                                        <div className={cn(`flex ml-0.5 space-x-2 pt-2`,
-                                                            (field.value) ? "mb-[-5px]" : "pb-2"
-                                                        )}>
-                                                            <FormLabel>允许文本生成</FormLabel>
-                                                            <Checkbox
-                                                                checked={field.value}
-                                                                onCheckedChange={field.onChange}
-                                                            />
-                                                        </div>
+                                                        <Checkbox
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
                                                     </FormControl>
-                                                    {/* 文本输出的警告提示 */}
-                                                    {(field.value) && (
-                                                        <FormDescription className="pb-2">
-                                                            Text output is in beta and can lead to unexpected text being rendered
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            启用文本输出
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            是否启用文本输出
                                                         </FormDescription>
-                                                    )}
+                                                    </div>
                                                 </FormItem>
                                             )}
                                         />
@@ -140,17 +191,29 @@ export function ViewComfyForm(args: {
                                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                         // @ts-ignore
                                         if (field.inputs.length > 0) {
-                                            if (editMode) {
+                                            // 检查是否是文本编码器或上传图片组件
+                                            const isSpecialComponent = field.title === "CLIP文本编码器" || field.title === "加载图像";
+                                            
+                                            if (isSpecialComponent) {
+                                                // 特殊组件不显示圆角方框
                                                 return (
-                                                    // 编辑模式下的输入字段组
-                                                    <fieldset className="grid gap-4 rounded-lg border p-4">
-                                                        <legend className="-ml-1 px-1 text-sm font-medium">
-                                                            {
-                                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                                                // @ts-ignore
-                                                                field.title
-                                                            }
-                                                            {/* 删除按钮 */}
+                                                    <div className="grid gap-4">
+                                                        <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
+                                                    </div>
+                                                );
+                                            }
+
+                                            // 其他组件显示圆角方框
+                                            return (
+                                                <fieldset className="grid gap-4 rounded-lg border p-4">
+                                                    <legend className="-ml-1 px-1 text-sm font-medium">
+                                                        {
+                                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                            // @ts-ignore
+                                                            field.title
+                                                        }
+                                                        {/* 编辑模式下显示删除按钮 */}
+                                                        {editMode && (
                                                             <Button
                                                                 size="icon"
                                                                 variant="ghost"
@@ -159,19 +222,11 @@ export function ViewComfyForm(args: {
                                                             >
                                                                 <Trash2 className="size-5" />
                                                             </Button>
-                                                        </legend>
-                                                        {/* 嵌套输入字段 */}
-                                                        <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
-                                                    </fieldset>
-                                                )
-                                            }
-
-                                            return (
-                                                // 非编辑模式下的输入字段组
-                                                <fieldset className="grid gap-4">
+                                                        )}
+                                                    </legend>
                                                     <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
                                                 </fieldset>
-                                            )
+                                            );
                                         }
                                         return undefined;
                                     })}
@@ -415,36 +470,100 @@ function NestedInputField(args: { form: UseFormReturn<IViewComfyBase, any, undef
 }
 
 /**
- * 输入字段类型转换组件
- * 根据输入字段类型返回对应的UI组件
+ * 将输入字段转换为相应的UI组件
+ * 根据字段类型选择不同的输入组件
  */
 function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolean, remove?: UseFieldArrayRemove, index: number }) {
     const { input, field, editMode, remove, index } = args;
 
-    // 根据不同的输入类型返回对应的组件
+    // 根据key判断是否为采样器或调度器输入
+    if (input.key?.includes("sampler_name")) {
+        const samplerOptions = [
+            "euler",
+            "heun",
+            "dpm2",
+            "dpmpp_2s_a",
+            "dpmpp_2m",
+            "dpmpp_sde",
+            "dpmpp_2m_sde",
+            "dpm_adaptive",
+            "lms",
+            "uni_pc",
+            "ddim"
+        ];
+        return (
+            <FormSelectInput 
+                input={input} 
+                field={field} 
+                options={samplerOptions} 
+                editMode={editMode} 
+                remove={remove} 
+                index={index} 
+            />
+        );
+    }
+
+    if (input.key?.includes("scheduler")) {
+        const schedulerOptions = [
+            "normal",
+            "karras",
+            "exponential",
+            "sgm_uniform",
+            "simple",
+            "ddim_uniform"
+        ];
+        return (
+            <FormSelectInput 
+                input={input} 
+                field={field} 
+                options={schedulerOptions} 
+                editMode={editMode} 
+                remove={remove} 
+                index={index} 
+            />
+        );
+    }
+
+    // Lora加载器下拉选择框
+    if (input.key?.includes("lora_name")) {
+        const loraOptions = [
+            "laiqingde2-000029.safetensors"
+        ];
+        return (
+            <FormSelectInput 
+                input={input} 
+                field={field} 
+                options={loraOptions} 
+                editMode={editMode} 
+                remove={remove} 
+                index={index} 
+            />
+        );
+    }
+
+    // 长文本输入
     if (input.valueType === "long-text") {
-        // 长文本输入
         return (
             <FormTextAreaInput input={input} field={field} editMode={editMode} remove={remove} index={index} />
         )
     }
 
+    // 布尔类型判断
     if (input.valueType === "boolean") {
-        // 布尔值复选框
         return (
             <FormCheckboxInput input={input} field={field} editMode={editMode} remove={remove} index={index} />
         )
     }
 
+    // 媒体文件类型判断
     if (input.valueType === "video" || input.valueType === "image") {
-        // 媒体文件输入
         return (
             <FormMediaInput input={input} field={field} editMode={editMode} remove={remove} index={index} />
         )
     }
 
-    if (input.valueType === "seed" || input.valueType === "noise_seed" || input.valueType === "rand_seed") {
-        // 随机种子输入
+    // 种子类型判断
+    if (input.key?.includes("seed") || input.key?.includes("noise_seed")) {
         return (
             <FormSeedInput input={input} field={field} editMode={editMode} remove={remove} index={index} />
         )
@@ -544,11 +663,11 @@ function FormSeedInput(args: { input: IInputForm, field: any, editMode?: boolean
  */
 function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolean, remove?: UseFieldArrayRemove, index: number }) {
     const { input, field, editMode, remove, index } = args;
-    // 媒体文件状态管理
-    const [media, setMedia] = useState({
+    const [media, setMedia] = useState<{ src: string, name: string }>({
         src: "",
-        name: "",
+        name: ""
     });
+    const [showMaskEditor, setShowMaskEditor] = useState(false);
 
     // 根据输入类型设置允许的文件扩展名
     let fileExtensions: string[] = []
@@ -594,7 +713,6 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
     return (
         <FormItem key={input.id}>
             <FormLabel className={FORM_STYLE.label}>{input.title}
-                {/* 编辑模式下显示删除按钮 */}
                 {editMode && (
                     <Button
                         size="icon"
@@ -607,11 +725,9 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                 )}
             </FormLabel>
             <FormControl>
-                {/* 如果有媒体文件则显示预览 */}
                 {media.src ? (
                     <div key={input.id} className="flex flex-col items-center gap-2">
                         <div className="max-w-full h-48 flex items-center justify-center overflow-hidden border rounded-md">
-                            {/* 图片预览 */}
                             {(input.valueType === "image") && (
                                 <img
                                     src={media.src}
@@ -631,17 +747,25 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                                 </video>
                             )}
                         </div>
-                        {/* 删除媒体按钮 */}
-                        <Button
-                            variant="secondary"
-                            className="border-2 text-muted-foreground"
-                            onClick={onDelete}
-                        >
-                            <Trash2 className="size-5 mr-2" /> 删除图片
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="secondary"
+                                className="border-2 text-muted-foreground"
+                                onClick={onDelete}
+                            >
+                                <Trash2 className="size-5 mr-2" /> 删除图片
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                className="border-2 text-muted-foreground"
+                                onClick={() => setShowMaskEditor(true)}
+                            >
+                                <Eraser className="size-5 mr-2" /> 绘制蒙版
+                            </Button>
+                        </div>
                     </div>
                 ) : (
-                    // 如果没有媒体文件则显示上传区域
                     <Dropzone
                         key={input.id}
                         onChange={field.onChange}
@@ -651,6 +775,53 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                     />
                 )}
             </FormControl>
+
+            {/* 蒙版编辑器对话框 */}
+            <Dialog open={showMaskEditor} onOpenChange={setShowMaskEditor}>
+                <DialogContent className="sm:max-w-[800px]">
+                    <DialogHeader>
+                        <DialogTitle>蒙版编辑器</DialogTitle>
+                        <DialogDescription>
+                            在图片上绘制需要重绘的区域
+                        </DialogDescription>
+                    </DialogHeader>
+                    <MaskEditor 
+                        imageUrl={media.src}
+                        onSave={(blob, maskUrl) => {
+                            // 创建新的 File 对象
+                            const newFile = new File([blob], `masked_${Date.now()}.png`, {
+                                type: 'image/png'
+                            });
+                            
+                            // 更新表单字段值
+                            field.onChange(newFile);
+                            
+                            // 更新预览
+                            setMedia({
+                                src: maskUrl,  // 使用保存的蒙版图片URL
+                                name: newFile.name
+                            });
+                            
+                            // 添加成功提示
+                            toast({
+                                title: "蒙版已保存",
+                                description: "图片已成功更新",
+                            });
+                            
+                            setShowMaskEditor(false);
+                        }}
+                    />
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => setShowMaskEditor(false)}
+                        >
+                            取消
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </FormItem>
     )
 }
@@ -766,4 +937,62 @@ function FormBasicInput(args: { input: IInputForm, field: any, editMode?: boolea
             )}
         </FormItem>
     )
+}
+
+/**
+ * 下拉选择框输入组件
+ * 用于展示预定义选项的选择框
+ */
+function FormSelectInput(args: { 
+    input: IInputForm, 
+    field: any, 
+    options: string[], 
+    editMode?: boolean, 
+    remove?: UseFieldArrayRemove, 
+    index: number 
+}) {
+    const { input, field, options, editMode, remove, index } = args;
+    
+    return (
+        <FormItem key={input.id}>
+            <FormLabel className={FORM_STYLE.label}>
+                {input.title}
+                {/* 编辑模式下显示删除按钮 */}
+                {editMode && (
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="text-muted-foreground"
+                        onClick={remove ? () => remove(index) : undefined}
+                    >
+                        <Trash2 className="size-5" />
+                    </Button>
+                )}
+            </FormLabel>
+            <FormControl>
+                <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value || options[0]}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder={input.placeholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {options.map(option => (
+                            <SelectItem key={option} value={option}>
+                                {option}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </FormControl>
+            {/* 帮助文本 */}
+            {input.helpText !== "Helper Text" && (
+                <FormDescription>
+                    {input.helpText}
+                </FormDescription>
+            )}
+        </FormItem>
+    );
 }

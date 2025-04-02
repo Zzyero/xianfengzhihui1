@@ -1,0 +1,70 @@
+{
+  "prompts": [
+    {
+      "tags": [],
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "seed": "1102277200849674",
+        "scheduler": "simple",
+        "denoise": "1",
+        "cfg": "7",
+        "negative": ""
+      },
+      "prompt": "一个男人正在",
+      "promptEn": "a man happy says something",
+      "imageUrl": "/images/prompts/1742303960665.png",
+      "id": "1742303962200",
+      "createdAt": "2025-03-18T13:19:22.200Z",
+      "updatedAt": "2025-03-29T23:40:54.106Z"
+    },
+    {
+      "tags": [],
+      "parameters": {
+        "steps": "35",
+        "cfg": "",
+        "sampler": "euler",
+        "seed": "109270284300615",
+        "scheduler": "simple",
+        "denoise": "1",
+        "model": "/comfyui/liblibai-models/models/4d23592a53e541688b95f8f4578af1c61e323170.safetensors",
+        "negative": ""
+      },
+      "prompt": "",
+      "promptEn": "sanguo a man happiles doing something",
+      "imageUrl": "/images/prompts/1742366555196.png",
+      "id": "1742366556584",
+      "createdAt": "2025-03-19T06:42:36.584Z",
+      "updatedAt": "2025-03-19T06:42:36.584Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "\nErase, remove",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "seed": "",
+        "scheduler": "normal",
+        "denoise": "1.0",
+        "cfg": "",
+        "negative": ""
+      },
+      "tags": [
+        {
+          "id": "1743497162987",
+          "name": "万物消除",
+          "color": "#4d577c"
+        },
+        {
+          "id": "1743497184330",
+          "name": "哒哒哒",
+          "color": "#f4ce0"
+        }
+      ],
+      "imageUrl": "/images/prompts/1743497048062.png",
+      "id": "1743497049380",
+      "createdAt": "2025-04-01T08:44:09.380Z",
+      "updatedAt": "2025-04-01T08:46:25.375Z"
+    }
+  ]
+}

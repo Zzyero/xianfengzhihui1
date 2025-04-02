@@ -1,4 +1,4 @@
-import { SquareTerminal, LifeBuoy, Book, Bot, BookOpen } from "lucide-react"
+import { SquareTerminal, LifeBuoy, Book, Bot, BookOpen,Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TooltipButton } from "@/components/ui/tooltip-button"
 import Link from "next/link";
@@ -17,7 +17,8 @@ export enum TabValue {
     Account = 'account',
     WorkflowApi = 'workflow_api',
     PromptLibrary = 'prompt_library',
-    PromptEnhance = 'prompt_enhance'
+    PromptEnhance = 'prompt_enhance',
+    SmartPS = 'smart_ps'
 }
 
 //侧边栏属性接口
@@ -71,15 +72,22 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                             onClick={() => onTabChange(TabValue.Playground)}
                             isSmallScreen={isSmallScreen}
                         />
+                        <SidebarButton
+                            icon={<Bot className="size-5" />}
+                            label="智能修图"
+                            isActive={currentTab === TabValue.SmartPS}
+                            onClick={() => onTabChange(TabValue.SmartPS)}
+                            isSmallScreen={isSmallScreen}
+                        />
                         <SidebarButton 
                             icon={<BookOpen className="size-5" />}
-                            label="提示词库"
+                            label="画廊"
                             isActive={currentTab === TabValue.PromptLibrary}
                             onClick={() => onTabChange(TabValue.PromptLibrary)}
                             isSmallScreen={isSmallScreen}
                         />
                         <SidebarButton
-                            icon={<Bot className="size-5" />}
+                            icon={<Star className="size-5" />}
                             label="提示词增强"
                             isActive={currentTab === TabValue.PromptEnhance}
                             onClick={() => onTabChange(TabValue.PromptEnhance)}
@@ -96,7 +104,6 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                             onClick={() => onTabChange(TabValue.WorkflowApi)}
                             isSmallScreen={isSmallScreen}
                         />
-                        {/* <PlaygroundButton currentTab={currentTab} onTabChange={onTabChange} /> */}
                         <SidebarButton
                             icon={<SquareTerminal className="size-5" />}
                             label="生图"
@@ -104,15 +111,22 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                             onClick={() => onTabChange(TabValue.Playground)}
                             isSmallScreen={isSmallScreen}
                         />
+                        <SidebarButton
+                            icon={<Bot className="size-5" />}
+                            label="智能修图"
+                            isActive={currentTab === TabValue.SmartPS}
+                            onClick={() => onTabChange(TabValue.SmartPS)}
+                            isSmallScreen={isSmallScreen}
+                        />
                         <SidebarButton 
                             icon={<BookOpen className="size-5" />}
-                            label="提示词库"
+                            label="画廊"
                             isActive={currentTab === TabValue.PromptLibrary}
                             onClick={() => onTabChange(TabValue.PromptLibrary)}
                             isSmallScreen={isSmallScreen}
                         />
                         <SidebarButton
-                            icon={<Bot className="size-5" />}
+                            icon={<Star className="size-5" />}
                             label="提示词增强"
                             isActive={currentTab === TabValue.PromptEnhance}
                             onClick={() => onTabChange(TabValue.PromptEnhance)}

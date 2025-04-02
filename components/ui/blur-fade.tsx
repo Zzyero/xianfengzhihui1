@@ -24,6 +24,8 @@ interface BlurFadeProps {
   inView?: boolean;
   inViewMargin?: MarginType;
   blur?: string;
+  animate?: boolean;
+  onAnimationComplete?: () => void;
 }
 
 export default function BlurFade({
@@ -36,6 +38,8 @@ export default function BlurFade({
   inView = false,
   inViewMargin = "-50px",
   blur = "6px",
+  animate = true,
+  onAnimationComplete,
 }: BlurFadeProps) {
   const ref = useRef(null);
   const inViewResult = useInView(ref, { once: true, margin: inViewMargin });
@@ -45,6 +49,15 @@ export default function BlurFade({
     visible: { y: -yOffset, opacity: 1, filter: `blur(0px)` },
   };
   const combinedVariants = variant || defaultVariants;
+  
+  if (!animate) {
+    return (
+      <div className={className}>
+        {children}
+      </div>
+    );
+  }
+  
   return (
     <AnimatePresence>
       <motion.div
@@ -59,6 +72,11 @@ export default function BlurFade({
           ease: "easeOut",
         }}
         className={className}
+        onAnimationComplete={() => {
+          if (isInView && onAnimationComplete) {
+            onAnimationComplete();
+          }
+        }}
       >
         {children}
       </motion.div>

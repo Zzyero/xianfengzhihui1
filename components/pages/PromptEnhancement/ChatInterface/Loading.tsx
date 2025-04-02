@@ -1,7 +1,12 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
+
 const Loading = () => {
   const [tipIndex, setTipIndex] = useState(0);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  
   const loadingTips = [
     "正在初始化提示词增强页面...",
     "即将完成，请稍候..."
@@ -25,7 +30,7 @@ const Loading = () => {
       bottom: 0,
       width: '100%',
       height: '100%',
-      backgroundColor: '#ffffff',
+      backgroundColor: isDark ? '#1f2937' : '#ffffff',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -41,7 +46,7 @@ const Loading = () => {
     spinner: {
       width: '50px',
       height: '50px',
-      border: '4px solid rgba(0, 0, 0, 0.1)',
+      border: `4px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
       borderRadius: '50%',
       borderTopColor: '#3b82f6',
       animation: 'spin 1s linear infinite',
@@ -50,19 +55,19 @@ const Loading = () => {
     title: {
       fontSize: '2rem',
       fontWeight: 600,
-      color: '#1f2937',
+      color: isDark ? '#f9fafb' : '#1f2937',
       marginBottom: '1rem',
     },
     text: {
       fontSize: '1rem',
-      color: '#6b7280',
+      color: isDark ? '#d1d5db' : '#6b7280',
       minHeight: '1.5rem',
       marginBottom: '1.5rem',
     },
     progressContainer: {
       width: '200px',
       height: '6px',
-      backgroundColor: '#e5e7eb',
+      backgroundColor: isDark ? '#374151' : '#e5e7eb',
       borderRadius: '3px',
       overflow: 'hidden',
       marginTop: '1rem',

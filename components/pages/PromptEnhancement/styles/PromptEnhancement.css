@@ -7,7 +7,7 @@
   overflow: hidden;
   box-sizing: border-box;
   position: relative;
-  background-color: var(--background, #ffffff); /* 确保背景为白色 */
+  background-color: var(--background, #ffffff);
 }
 
 .prompt-enhancement-container.active {
@@ -18,7 +18,7 @@
   overflow: hidden;
   box-sizing: border-box;
   position: relative;
-  background-color: var(--background, #ffffff); /* 确保背景为白色 */
+  background-color: var(--background, #ffffff);
 }
 
 /* 页面头部 */
@@ -28,14 +28,14 @@
   justify-content: space-between;
   padding: 0.75rem 1rem;
   background-color: var(--background);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border);
   z-index: 10;
 }
 
 .header-title {
   font-size: var(--font-lg);
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--foreground);
 }
 
 .header-actions {
@@ -57,7 +57,7 @@
 /* 控制栏 */
 .control-bar {
   background-color: transparent; /* 将背景颜色设置为透明 */
-  border-color: #e5e7eb;
+  border-color: var(--border);
   border-radius: 0 !important;
   z-index: 30;
   width: 100%;
@@ -71,7 +71,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }    
 
 /* 控制栏子元素响应式布局 */
@@ -257,7 +257,7 @@
   z-index: 30; /* 提高优先级 */
   margin-bottom: 0;
   flex-shrink: 0; /* 防止收缩 */
-  background-color: #fff; /* 添加背景色 */
+  background-color: var(--background); /* 使用变量代替固定颜色 */
 }
 
 /* 模板栏容器 */
@@ -265,7 +265,7 @@
   position: relative;
   z-index: 30; 
   flex-shrink: 0; /* 防止收缩 */
-  background-color: #fff; /* 添加背景色 */
+  background-color: var(--background); /* 使用变量代替固定颜色 */
 }
 
 /* 添加加载指示器样式 */
@@ -278,7 +278,7 @@
   justify-content: center;
   padding: 2rem;
   font-size: 0.875rem;
-  color: #000;
+  color: var(--foreground); /* 使用变量代替固定颜色 */
   text-align: center;
 }
 
@@ -300,11 +300,40 @@
   align-items: center;
   gap: 0.5rem;
   font-weight: 500;
-  color: #000;
+  color: var(--foreground); /* 使用变量代替固定颜色 */
   width: 100%;
 }
 
-/* 对话框样式修复 - 强制使用亮色主题 */
+/* 对话框样式 - 支持暗色主题 */
+.dark .Dialog,
+.dark .DialogContent,
+.dark .DialogHeader,
+.dark .DialogTitle,
+.dark .DialogFooter {
+  background-color: hsl(222.2 84% 4.9%);
+  color: hsl(210 40% 98%);
+}
+
+.dark .DialogContent {
+  background-color: hsl(222.2 84% 4.9%);
+}
+
+.dark .DialogTitle {
+  color: hsl(210 40% 98%);
+}
+
+.dark .form-group label {
+  color: hsl(210 40% 98%);
+}
+
+.dark .form-group input, 
+.dark .form-group textarea {
+  color: hsl(210 40% 98%);
+  background-color: hsl(222.2 84% 4.9%);
+  border-color: hsl(217.2 32.6% 17.5%);
+}
+
+/* 保留原有的浅色主题样式 */
 .Dialog,
 .DialogContent,
 .DialogHeader,
@@ -371,4 +400,110 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* 消息输入框样式 */
+.message-input-container {
+  border-top: 1px solid var(--border);
+  background-color: var(--background);
+  padding: 0.5rem 1rem;
+  width: 100%;
+}
+
+.dark .message-input-container {
+  background-color: hsl(222.2 84% 4.9%);
+  border-top-color: hsl(217.2 32.6% 17.5%);
+}
+
+.message-input-textarea {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  resize: none;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+}
+
+.dark .message-input-textarea {
+  background-color: hsl(222.2 84% 4.9%);
+  color: hsl(210 40% 98%);
+  border-color: hsl(217.2 32.6% 17.5%);
+}
+
+.message-input-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+/* 按钮样式调整 */
+button,
+.button {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+}
+
+.dark button,
+.dark .button {
+  background-color: hsl(217.2 32.6% 17.5%);
+  color: hsl(210 40% 98%);
+}
+
+/* 次要按钮 */
+button.secondary,
+.button.secondary {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.dark button.secondary,
+.dark .button.secondary {
+  background-color: hsl(217.2 32.6% 17.5%);
+  color: hsl(210 40% 98%);
+}
+
+/* 底部选择器和输入 */
+select,
+input,
+textarea {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.dark select,
+.dark input,
+.dark textarea {
+  background-color: hsl(222.2 84% 4.9%);
+  color: hsl(210 40% 98%);
+  border-color: hsl(217.2 32.6% 17.5%);
+}
+
+/* 顶部操作按钮 */
+.action-button {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+  border: 1px solid var(--border);
+}
+
+.dark .action-button {
+  background-color: hsl(217.2 32.6% 17.5%);
+  color: hsl(210 40% 98%);
+  border-color: hsl(217.2 32.6% 17.5%);
+}
+
+/* 底部模型选择区域 */
+.model-selector-container button {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.dark .model-selector-container button {
+  background-color: hsl(222.2 84% 4.9%);
+  color: hsl(210 40% 98%);
+  border-color: hsl(217.2 32.6% 17.5%);
 } 

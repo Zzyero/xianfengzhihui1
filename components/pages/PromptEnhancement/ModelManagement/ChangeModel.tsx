@@ -225,7 +225,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       <Button
         variant="outline"
         size="sm"
-        className="new-chat-button flex items-center gap-1"
+        className="new-chat-button flex items-center gap-1 dark:bg-background dark:border-input dark:text-foreground"
         onClick={() => setIsModelDialogOpen(true)}
       >
         <span>模型: {selectedModelName}</span>
@@ -233,7 +233,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
 
       {/* 模型选择对话框 */}
       <Dialog open={isModelDialogOpen} onOpenChange={handleDialogOpenChange}>
-        <DialogContent className="model-dialog-content">
+        <DialogContent className="model-dialog-content dark:bg-background dark:border-input dark:text-foreground">
           <DialogHeader>
             <DialogTitle>
               {editingModel ? '编辑模型' : 

@@ -156,6 +156,11 @@
   background-color: #f9fafb;
 }
 
+/* 暗色模式消息输入容器 */
+.dark .message-input-container {
+  background-color: hsl(222.2 84% 4.9%);
+}
+
 /* 输入区域样式 */
 .input-area {
   position: relative;
@@ -167,6 +172,13 @@
   border: 1px solid #e5e7eb;
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* 暗色模式输入区域 */
+.dark .input-area {
+  background-color: hsl(222.2 84% 4.9%);
+  border-color: hsl(217.2 32.6% 17.5%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* 隐藏的文本区域用于计算高度 */
@@ -207,10 +219,19 @@
   max-height: 250px !important; /* 增加最大高度 */
 }
 
+/* 暗色模式文本输入框样式 */
+.dark .text-input {
+  color: #fff !important;
+}
+
 /* 输入框占位符文本样式 */
 .text-input::placeholder {
   color: #9ca3af !important;
   opacity: 0.8 !important;
+}
+
+.dark .text-input::placeholder {
+  color: #6b7280 !important;
 }
 
 /* 输入框聚焦时样式 */
@@ -248,8 +269,7 @@
 .button-container {
   display: flex;
   align-items: center;
-  padding-right: 0.75rem;
-  padding-bottom: 0.75rem;
+  padding: 0.5rem;
 }
 
 /* 发送按钮样式 */
@@ -261,24 +281,71 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  color: #4b5563;
   background-color: transparent;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* 发送按钮悬停效果 */
+/* 暗色模式按钮颜色 */
+.dark .send-button,
+.dark .stop-button {
+  color: #d1d5db;
+}
+
 .send-button:hover,
 .stop-button:hover {
-  background-color: #f3f4f6;
+  background-color: rgba(0, 0, 0, 0.05);
   color: #2563eb;
-  transform: scale(1.05);
 }
 
-/* 发送按钮禁用效果 */
+.dark .send-button:hover,
+.dark .stop-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #60a5fa;
+}
+
+/* 禁用状态按钮样式 */
 .send-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* 用户消息样式 - 暗色模式 */
+.dark .chat-window .user-message .message-content {
+  background-color: #1e3a8a;
+  color: #fff;
+}
+
+/* AI助手消息样式 - 暗色模式 */
+.dark .chat-window .assistant-message .message-content {
+  background-color: #374151;
+  color: #fff;
+}
+
+/* 头像样式 - 暗色模式 */
+.dark .chat-window .avatar-content {
+  background-color: #3b82f6;
+}
+
+/* 用户头像样式 - 暗色模式 */
+.dark .chat-window .avatar-content.user {
+  background-color: #4b5563;
+}
+
+/* 消息文本样式 - 暗色模式 */
+.dark .chat-window .message-text {
+  color: #fff;
+}
+
+/* 时间戳样式 - 暗色模式 */
+.dark .chat-window .message-timestamp {
+  color: #d1d5db;
+}
+
+/* 正在输入提示样式 - 暗色模式 */
+.dark .chat-window .typing-indicator {
+  color: #d1d5db;
 }
 
 /* 消息结束标记 */

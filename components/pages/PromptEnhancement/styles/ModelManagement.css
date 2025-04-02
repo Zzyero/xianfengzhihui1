@@ -46,6 +46,23 @@
   border-color: #94a3b8;
 }
 
+/* 暗色模式下的模型项样式 */
+.dark .model-item {
+  border-color: hsl(217.2 32.6% 17.5%);
+  background-color: hsl(222.2 84% 4.9%);
+  color: hsl(210 40% 98%);
+}
+
+.dark .model-item:hover {
+  background-color: hsl(217.2 32.6% 17.5%);
+  border-color: hsl(215.4 16.3% 56.9%);
+}
+
+.dark .model-item.selected {
+  background-color: hsl(217.2 32.6% 17.5%);
+  border-color: hsl(215.4 16.3% 56.9%);
+}
+
 /* 删除按钮和编辑按钮 */
 .delete-button,
 .edit-button {
@@ -70,6 +87,11 @@
   border-top: 1px dashed #e5e7eb;
   font-size: 0.875rem;
   color: #6b7280;
+}
+
+.dark .model-details {
+  border-top: 1px dashed hsl(217.2 32.6% 17.5%);
+  color: hsl(215.4 16.3% 76.9%);
 }
 
 .model-details p {
@@ -152,54 +174,39 @@
                  0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* 深色主题 */
-@media (prefers-color-scheme: dark) {
-  .model-management {
-    --primary-color: #3b82f6;
-    --primary-color-alpha: rgba(59, 130, 246, 0.2);
-    --error-color: #ef4444;
-    --text-primary: #f9fafb;
-    --text-secondary: #9ca3af;
-    --border-color: #374151;
-    --hover-border-color: #4b5563;
-    --background: #1f2937;
-    --hover-background: #374151;
-    --selected-background: #1e3a8a;
-    --model-dialog-background: #1f2937;
-    --input-background: #111827;
-    --input-border-color: #4b5563;
-    --label-color: #e5e7eb;
-    --icon-color: #9ca3af;
-  }
-  
-  .model-item {
-    border-color: #374151;
-  }
-  
-  .model-item:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: #4b5563;
-  }
-  
-  .model-item.selected {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: #64748b;
-  }
-  
-  .model-details {
-    border-color: #374151;
-    color: #9ca3af;
-  }
-  
-  .error {
-    border-color: #ef4444 !important;
-  }
-  
-  .error-message {
-    color: #f87171;
-  }
-  
-  .edit-button:hover {
-    color: #38bdf8;
-  }
+/* 深色主题 - 使用.dark类选择器 */
+.dark .model-management {
+  --primary-color: #3b82f6;
+  --primary-color-alpha: rgba(59, 130, 246, 0.2);
+  --error-color: #ef4444;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --border-color: #374151;
+  --hover-border-color: #4b5563;
+  --background: #1f2937;
+  --hover-background: #374151;
+  --selected-background: #1e3a8a;
+  --model-dialog-background: #1f2937;
+  --input-background: #111827;
+  --input-border-color: #4b5563;
+  --label-color: #e5e7eb;
+  --icon-color: #9ca3af;
+}
+
+.dark .error {
+  border-color: #ef4444 !important;
+}
+
+.dark .error-message {
+  color: #f87171;
+}
+
+.dark .edit-button:hover {
+  color: #38bdf8;
+}
+
+/* 本地模型服务控制区域暗色样式 */
+.dark .mb-4.p-4.bg-gray-50.rounded-md {
+  background-color: hsl(222.2 84% 4.9%);
+  border: 1px solid hsl(217.2 32.6% 17.5%);
 } 

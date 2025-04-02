@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { cn } from "@/lib/utils";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { IViewComfyWorkflow } from "@/app/providers/view-comfy-provider";
 
@@ -25,27 +25,35 @@ export function PreviewOutputsImageGallery({
         (viewComfyJSON.previewImages && viewComfyJSON.previewImages[2]) ? viewComfyJSON.previewImages[2] : null
     );
 
+    // 添加 useEffect 钩子来监听 viewComfyJSON 的变化
+    useEffect(() => {
+        // 当 viewComfyJSON 变化时，更新图片状态
+        setImage1((viewComfyJSON.previewImages && viewComfyJSON.previewImages[0]) ? viewComfyJSON.previewImages[0] : null);
+        setImage2((viewComfyJSON.previewImages && viewComfyJSON.previewImages[1]) ? viewComfyJSON.previewImages[1] : null);
+        setImage3((viewComfyJSON.previewImages && viewComfyJSON.previewImages[2]) ? viewComfyJSON.previewImages[2] : null);
+    }, [viewComfyJSON]); // 依赖项包含 viewComfyJSON，当它变化时执行 effect
+
     // 定义第一张图片的动画变体
     const first = {
         initial: {
-            x: 20,
-            rotate: -5,
+            //x: 20,
+            //rotate: -5,
         },
         hover: {
-            x: 0,
-            rotate: 0,
+            //x: 0,
+            //rotate: 0,
         },
     };
 
     // 定义第二张图片的动画变体
     const second = {
         initial: {
-            x: -20,
-            rotate: 5,
+            //x: -20,
+            //rotate: 5,
         },
         hover: {
-            x: 0,
-            rotate: 0,
+            //x: 0,
+            // rotate: 0,
         },
     };
 

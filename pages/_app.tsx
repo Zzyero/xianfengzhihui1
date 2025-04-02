@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app';
 import { ThemeProvider } from '@/components/theme-provider';
 import { TopNav } from '@/components/top-nav';
 import '@/styles.css';
+import '@/app/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

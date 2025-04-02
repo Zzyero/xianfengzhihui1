@@ -9,10 +9,12 @@ export interface IViewComfyBase {
     previewImages: string[];
     inputs: IMultiValueInput[];
     advancedInputs: IMultiValueInput[];
+    type?: 'image_generation' | 'smart_ps';
 }
 
 // 视图模式草稿接口
 export interface IViewComfyDraft {
+    type?: 'image_generation' | 'smart_ps';
     viewComfyJSON: IViewComfyBase;
     workflowApiJSON?: object | undefined;
     file?: File | undefined;
@@ -33,9 +35,24 @@ export interface IViewComfyJSON {
 
 // ViewComfy 配置接口
 export interface IViewComfy {
+    type?: 'image_generation' | 'smart_ps';
     viewComfyJSON: IViewComfyWorkflow;
     workflowApiJSON?: object | undefined;
     file?: File | undefined;
+}
+
+// 生成输出接口
+export interface IGenerationOutput {
+    type: string;
+    data: string; // Base64 编码的数据
+    animated: boolean; // 是否已经播放过动画
+}
+
+// 生成结果接口
+export interface IGenerationResult {
+    outputs: IGenerationOutput[];
+    timestamp: number; // 用于排序
+    pageType: 'image_generation' | 'smart_ps'; // 标记生成结果属于哪个页面
 }
 
 // 视图模式状态接口
@@ -43,6 +60,10 @@ export interface IViewComfyState {
     viewComfys: IViewComfy[];
     viewComfyDraft: IViewComfyDraft | undefined;
     currentViewComfy: IViewComfy | undefined;
+    // 添加生成历史状态
+    generationResults: {
+        [key: string]: IGenerationResult;
+    };
 }
 
 // 定义 Action 类型
@@ -53,7 +74,11 @@ export enum ActionType {
     SET_VIEW_COMFY_DRAFT = "SET_VIEW_COMFY_DRAFT",
     UPDATE_CURRENT_VIEW_COMFY = "UPDATE_CURRENT_VIEW_COMFY",
     RESET_CURRENT_AND_DRAFT_VIEW_COMFY = "RESET_CURRENT_AND_DRAFT_VIEW_COMFY",
-    INIT_VIEW_COMFY = "INIT_VIEW_COMFY"
+    INIT_VIEW_COMFY = "INIT_VIEW_COMFY",
+    // 添加生成历史相关操作
+    ADD_GENERATION_RESULT = "ADD_GENERATION_RESULT",
+    CLEAR_GENERATION_RESULTS = "CLEAR_GENERATION_RESULTS",
+    SET_RESULT_ANIMATED = "SET_RESULT_ANIMATED"
 }
 
 // 更新 Action 类型以使用枚举
@@ -65,6 +90,17 @@ export type Action =
     | { type: ActionType.UPDATE_CURRENT_VIEW_COMFY; payload: IViewComfy }
     | { type: ActionType.RESET_CURRENT_AND_DRAFT_VIEW_COMFY; payload: undefined }
     | { type: ActionType.INIT_VIEW_COMFY; payload: IViewComfyJSON }
+    // 添加生成历史相关操作
+    | { 
+        type: ActionType.ADD_GENERATION_RESULT; 
+        payload: { 
+            id: string, 
+            outputs: { type: string, data: string }[],
+            pageType: 'image_generation' | 'smart_ps'
+        } 
+    }
+    | { type: ActionType.CLEAR_GENERATION_RESULTS; payload: { pageType: 'image_generation' | 'smart_ps' } }
+    | { type: ActionType.SET_RESULT_ANIMATED; payload: { id: string, index: number } };
 
 // 状态处理器
 function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfyState {
@@ -76,11 +112,13 @@ function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfySta
                 ...state,
                 viewComfys: [...state.viewComfys, { ...action.payload }],
                 currentViewComfy: {
+                    type: action.payload.type,
                     viewComfyJSON: action.payload.viewComfyJSON,
                     workflowApiJSON: action.payload.workflowApiJSON,
                     file: action.payload.file
                 },
                 viewComfyDraft: {
+                    type: action.payload.type,
                     viewComfyJSON: action.payload.viewComfyJSON,
                     workflowApiJSON: action.payload.workflowApiJSON,
                     file: action.payload.file
@@ -103,11 +141,13 @@ function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfySta
                         : item
                 ),
                 currentViewComfy: {
+                    type: action.payload.viewComfy.type,
                     viewComfyJSON: action.payload.viewComfy.viewComfyJSON,
                     workflowApiJSON: action.payload.viewComfy.workflowApiJSON,
                     file: action.payload.viewComfy.file
                 },
                 viewComfyDraft: {
+                    type: action.payload.viewComfy.type,
                     viewComfyJSON: action.payload.viewComfy.viewComfyJSON,
                     workflowApiJSON: action.payload.viewComfy.workflowApiJSON,
                     file: action.payload.viewComfy.file
@@ -122,6 +162,7 @@ function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfySta
             if (data.viewComfys.length > 0) {
                 data.currentViewComfy = data.viewComfys[0];
                 data.viewComfyDraft = {
+                    type: data.viewComfys[0].type,
                     viewComfyJSON: data.viewComfys[0].viewComfyJSON,
                     workflowApiJSON: data.viewComfys[0].workflowApiJSON,
                     file: data.viewComfys[0].file
@@ -149,13 +190,80 @@ function viewComfyReducer(state: IViewComfyState, action: Action): IViewComfySta
             if (action.payload.workflows.length === 0) {
                 return state;
             }
+            
+            // 确保每个工作流都有 type 字段
+            const workflows = action.payload.workflows.map(workflow => ({
+                type: workflow.type,
+                viewComfyJSON: workflow.viewComfyJSON,
+                workflowApiJSON: workflow.workflowApiJSON,
+            }));
+            
             return {
-                viewComfys: [...action.payload.workflows.map((workflow) => ({
-                    viewComfyJSON: workflow.viewComfyJSON,
-                    workflowApiJSON: workflow.workflowApiJSON,
-                }))],
-                currentViewComfy: { viewComfyJSON: action.payload.workflows[0].viewComfyJSON, workflowApiJSON: action.payload.workflows[0].workflowApiJSON },
-                viewComfyDraft: { viewComfyJSON: action.payload.workflows[0].viewComfyJSON, workflowApiJSON: action.payload.workflows[0].workflowApiJSON },
+                ...state,
+                viewComfys: workflows,
+                currentViewComfy: workflows.length > 0 ? workflows[0] : undefined,
+                viewComfyDraft: workflows.length > 0 ? {
+                    type: workflows[0].type,
+                    viewComfyJSON: workflows[0].viewComfyJSON,
+                    workflowApiJSON: workflows[0].workflowApiJSON
+                } : undefined,
+            };
+        }
+        case ActionType.ADD_GENERATION_RESULT: {
+            const { id, outputs, pageType } = action.payload;
+            return {
+                ...state,
+                generationResults: {
+                    ...state.generationResults,
+                    [id]: {
+                        outputs: outputs.map(output => ({
+                            ...output,
+                            animated: false
+                        })),
+                        timestamp: Date.now(),
+                        pageType
+                    }
+                }
+            };
+        }
+        
+        case ActionType.CLEAR_GENERATION_RESULTS: {
+            const { pageType } = action.payload;
+            // 只清除特定页面类型的结果
+            const filteredResults = Object.entries(state.generationResults)
+                .filter(([_, result]) => result.pageType !== pageType)
+                .reduce((acc, [key, value]) => {
+                    acc[key] = value;
+                    return acc;
+                }, {} as typeof state.generationResults);
+                
+            return {
+                ...state,
+                generationResults: filteredResults
+            };
+        }
+        
+        case ActionType.SET_RESULT_ANIMATED: {
+            const { id, index } = action.payload;
+            if (!state.generationResults[id]) return state;
+            
+            const updatedOutputs = [...state.generationResults[id].outputs];
+            if (updatedOutputs[index]) {
+                updatedOutputs[index] = {
+                    ...updatedOutputs[index],
+                    animated: true
+                };
+            }
+            
+            return {
+                ...state,
+                generationResults: {
+                    ...state.generationResults,
+                    [id]: {
+                        ...state.generationResults[id],
+                        outputs: updatedOutputs
+                    }
+                }
             };
         }
         default:
@@ -173,7 +281,12 @@ const ViewComfyContext = createContext<ViewComfyContextType | undefined>(undefin
 
 export function ViewComfyProvider({ children }: { children: ReactNode }) {
     // 使用 Reducer 创建状态和分派器
-    const [viewComfyState, dispatch] = useReducer(viewComfyReducer, { viewComfys: [], viewComfyDraft: undefined, currentViewComfy: undefined });
+    const [viewComfyState, dispatch] = useReducer(viewComfyReducer, { 
+        viewComfys: [], 
+        viewComfyDraft: undefined, 
+        currentViewComfy: undefined,
+        generationResults: {} // 初始化生成历史状态
+    });
 
     return (
         <ViewComfyContext.Provider value={{ viewComfyState, viewComfyStateDispatcher: dispatch }}>
