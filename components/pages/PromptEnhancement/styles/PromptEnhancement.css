@@ -406,7 +406,6 @@
 .message-input-container {
   border-top: 1px solid var(--border);
   background-color: var(--background);
-  padding: 0.5rem 1rem;
   width: 100%;
 }
 
@@ -495,9 +494,9 @@ textarea {
   border-color: hsl(217.2 32.6% 17.5%);
 }
 
-/* 底部模型选择区域 */
+/* 模型选择区域 */
 .model-selector-container button {
-  background-color: var(--background);
+  background-color: #f9fafb;
   color: var(--foreground);
   border: 1px solid var(--border);
 }

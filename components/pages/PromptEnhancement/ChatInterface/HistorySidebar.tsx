@@ -114,6 +114,7 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
     }
   };
 
+
   /**
    * 处理会话标题编辑
    * @param e 事件对象
@@ -121,23 +122,18 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
    */
   const handleEditSession = (e: React.MouseEvent, session: ChatSession) => {
     e.stopPropagation(); // 阻止事件冒泡
-    
-    // 如果当前正在编辑这个会话，则保存编辑
-    if (editingSessionId === session.id) {
-      handleSaveEdit(session);
-    } else {
-      // 否则开始编辑
-      setEditingSessionId(session.id);
-      setEditedTitle(session.title);
-    }
+    e.preventDefault(); // 防止默认行为
+    setEditingSessionId(session.id);
+    setEditedTitle(session.title);
   };
 
   /**
    * 保存编辑的会话标题
    */
-  const handleSaveEdit = async (session: ChatSession) => {
+  const handleSaveEdit = async (e: React.MouseEvent| React.KeyboardEvent, session: ChatSession) => {
+    e.stopPropagation(); // 阻止事件冒泡
+    e.preventDefault(); // 防止默认行为
     if (!editedTitle.trim()) {
-      // 如果标题为空，恢复原标题
       setEditingSessionId(null);
       return;
     }
@@ -149,6 +145,9 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
         title: editedTitle.trim()
       };
       
+      // 立即重置编辑状态，避免后续操作中的干扰
+      setEditingSessionId(null);
+      
       // 保存到数据库
       await db.saveSession(updatedSession);
       
@@ -157,14 +156,10 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
         prev.map(s => s.id === session.id ? {...s, title: editedTitle.trim()} : s)
       );
       
-      // 结束编辑模式
-      setEditingSessionId(null);
       toast.success('会话标题已更新');
     } catch (error) {
       console.error('更新会话标题失败:', error);
       toast.error('更新会话标题失败');
-      // 即使失败也退出编辑模式
-      setEditingSessionId(null);
     }
   };
 
@@ -251,13 +246,12 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
                             onClick={(e) => e.stopPropagation()}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
-                                handleSaveEdit(session);
+                                handleSaveEdit(e, session);
                               } else if (e.key === 'Escape') {
                                 setEditingSessionId(null);
                               }
                             }}
                             autoFocus
-                            onBlur={() => handleSaveEdit(session)}
                           />
                         ) : (
                           <span>{session.title}</span>
@@ -276,30 +270,38 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
                         </Button>
                         
                         {/* 编辑按钮 */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="edit-button"
-                          onClick={(e) => handleEditSession(e, session)}
-                        >
-                          {editingSessionId === session.id ? (
-                            <Save className="h-3 w-3" />
-                          ) : (
-                            <Edit className="h-3 w-3" />
-                          )}
-                        </Button>
-                        
-                        {/* 删除按钮 - 当前活动会话不显示删除按钮 */}
-                        {session.id !== activeSessionId && (
+                        {editingSessionId === session.id ? (
+                          // 保存按钮
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="delete-button"
-                            onClick={(e) => handleDeleteSession(e, session.id)}
+                            className="edit-button"
+                            onClick={(e) => handleSaveEdit(e, session)}
                           >
-                            <Trash className="h-3 w-3" />
+                            <Save className="h-3 w-3" />
+                          </Button>
+                        ) : (
+                          // 编辑按钮
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="edit-button"
+                            onClick={(e) => handleEditSession(e, session)}
+                          >
+                            <Edit className="h-3 w-3" />
                           </Button>
                         )}
+                        
+                        {/* 删除按钮 */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="delete-button"
+                          disabled={session.id === activeSessionId}
+                          onClick={(e) => handleDeleteSession(e, session.id)}
+                        >
+                          <Trash className="h-3 w-3" />
+                        </Button>
                       </div>
                     </div>
                     <div className="session-info">
