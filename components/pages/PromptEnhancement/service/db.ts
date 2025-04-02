@@ -538,14 +538,13 @@ const db = {
     try {
       const models = await this.getAllModels();
       if (models.length === 0) {
-        // 添加默认的OpenAI GPT-3.5模型
+        // 添加默认模型
         const defaultModel: Model = {
-          id: 'api-' + Date.now(),
-          name: 'OpenAI GPT-3.5',
-          type: 'api',
-          url: 'https://api.openai.com/v1',
+          id: `${Date.now()}`,
+          name: 'Your Model',
+          url: 'Your Model Url',
           apiKey: '',
-          apiId: 'gpt-3.5-turbo',
+          apiId: 'Your Model Id',
           parameters: '{"temperature":0.7,"max_tokens":2000}',
           timestamp: new Date()
         };

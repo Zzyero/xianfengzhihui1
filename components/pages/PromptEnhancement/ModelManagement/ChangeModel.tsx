@@ -8,7 +8,7 @@ import EditModel from "./EditModel";
 import { Trash, Edit } from "lucide-react";
 import "../styles/ModelManagement.css";
 import db, { Model } from "../service/db";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 
 /**
  * 模型选择按钮组件属性接口
@@ -30,17 +30,15 @@ interface ChangeModelProps {
 const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedModel }): JSX.Element => {
   // ===== 状态管理 =====
   const [isModelDialogOpen, setIsModelDialogOpen] = useState<boolean>(false);  // 模型选择对话框状态
-  const [showAddApiModel, setShowAddApiModel] = useState<boolean>(false);      // 添加模型面板显示状态
+  const [showAddModel, setShowAddModel] = useState<boolean>(false);      // 添加模型面板显示状态
   const [editingModel, setEditingModel] = useState<Model | null>(null);        // 正在编辑的模型
   const [apiModels, setApiModels] = useState<Model[]>([]);                     // 模型列表
-  const [isLoading, setIsLoading] = useState<boolean>(true);                   // 加载状态
   const [selectedModelName, setSelectedModelName] = useState<string>("");      // 当前选中模型名称
 
   /**
    * 加载模型数据
    */
   const loadModels = async () => {
-    setIsLoading(true);
     try {
       // 初始化默认模型（如果数据库为空）
       await db.initDefaultModels();
@@ -66,8 +64,6 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       console.error('加载模型失败:', error);
       toast.error('加载模型配置失败');
       setSelectedModelName("加载失败");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -92,6 +88,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
     if (model) {
       // 更新选中模型
       setSelectedModel(modelId);
+      toast.success(`选中模型：${model.name}`)
       // 关闭对话框
       setIsModelDialogOpen(false);
     } else {
@@ -103,7 +100,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
    * 处理添加模型
    * @param model 新模型数据
    */
-  const handleAddApiModel = async (model: Omit<Model, 'id' | 'timestamp'> & { id?: string }) => {
+  const handleAddModel = async (model: Omit<Model, 'id' | 'timestamp'> & { id?: string }) => {
     try {
       // 如果是编辑模式，保留原有ID
       const isEditing = !!editingModel;
@@ -127,7 +124,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       toast.success(isEditing ? '模型更新成功' : '模型添加成功');
       
       // 重置编辑状态
-      setShowAddApiModel(false);
+      setShowAddModel(false);
       setEditingModel(null);
     } catch (error) {
       console.error(editingModel ? '更新模型失败:' : '添加模型失败:', error);
@@ -154,7 +151,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       
       // 设置编辑模式
       setEditingModel(model);
-      setShowAddApiModel(true);
+      setShowAddModel(true);
     } catch (error) {
       console.error('编辑模型失败:', error);
       toast.error('编辑模型失败');
@@ -202,25 +199,23 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
     setIsModelDialogOpen(open);
     if (!open) {
       setEditingModel(null);
-      setShowAddApiModel(false);
+      setShowAddModel(false);
     }
   };
 
   // 取消添加/编辑模型
   const handleCancelApiModelEdit = () => {
-    setShowAddApiModel(false);
+    setShowAddModel(false);
     setEditingModel(null);
   };
 
   // 处理添加模型按钮点击
-  const handleAddApiModelClick = () => {
-    setShowAddApiModel(true);
+  const handleAddModelClick = () => {
+    setShowAddModel(true);
   };
 
   return (
     <div className="model-management">
-      <Toaster position="top-center" richColors />
-      
       {/* 模型选择按钮 */}
       <Button
         variant="outline"
@@ -237,19 +232,19 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
           <DialogHeader>
             <DialogTitle>
               {editingModel ? '编辑模型' : 
-               showAddApiModel ? '添加模型' : 
+               showAddModel ? '添加模型' : 
                '选择模型'}
             </DialogTitle>
-            {!showAddApiModel && (
+            {!showAddModel && (
               <DialogDescription>
                 选择一个模型来处理您的请求。模型接口为OpenAI格式。
               </DialogDescription>
             )}
           </DialogHeader>
 
-          {showAddApiModel ? (
+          {showAddModel ? (
             <EditModel
-              onAdd={handleAddApiModel}
+              onAdd={handleAddModel}
               onCancel={handleCancelApiModelEdit}
               initialData={editingModel || undefined}
             />
@@ -304,7 +299,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
                   ))}
                 </RadioGroup>
               )}
-              <Button variant="secondary" className="w-full" onClick={handleAddApiModelClick}>
+              <Button variant="secondary" className="w-full" onClick={handleAddModelClick}>
                 添加模型
               </Button>
             </div>

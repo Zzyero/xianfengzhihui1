@@ -93,7 +93,6 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
     
     if (validateForm()) {
       onAdd({
-        type: 'api', // 固定为API模型类型
         name: formData.name,
         apiId: formData.apiId,
         url: formData.url,

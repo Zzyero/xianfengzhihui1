@@ -394,6 +394,7 @@
   display: flex;
   justify-content: left;
   flex: 1;
+  gap: 0.5rem;
 }
 
 .control-actions {

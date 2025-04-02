@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Trash2, Trash, MoreHorizontal, Edit } from "lucide-react";
+import { PlusCircle, Trash, MoreHorizontal, Edit } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 // 导入数据库工具类和模板接口
@@ -327,7 +327,6 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
 
   return (
     <>
-      <Toaster position="top-center" />
       <div className="template-bar" ref={containerRef}>
         {isLoading ? (
           <div className="loading-templates">加载模板中...</div>

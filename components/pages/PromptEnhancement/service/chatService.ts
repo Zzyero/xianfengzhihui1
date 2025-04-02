@@ -1,0 +1,366 @@
+import db, { Message, ChatSession, Model } from "./db";
+import OpenAI from 'openai';
+
+/**
+ * 聊天回调接口
+ */
+export interface ChatCallbacks {
+  // 用户消息保存后回调
+  onUserMessageSaved?: (message: Message) => void;
+  // AI回复开始生成回调
+  onStart?: () => void;
+  // AI回复内容更新回调
+  onUpdate?: (content: string, messageId: string, sessionId: string) => void;
+  // AI回复完成回调
+  onComplete?: (message: Message) => void;
+  // 会话更新回调
+  onSessionUpdated?: () => void;
+  // 错误回调
+  onError?: (error: Error) => void;
+}
+
+/**
+ * 聊天服务类
+ */
+class ChatService {
+  // 全局单例控制器，用于取消请求
+  private static abortController: AbortController | null = null;
+  
+  /**
+   * 发送消息并获取AI响应
+   * @param content 消息内容
+   * @param sessionId 会话ID
+   * @param modelId 模型ID
+   * @param callbacks 回调函数
+   * @param customPrompt 自定义提示词
+   * @param disableHistory 是否禁用历史记录
+   */
+  static async sendMessage(
+    content: string,
+    sessionId: string | undefined,
+    modelId: string,
+    callbacks: ChatCallbacks = {},
+    customPrompt?: string,
+    disableHistory: boolean = false
+  ): Promise<void> {
+    try {
+      // 处理会话ID - 如果不存在或是临时ID则创建新会话
+      let currentSessionId = sessionId;
+      if (!currentSessionId || currentSessionId.startsWith('temp_')) {
+        currentSessionId = await this.createNewSession(content);
+        if (!currentSessionId) {
+          throw new Error('创建会话失败');
+        }
+      }
+
+      // 创建用户消息
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        sessionId: currentSessionId,
+        role: 'user',
+        content,
+        timestamp: new Date()
+      };
+
+      // 保存用户消息到数据库
+      await db.addMessage(userMessage);
+      callbacks.onUserMessageSaved?.(userMessage);
+      
+      // 更新会话信息
+      await this.updateSessionInfo(currentSessionId, content);
+      callbacks.onSessionUpdated?.();
+
+      // 获取模型
+      const model = await db.getModel(modelId);
+      if (!model) {
+        throw new Error('找不到所选模型，请检查模型配置');
+      }
+
+      // AI消息ID
+      const aiMessageId = (Date.now() + 1).toString();
+      
+      // 如果有正在进行的请求，先中断它
+      this.abortRequest();
+      
+      // 创建新的控制器
+      this.abortController = new AbortController();
+      console.log('已创建新的请求控制器');
+      
+      // 获取会话消息
+      let historyMessages: Message[] = [];
+      
+      if (disableHistory) {
+        // 禁用历史记录时，只使用当前用户消息
+        historyMessages = [userMessage];
+      } else {
+        // 否则获取完整的历史记录
+        historyMessages = await db.getMessagesBySession(currentSessionId);
+      }
+      
+      // 调用AI接口
+      await this.callModel({
+        model,
+        messages: historyMessages,
+        callbacks: {
+          onStart: callbacks.onStart,
+          onUpdate: (content) => {
+            callbacks.onUpdate?.(content, aiMessageId, currentSessionId);
+          },
+          onComplete: async (fullContent) => {
+            // 保存AI消息
+            const aiMessage: Message = {
+              id: aiMessageId,
+              sessionId: currentSessionId!,
+              role: 'assistant',
+              content: fullContent,
+              timestamp: new Date()
+            };
+            
+            await db.addMessage(aiMessage);
+            await this.updateSessionInfo(currentSessionId!, fullContent);
+            
+            callbacks.onComplete?.(aiMessage);
+            callbacks.onSessionUpdated?.();
+            
+            // 清理控制器
+            this.abortController = null;
+          },
+          onError: (error) => {
+            callbacks.onError?.(error);
+            this.abortController = null;
+          }
+        },
+        signal: this.abortController.signal,
+        customPrompt
+      });
+    } catch (error: any) {
+      callbacks.onError?.(new Error(error.message || '发送消息失败'));
+    }
+  }
+
+  /**
+   * 调用AI模型
+   */
+  private static async callModel(options: {
+    model: Model;
+    messages: Message[];
+    callbacks: {
+      onStart?: () => void;
+      onUpdate?: (content: string) => void;
+      onComplete?: (fullContent: string) => void;
+      onError?: (error: Error) => void;
+    };
+    signal?: AbortSignal;
+    customPrompt?: string;
+  }): Promise<void> {
+    const { model, messages, callbacks, signal, customPrompt } = options;
+
+    try {
+      callbacks.onStart?.();
+
+      // 创建OpenAI客户端
+      const openai = new OpenAI({
+        apiKey: model.apiKey || '',
+        dangerouslyAllowBrowser: true,
+        baseURL: model.url || undefined
+      });
+
+      // 转换消息格式
+      const apiMessages = messages.map(msg => ({
+        role: msg.role as any,
+        content: msg.content
+      }));
+
+      // 处理自定义提示词
+      if (customPrompt && customPrompt.trim()) {
+        const hasSystemMessage = apiMessages.some(msg => msg.role === 'system');
+        
+        if (hasSystemMessage) {
+          // 更新现有的系统消息
+          for (let i = 0; i < apiMessages.length; i++) {
+            if (apiMessages[i].role === 'system') {
+              apiMessages[i].content = customPrompt;
+              break;
+            }
+          }
+        } else {
+          // 添加新的系统消息
+          apiMessages.unshift({
+            role: 'system',
+            content: customPrompt
+          });
+        }
+      } else {
+        // 移除所有system消息
+        const filteredMessages = apiMessages.filter(msg => msg.role !== 'system');
+        apiMessages.length = 0;
+        apiMessages.push(...filteredMessages);
+      }
+
+      // 设置API参数
+      const apiModelId = model.apiId || '';
+      let temperature = 0.7;
+      let max_tokens = 2000;
+      let stream = true;
+
+      // 解析自定义参数
+      if (model.parameters) {
+        try {
+          const params = JSON.parse(model.parameters);
+          if (params.temperature !== undefined) temperature = params.temperature;
+          if (params.max_tokens !== undefined) max_tokens = params.max_tokens;
+          if (params.stream !== undefined) stream = params.stream;
+        } catch (e) {
+          console.error('解析自定义参数失败:', e);
+        }
+      }
+
+      let fullContent = '';
+      // 传递中断信号到API请求
+      const requestOptions = signal ? { signal } : {};
+
+      // 使用流式响应
+      if (stream) {
+        const stream = await openai.chat.completions.create({
+          model: apiModelId, 
+          messages: apiMessages,
+          temperature,
+          max_tokens,
+          stream: true
+        }, requestOptions);
+
+        for await (const chunk of stream) {
+          const content = chunk.choices[0]?.delta?.content || '';
+          fullContent += content;
+          callbacks.onUpdate?.(fullContent);
+        }
+
+        callbacks.onComplete?.(fullContent);
+      } else {
+        // 非流式响应
+        const completion = await openai.chat.completions.create({
+          model: apiModelId,
+          messages: apiMessages,
+          temperature,
+          max_tokens,
+          stream: false
+        });
+
+        fullContent = completion.choices[0].message.content || '';
+        callbacks.onComplete?.(fullContent);
+      }
+    } catch (error: any) {
+      // 处理API错误
+      console.error('API调用失败:', error);
+      const errorMsg = error.status 
+        ? `API调用失败(${error.status}): ${error.message || '未知错误'}`
+        : `API调用失败: ${error.message || '未知错误'}`;
+      callbacks.onError?.(new Error(errorMsg));
+    }
+  }
+  
+  /**
+   * 中断当前请求
+   */
+  static abortRequest(): void {
+    if (this.abortController) {
+      console.log('执行中断请求操作');
+      this.abortController.abort();
+      this.abortController = null;
+      console.log('已中止AI生成请求');
+    } else {
+      console.log('无法中断请求：没有活动的控制器');
+    }
+  }
+
+  /**
+   * 创建新会话
+   */
+  static async createNewSession(firstMessage?: string, title?: string): Promise<string | undefined> {
+    try {
+      // 生成会话标题
+      let sessionTitle = '新对话';
+      if (title) {
+        sessionTitle = title;
+      } else if (firstMessage) {
+        sessionTitle = firstMessage.length > 15 
+          ? `${firstMessage.substring(0, 15)}...` 
+          : firstMessage;
+      }
+
+      const newSession: ChatSession = {
+        id: Date.now().toString(),
+        title: sessionTitle,
+        lastMessage: firstMessage || '',
+        timestamp: new Date(),
+        messageCount: firstMessage ? 1 : 0
+      };
+
+      await db.saveSession(newSession);
+      db.saveLastUsedSessionId(newSession.id);
+      return newSession.id;
+    } catch (error) {
+      console.error('创建会话失败:', error);
+      throw new Error('创建新对话失败');
+    }
+  }
+
+  /**
+   * 更新会话信息
+   */
+  static async updateSessionInfo(sessionId: string, lastMessage: string): Promise<void> {
+    try {
+      const session = await db.getSession(sessionId);
+      if (!session) return;
+
+      const updatedSession: ChatSession = {
+        ...session,
+        lastMessage,
+        timestamp: new Date(),
+        messageCount: session.messageCount + 1
+      };
+
+      await db.saveSession(updatedSession);
+    } catch (error) {
+      console.error('更新会话信息失败:', error);
+    }
+  }
+
+  /**
+   * 加载会话消息
+   */
+  static async loadSessionMessages(sessionId: string): Promise<Message[]> {
+    try {
+      return await db.getMessagesBySession(sessionId);
+    } catch (error) {
+      console.error('加载消息失败:', error);
+      throw new Error('加载消息失败');
+    }
+  }
+
+  /**
+   * 加载所有会话
+   */
+  static async loadSessions(): Promise<ChatSession[]> {
+    try {
+      return await db.getAllSessions();
+    } catch (error) {
+      console.error('加载会话失败:', error);
+      throw new Error('加载会话列表失败');
+    }
+  }
+
+  /**
+   * 删除会话及其所有消息
+   */
+  static async deleteSession(sessionId: string): Promise<void> {
+    try {
+      await db.deleteSession(sessionId);
+    } catch (error) {
+      console.error('删除会话失败:', error);
+      throw new Error('删除会话失败');
+    }
+  }
+}
+
+export default ChatService; 

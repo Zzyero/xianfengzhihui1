@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import '../styles/ChatInterface.css';
 import { Message, ChatSession } from '../service/db';
-import { Toaster } from "sonner";
 import MessageDisplay from './MessageDisplay';
 import HistorySidebar from './HistorySidebar';
 
@@ -108,8 +107,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   return (
     <div className="chat-window">
-      {/* 消息通知组件 */}
-      <Toaster position="top-center" />
       <div 
         className={cn(
           "message-list",

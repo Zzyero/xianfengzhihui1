@@ -12,6 +12,7 @@ import MessageInput from './ChatInterface/MessageInput';
 import ExportData from './service/DataTransfer';
 import TemplateBar from './TemplateManagement/TemplateBar';
 import ChangeModel from "./ModelManagement/ChangeModel";
+import DisableHistory from "./ModelManagement/DisableHistory";
 import HistorySidebarControl from './ChatInterface/HistorySidebarControl';
 import { Toaster } from "sonner";
 // 导入样式
@@ -37,7 +38,6 @@ const PromptEnhancementInner: React.FC<{ isactive: boolean }> = ({ isactive }) =
 
   return (
     <div className={`prompt-enhancement-container ${isactive ? 'active' : ''}`}>
-      <Toaster position="top-center" />
       <div className="main-content">
         <Card className="chat-card">
           <CardContent className="chat-card-content">
@@ -49,6 +49,7 @@ const PromptEnhancementInner: React.FC<{ isactive: boolean }> = ({ isactive }) =
                   selectedModel={state.selectedModel}
                   setSelectedModel={actions.handleModelChange}
                 />
+                <DisableHistory />
               </div>
 
               {/* 右侧控制按钮 */}
@@ -136,6 +137,9 @@ const PromptEnhancementPage: React.FC<{ isactive: boolean }> = ({ isactive }) =>
     <>
       {/* 内联加载动画 - 只在加载状态显示 */}
       {isLoading && <Loading />}
+      
+      {/* Toast通知器 */}
+      <Toaster position="top-center" />
       
       {/* 主应用内容 */}
       <AppStateProvider>

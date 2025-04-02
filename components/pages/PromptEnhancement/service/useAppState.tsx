@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect, createContext, useContext } from 'react';
-import { Message, Template, ChatSession } from '../service/db';
-import db from '../service/db';
-import MessageService from '../service/messageService';
+import { Message, Template, ChatSession } from './db';
+import db from './db';
+import ChatService from './chatService';
 import { toast } from "sonner";
 
 // 定义应用状态类型
@@ -27,6 +27,9 @@ interface AppState {
   
   // 模型相关
   selectedModel: string;
+  
+  // 历史记录控制
+  isDisableHistory: boolean;
   
   // 应用状态
   isLoading: boolean;
@@ -61,6 +64,9 @@ const AppStateContext = createContext<{
     // 模型操作
     handleModelChange: (modelId: string) => void;
     
+    // 历史记录控制
+    toggleDisableHistory: () => void;
+    
     // 输入操作
     handleInputResize: (height: number) => void;
     
@@ -80,6 +86,7 @@ const AppStateContext = createContext<{
     newTemplate: { id: '', name: '', content: '' },
     inputHeight: 56,
     selectedModel: '',
+    isDisableHistory: false,
     isLoading: true,
     sidebarOpen: false
   },
@@ -108,6 +115,9 @@ const AppStateContext = createContext<{
     // 模型操作
     handleModelChange: () => {},
     
+    // 历史记录控制
+    toggleDisableHistory: () => {},
+    
     // 输入操作
     handleInputResize: () => {},
     
@@ -132,6 +142,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   const [newTemplate, setNewTemplate] = useState<Template>({ id: '', name: '', content: '' });
   const [inputHeight, setInputHeight] = useState<number>(56);
   const [selectedModel, setSelectedModel] = useState<string>('');
+  const [isDisableHistory, setIsDisableHistory] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
@@ -141,7 +152,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
    */
   const loadSessions = async (): Promise<ChatSession[]> => {
     try {
-      const sessions = await MessageService.loadSessions();
+      const sessions = await ChatService.loadSessions();
       setChatSessions(sessions);
       return sessions;
     } catch (error) {
@@ -153,13 +164,10 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
 
   /**
    * 创建新会话
-   * @param title 会话标题，可选
-   * @param firstMessage 首条消息内容，可选
    */
   const createNewSession = async (title?: string, firstMessage?: string): Promise<string | undefined> => {
     try {
-      // 创建临时会话ID，不立即保存到数据库
-      // 只有当用户发送第一条消息时才真正创建会话
+      // 创建临时会话ID
       const tempSessionId = `temp_${Date.now().toString()}`;
       setActiveSessionId(tempSessionId);
       setMessages([]);
@@ -177,7 +185,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   const handleNewChat = async (): Promise<void> => {
     // 如果正在生成，先取消当前的生成
     if (isGenerating && activeSessionId) {
-      MessageService.cancelGeneration(activeSessionId);
+      ChatService.abortRequest();
       setIsGenerating(false);
     }
     
@@ -200,12 +208,11 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
 
   /**
    * 处理会话选择
-   * @param sessionId 会话ID
    */
   const handleSelectSession = async (sessionId: string): Promise<void> => {
     // 如果正在生成，先取消当前的生成
     if (isGenerating && activeSessionId) {
-      MessageService.cancelGeneration(activeSessionId);
+      ChatService.abortRequest();
       setIsGenerating(false);
     }
     
@@ -218,14 +225,27 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
     setCustomPrompt('');
   };
 
+  // ===== 历史记录控制 =====
+  /**
+   * 切换禁用历史记录状态
+   */
+  const toggleDisableHistory = (): void => {
+    const newValue = !isDisableHistory;
+    setIsDisableHistory(newValue);
+    if (newValue) {
+      toast.success('已禁用聊天历史记录，AI 将只看到当前消息');
+    } else {
+      toast.info('已启用聊天历史记录，AI 将看到完整对话');
+    }
+  };
+
   // ===== 消息操作 =====
   /**
    * 加载会话消息
-   * @param sessionId 会话ID
    */
   const loadSessionMessages = async (sessionId: string): Promise<void> => {
     try {
-      const sessionMessages = await MessageService.loadSessionMessages(sessionId);
+      const sessionMessages = await ChatService.loadSessionMessages(sessionId);
       setMessages(sessionMessages);
     } catch (error) {
       console.error('加载消息失败:', error);
@@ -235,38 +255,14 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   
   /**
    * 处理发送消息
-   * @param content 要发送的消息内容
    */
   const handleSendMessage = async (content: string): Promise<void> => {
     // 设置生成状态
     setIsGenerating(true);
 
-    // 检查是否需要创建新会话（对临时会话ID的情况）
-    let currentSessionId = activeSessionId;
-    if (!currentSessionId || currentSessionId.startsWith('temp_')) {
-      try {
-        // 使用用户首次输入的内容作为会话名称
-        const sessionTitle = content.length > 20
-          ? `${content.substring(0, 20)}...`
-          : content;
-        
-        currentSessionId = await MessageService.createNewSession(content, sessionTitle);
-        if (!currentSessionId) {
-          throw new Error('创建会话失败');
-        }
-        setActiveSessionId(currentSessionId);
-      } catch (error) {
-        console.error('创建会话失败:', error);
-        toast.error('创建新对话失败');
-        setIsGenerating(false);
-        return;
-      }
-    }
-
-    // 调用消息服务发送消息
-    MessageService.sendMessage(
+    ChatService.sendMessage(
       content,
-      currentSessionId,
+      activeSessionId,
       selectedModel,
       {
         // 当用户消息保存完成
@@ -281,45 +277,33 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
           });
         },
         // 当AI回复内容更新（流式输出）
-        onAiMessageUpdate: (partialMessage) => {
+        onUpdate: (content, messageId, sessionId) => {
           setMessages(prev => {
             // 检查是否已存在此ID的消息
-            const existingIndex = prev.findIndex(m => m.id === partialMessage.id);
+            const existingIndex = prev.findIndex(m => m.id === messageId);
             
             if (existingIndex >= 0) {
               // 更新现有消息
               const newMessages = [...prev];
               newMessages[existingIndex] = {
                 ...newMessages[existingIndex],
-                content: partialMessage.content
+                content
               };
               return newMessages;
             } else {
-              // 检查是否有相同ID、角色和会话ID的消息（额外的去重检查）
-              const isDuplicate = prev.some(m => 
-                m.id === partialMessage.id || 
-                (m.sessionId === (partialMessage.sessionId || currentSessionId) && 
-                 m.role === 'assistant' && 
-                 m.content === partialMessage.content)
-              );
-              
-              if (isDuplicate) {
-                return prev;
-              }
-              
               // 添加新消息
               return [...prev, {
-                id: partialMessage.id || Date.now().toString(), // 确保ID不为undefined
-                sessionId: partialMessage.sessionId || currentSessionId || '',
+                id: messageId,
+                sessionId: sessionId,
                 role: 'assistant' as const,
-                content: partialMessage.content || '',
+                content: content || '',
                 timestamp: new Date()
               }];
             }
           });
         },
         // 当AI回复完成
-        onAiMessageComplete: () => {
+        onComplete: () => {
           setIsGenerating(false);
         },
         // 当会话更新
@@ -333,8 +317,10 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
           setIsGenerating(false);
         }
       },
-      // 只有当存在激活的模板ID时才传递自定义提示词
-      activeTemplateId ? customPrompt : undefined
+      // 自定义提示词参数
+      activeTemplateId ? customPrompt : undefined,
+      // 是否禁用历史记录
+      isDisableHistory
     ).catch(error => {
       console.error('发送消息失败:', error);
       toast.error('发送消息失败');
@@ -347,8 +333,11 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
    */
   const handleStopGeneration = (): void => {
     if (!activeSessionId) return;
-    MessageService.cancelGeneration(activeSessionId);
+    ChatService.abortRequest();
+    setIsGenerating(false);
+    toast.success('AI生成请求已取消');
   };
+
   // ===== 模板操作 =====
   /**
    * 处理添加模板
@@ -387,7 +376,6 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   
   /**
    * 处理使用模板
-   * @param template 要使用的模板
    */
   const handleUseTemplate = (template: Template): void => {
     // 如果当前模板已经被选中，就取消选中并重置自定义提示词
@@ -419,7 +407,6 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   // ===== 模型操作 =====
   /**
    * 处理模型选择
-   * @param modelId 选择的模型ID
    */
   const handleModelChange = (modelID: string): void => {
     setSelectedModel(modelID);
@@ -436,7 +423,6 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
   // ===== 输入操作 =====
   /**
    * 处理输入框大小调整
-   * @param height 新的高度值
    */
   const handleInputResize = (height: number): void => {
     setInputHeight(height);
@@ -481,24 +467,23 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
           setActiveSessionId(lastUsedSessionId);
           console.log(`回到上次选择的会话: ${lastUsedSessionId}`);
         }
-        else
-        {if (sessions.length > 0) {
-            // 按时间戳排序，获取最新的会话
-            const sortedSessions = [...sessions].sort(
-              (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-            );
-            // 获取最新会话ID
-            const latestSessionId = sortedSessions[0].id;
-            setActiveSessionId(latestSessionId);
-            await loadSessionMessages(latestSessionId);
-          } else {
-            // 如果没有会话，创建一个新会话
-            const newSessionId = await createNewSession("新对话");
-            if (newSessionId) {
-              setActiveSessionId(newSessionId);
-              setMessages([]);
-            }
-          }}
+        else if (sessions.length > 0) {
+          // 按时间戳排序，获取最新的会话
+          const sortedSessions = [...sessions].sort(
+            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          );
+          // 获取最新会话ID
+          const latestSessionId = sortedSessions[0].id;
+          setActiveSessionId(latestSessionId);
+          await loadSessionMessages(latestSessionId);
+        } else {
+          // 如果没有会话，创建一个新会话
+          const newSessionId = await createNewSession("新对话");
+          if (newSessionId) {
+            setActiveSessionId(newSessionId);
+            setMessages([]);
+          }
+        }
       } catch (error) {
         console.error('应用初始化失败:', error);
         toast.error('初始化应用失败，请刷新页面重试');
@@ -524,6 +509,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
       newTemplate,
       inputHeight,
       selectedModel,
+      isDisableHistory,
       isLoading,
       sidebarOpen
     },
@@ -544,6 +530,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
       setCustomPrompt,
       setIsAddTemplateDialogOpen,
       handleModelChange,
+      toggleDisableHistory,
       handleInputResize,
       setSidebarOpen
     }
