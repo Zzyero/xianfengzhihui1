@@ -4,13 +4,10 @@ import { Button } from "@/components/ui/button";
 import { History, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import '../styles/HistorySidebar.css';
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 interface HistorySidebarControlProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  sessions: any[];
-  onSelectSession: (id: string) => void;
-  activeSessionId?: string;
   onNewChat: () => void;
 }
 
@@ -22,9 +19,6 @@ interface HistorySidebarControlProps {
 const HistorySidebarControl: React.FC<HistorySidebarControlProps> = ({
   isOpen,
   setIsOpen,
-  sessions,
-  onSelectSession,
-  activeSessionId,
   onNewChat
 }) => {
   const [isPinned, setIsPinned] = useState<boolean>(isOpen);
@@ -38,31 +32,46 @@ const HistorySidebarControl: React.FC<HistorySidebarControlProps> = ({
   };
   
   return (
-    <div className="history-controls flex items-center gap-2">
-      {/* 新建聊天按钮 */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="new-chat-button flex items-center gap-1"
-        onClick={onNewChat}
-      >
-        <PlusCircle className="h-4 w-4" />
-        <span>新聊天</span>
-      </Button>
-      
-      {/* 历史侧边栏按钮 */}
-      <Button
-        variant="outline"
-        size="sm"
-        className={cn("history-button flex items-center gap-1", isPinned && 'pinned')}
-        onClick={toggleSidebar}
-      >
-        <History className="h-4 w-4" />
-        <span>历史</span>
-      </Button>
-      
-      {/* 移除历史侧边栏组件，因为它现在已经集成到ChatWindow中 */}
-    </div>
+      <div className="history-controls flex items-center gap-2">
+        {/* 新建聊天按钮 */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="new-chat-button flex items-center gap-1"
+              onClick={onNewChat}
+            >
+              <PlusCircle className="h-4 w-4" />
+              <span>新聊天</span>
+            </Button>
+            </TooltipTrigger>
+            <TooltipContent style={{ backgroundColor: '#f9fafb', color: 'black' }}>
+              <p>创建新的聊天会话</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        {/* 历史侧边栏按钮 */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className={cn("history-button flex items-center gap-1", isPinned && 'pinned')}
+              onClick={toggleSidebar}
+            >
+              <History className="h-4 w-4" />
+              <span>历史</span>
+            </Button>
+            </TooltipTrigger>
+            <TooltipContent style={{ backgroundColor: '#f9fafb', color: 'black' }}>
+              <p>查看历史聊天记录</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
   );
 };
 

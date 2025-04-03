@@ -9,7 +9,7 @@ import { Trash, Edit } from "lucide-react";
 import "../styles/ModelManagement.css";
 import db, { Model } from "../service/db";
 import { toast } from "sonner";
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 /**
  * 模型选择按钮组件属性接口
  */
@@ -32,7 +32,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
   const [isModelDialogOpen, setIsModelDialogOpen] = useState<boolean>(false);  // 模型选择对话框状态
   const [showAddModel, setShowAddModel] = useState<boolean>(false);      // 添加模型面板显示状态
   const [editingModel, setEditingModel] = useState<Model | null>(null);        // 正在编辑的模型
-  const [apiModels, setApiModels] = useState<Model[]>([]);                     // 模型列表
+  const [Models, setModels] = useState<Model[]>([]);                     // 模型列表
   const [selectedModelName, setSelectedModelName] = useState<string>("");      // 当前选中模型名称
 
   /**
@@ -43,14 +43,16 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       // 初始化默认模型（如果数据库为空）
       await db.initDefaultModels();
 
-      // 加载模型
-      const apiModelsData = await db.getAllModels('api');
-      setApiModels(apiModelsData);
+      // 加载所有模型
+      const ModelsData = await db.getAllModels();
+      console.log('加载的模型数量:', ModelsData.length);
+      // 设置模型列表
+      setModels(ModelsData);
 
       // 查找当前选中模型并更新名称
       if (selectedModel) {
         // 根据模型ID查找对应的模型对象
-        const currentModel = await apiModelsData.find(m => m.id === selectedModel);
+        const currentModel = ModelsData.find(m => m.id === selectedModel);
         if (currentModel) {
           // 使用模型的名称属性作为显示名称
           setSelectedModelName(currentModel.name);
@@ -69,7 +71,16 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
 
   // 组件挂载和selectedModel变化时加载模型
   useEffect(() => {
-    loadModels();
+    const fetchModels = async () => {
+      await loadModels();
+      if (Models.length > 0) {
+        Models.forEach(model => {
+          console.log('模型参数:', model.id, model.parameters);
+        });
+      }
+    };
+    
+    fetchModels();
   }, [selectedModel]); // 当selectedModel变化时重新加载
 
   /**
@@ -83,7 +94,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
     }
     
     // 查找选中的模型
-    const model = apiModels.find(m => m.id === modelId);
+    const model = Models.find(m => m.id === modelId);
     
     if (model) {
       // 更新选中模型
@@ -107,12 +118,22 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       // 使用编辑模式下的原始ID，或者生成新ID
       const modelId = isEditing ? editingModel.id : `${Date.now()}`;
       
+      // 确保parameters是字符串类型
+      let parameters = model.parameters;
+      if (parameters && typeof parameters !== 'string') {
+        parameters = JSON.stringify(parameters);
+      }
+      
       // 构建完整的模型对象
       const newModel: Model = {
         ...model,
+        parameters: parameters as string,
         id: modelId,
-        timestamp: new Date()
+        timestamp: new Date(),
+        type: 'api'
       };
+      
+      console.log('保存模型:', newModel);
       
       // 保存到数据库
       await db.saveModel(newModel);
@@ -128,6 +149,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       setEditingModel(null);
     } catch (error) {
       console.error(editingModel ? '更新模型失败:' : '添加模型失败:', error);
+      console.error('错误详情:', error);
       toast.error(editingModel ? '更新模型失败' : '添加模型失败');
     }
   };
@@ -142,7 +164,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
     
     try {
       // 查找模型
-      const model = apiModels.find(m => m.id === modelId);
+      const model = Models.find(m => m.id === modelId);
       
       if (!model) {
         toast.error('找不到指定的模型');
@@ -174,7 +196,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       }
       
       // 查找要删除的模型
-      const modelToDelete = apiModels.find(m => m.id === modelId);
+      const modelToDelete = Models.find(m => m.id === modelId);
       
       if (!modelToDelete) {
         toast.error('找不到要删除的模型');
@@ -197,6 +219,12 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
   // 当对话框关闭时，重置编辑状态
   const handleDialogOpenChange = (open: boolean) => {
     setIsModelDialogOpen(open);
+    if (open) {
+      // 当对话框打开时，重新加载模型并打印信息用于调试
+      loadModels().then(() => {
+        console.log('当前所有模型:', Models);
+      });
+    }
     if (!open) {
       setEditingModel(null);
       setShowAddModel(false);
@@ -217,15 +245,23 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
   return (
     <div className="model-management">
       {/* 模型选择按钮 */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="new-chat-button flex items-center gap-1 dark:bg-background dark:border-input dark:text-foreground"
-        onClick={() => setIsModelDialogOpen(true)}
-      >
-        <span>模型: {selectedModelName}</span>
-      </Button>
-
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="new-chat-button flex items-center gap-1 dark:bg-background dark:border-input dark:text-foreground"
+              onClick={() => setIsModelDialogOpen(true)}
+            >
+              <span>模型: {selectedModelName}</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent style={{ backgroundColor: '#f9fafb', color: 'black' }}>
+            <p>选择/修改模型，使用OpenAI接口</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {/* 模型选择对话框 */}
       <Dialog open={isModelDialogOpen} onOpenChange={handleDialogOpenChange}>
         <DialogContent className="model-dialog-content dark:bg-background dark:border-input dark:text-foreground">
@@ -251,11 +287,11 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
           ) : (
             <div className="space-y-4">
               {/* 模型列表 */}
-              {apiModels.length === 0 ? (
+              {Models.length === 0 ? (
                 <div className="text-center py-4">暂无模型，请添加</div>
               ) : (
                 <RadioGroup value={selectedModel} className="space-y-2">
-                  {apiModels.map((model) => (
+                  {Models.map((model) => (
                     <div
                       key={model.id}
                       className={`model-item ${model.id === selectedModel ? 'selected' : ''}`}
@@ -291,8 +327,15 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
                         <div className="model-details">
                           <p><strong>模型ID:</strong> {model.apiId || model.id}</p>
                           <p><strong>URL:</strong> {model.url || '未设置'}</p>
-                          <p><strong>Key:</strong> {model.apiKey ? '******************' : '未设置'}</p>
-                          {model.parameters && <p><strong>参数:</strong> {model.parameters}</p>}
+                          <p><strong>Key:</strong> {model.apiKey ? '******************' : '未设置（非必要）'}</p>
+                          {model.parameters && (
+                            <p>
+                              <strong>参数:</strong> 
+                              {typeof model.parameters === 'string' ? 
+                                model.parameters : 
+                                JSON.stringify(model.parameters)}
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
