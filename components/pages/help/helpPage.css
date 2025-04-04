@@ -1,0 +1,168 @@
+.help-page-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #ffffff;
+  position: relative; /* 添加相对定位 */
+}
+
+/* 内容区域样式 */
+.content-container {
+  flex: 1;
+  padding: 30px 40px;
+  padding-bottom: 80px; /* 增加底部内边距，确保底部内容可见 */
+  overflow-y: auto;
+  line-height: 1.6;
+  width: calc(100% - 300px); /* 减去侧边栏宽度 */
+  margin-right: 300px; /* 确保内容不被侧边栏覆盖 */
+}
+
+/* 明确设置侧边栏在右侧 */
+.help-sidebar {
+  position: fixed; /* 改为固定定位，避免内容滚动时被挤出视图 */
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 300px; /* 导航栏宽度 */
+  z-index: 10;
+  overflow-y: auto; /* 添加滚动功能 */
+}
+
+/* 所有标题的基础样式 */
+.help-heading {
+  scroll-margin-top: 30px;
+  scroll-margin-bottom: 50px; /* 添加底部滚动边距，确保内容完全可见 */
+}
+
+/* 标题激活效果 */
+.active-heading {
+  animation: headingHighlight 2s ease;
+}
+
+@keyframes headingHighlight {
+  0% {
+    background-color: rgba(25, 118, 210, 0.15);
+    border-radius: 4px;
+  }
+  70% {
+    background-color: rgba(25, 118, 210, 0.15);
+    border-radius: 4px;
+  }
+  100% {
+    background-color: transparent;
+    border-radius: 0;
+  }
+}
+
+/* Markdown 渲染样式 */
+.content-container h1 {
+  font-size: 2.2rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eaeaea;
+  color: #333;
+}
+
+.content-container h2 {
+  font-size: 1.8rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+.content-container h3 {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+  color: #555;
+}
+
+.content-container h4 {
+  font-size: 1.3rem;
+  margin-top: 1rem;
+  margin-bottom: 0.6rem;
+  color: #666;
+}
+
+.content-container h5,
+.content-container h6 {
+  scroll-margin-top: 20px;
+}
+
+.content-container p {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.content-container ul, .content-container ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.content-container li {
+  margin-bottom: 0.5rem;
+}
+
+.content-container blockquote {
+  border-left: 4px solid #e0e0e0;
+  padding-left: 1rem;
+  margin-left: 0;
+  color: #666;
+  font-style: italic;
+}
+
+.content-container code {
+  background-color: #f6f8fa;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9em;
+}
+
+.content-container pre {
+  background-color: #f6f8fa;
+  padding: 1rem;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.content-container pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.content-container a {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.content-container a:hover {
+  text-decoration: underline;
+}
+
+.content-container table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.content-container th, .content-container td {
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.content-container th {
+  background-color: #f6f8fa;
+  font-weight: 600;
+}
+
+.content-container .doc-image {
+  max-width: 100%;
+  border-radius: 5px;
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

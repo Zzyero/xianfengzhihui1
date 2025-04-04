@@ -1,0 +1,235 @@
+.help-sidebar {
+  width: 300px;
+  height: 100vh; /* 使用视口高度 */
+  border-left: 1px solid #e0e0e0;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 顶层文档导航样式 */
+.doc-navigation {
+  padding: 0.5rem;
+}
+
+/* 下拉菜单容器 */
+.dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+/* 下拉按钮样式 */
+.dropdown-button {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-button:hover {
+  background-color: #f5f5f5;
+}
+
+/* 下拉菜单图标 */
+.dropdown-icon {
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+  flex-shrink: 0; /* 防止图标被压缩 */
+  margin-left: 8px;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+/* 下拉菜单内容 */
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  background-color: #ffffff;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  z-index: 20;
+}
+
+.dropdown-content.open {
+  max-height: 200px;
+  padding: 10px 0;
+}
+
+/* 文档类型按钮 */
+.doc-nav-button {
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  background-color: transparent;
+  color: #333;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-nav-button:hover {
+  background-color: #f0f0f0;
+  color: #1976d2;
+}
+
+.doc-nav-button.active {
+  color: #1976d2;
+  background-color: #e3f2fd;
+}
+
+/* 内容导航样式 */
+.content-navigation {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 15px;
+  padding-bottom: 80px; /* 确保底部有足够空间 */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.nav-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  border-bottom: 1px solid #eaeaea;
+  position: sticky;
+  top: 0;
+  background-color: #f9f9f9;
+  z-index: 10;
+}
+
+/* 标题树样式 */
+.headings-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: visible;
+  position: relative;
+}
+
+.heading-item-container {
+  margin-bottom: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.heading-item-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  position: relative;
+  background-color: #f9f9f9;
+  z-index: 2;
+}
+
+.heading-item-wrapper:hover {
+  background-color: #f0f0f0;
+}
+
+.heading-item-wrapper.with-children {
+  cursor: pointer;
+}
+
+/* 折叠图标 */
+.collapse-icon {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  margin-left: 5px;
+  color: #777;
+  flex-shrink: 0; /* 防止图标被压缩 */
+}
+
+.collapse-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+/* 标题项 */
+.heading-item {
+  padding:6px 10px;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.2s;
+  font-size: 14px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heading-item:hover {
+  color: #1976d2;
+}
+
+.heading-item.active {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+/* 子标题容器 */
+.heading-children {
+  max-height: none;
+  overflow: visible;
+  transition: max-height 0.3s ease;
+  padding-left: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.heading-children.collapsed {
+  max-height: 0;
+  overflow: hidden;
+}
+
+/* 不同级别标题的样式 */
+.level-1 > .heading-item-wrapper > .heading-item {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.level-2 > .heading-item-wrapper > .heading-item {
+  font-weight: 500;
+  color: #444;
+}
+
+.level-3 > .heading-item-wrapper > .heading-item {
+  font-size: 13px;
+  color: #555;
+}
+
+.level-4 > .heading-item-wrapper > .heading-item,
+.level-5 > .heading-item-wrapper > .heading-item,
+.level-6 > .heading-item-wrapper > .heading-item {
+  font-size: 12px;
+  color: #777;
+}
