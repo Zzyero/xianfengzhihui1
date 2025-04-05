@@ -106,7 +106,7 @@ export class ComfyWorkflow {
         const fileName = `${this.getFileNamePrefix()}${file.name}`;
         const filePath = path.join(COMFY_INPUTS_DIR, fileName);
         const fileBuffer = await file.arrayBuffer();
-        await fs.writeFile(filePath, Buffer.from(fileBuffer));
+        await fs.writeFile(filePath, new Uint8Array(fileBuffer));
         return filePath;
     }
 }
