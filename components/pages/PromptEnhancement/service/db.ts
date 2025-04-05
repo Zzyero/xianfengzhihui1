@@ -19,6 +19,7 @@ export interface Message {
   role: 'user' | 'assistant' | 'system'; // 消息角色
   content: string;          // 消息内容
   timestamp: Date;          // 时间戳
+  reasoningContent?: string; // 思考内容
 }
 
 export interface ChatSession {

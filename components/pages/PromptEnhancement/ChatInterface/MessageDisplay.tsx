@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm';
 import { Message } from '../service/db';
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { Copy } from 'lucide-react';
+import { Copy, ChevronDown, ChevronRight, Brain } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Components } from 'react-markdown';
@@ -34,6 +34,7 @@ interface ReactElementWithChildren {
  */
 const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp = true }) => {
   const isUser = message.role === 'user';
+  const [showReasoning, setShowReasoning] = useState(true);
   
   // 检测内容是否可能包含Markdown
   const containsMarkdown = (content: string): boolean => {
@@ -59,6 +60,12 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
   
   // 是否包含可能的Markdown格式
   const hasMarkdown = containsMarkdown(message.content);
+  const hasReasoning = message.reasoningContent && message.reasoningContent.length > 0;
+
+  // 处理折叠/展开思考过程
+  const toggleReasoning = () => {
+    setShowReasoning(!showReasoning);
+  };
 
   // 处理代码复制
   const handleCopyCode = useCallback((code: string) => {
@@ -246,17 +253,52 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
             </div>
           ) : (
             // AI助手消息使用Markdown解析
-            <div className="markdown-content">
-              <ReactMarkdown 
-                rehypePlugins={[rehypeRaw]} 
-                remarkPlugins={[remarkGfm]}
-                components={customComponents}
-                skipHtml={true}
-                unwrapDisallowed={true}
-              >
-                {message.content.replace(/<think>[\s\S]*?<\/think>/g, '')}
-              </ReactMarkdown>
-            </div>
+            <>
+              {hasReasoning && (
+                <div className="reasoning-container">
+                  <button 
+                    className="reasoning-toggle"
+                    onClick={toggleReasoning}
+                    aria-expanded={showReasoning}
+                  >
+                    {showReasoning ? 
+                      <ChevronDown className="reasoning-icon" /> : 
+                      <ChevronRight className="reasoning-icon" />
+                    }
+                    <Brain className="reasoning-brain-icon" />
+                    <span className="reasoning-label">
+                      {showReasoning ? "隐藏思考过程" : "查看思考过程"}
+                    </span>
+                  </button>
+                  
+                  {showReasoning && (
+                    <div className="reasoning-content">
+                      <ReactMarkdown 
+                        rehypePlugins={[rehypeRaw]} 
+                        remarkPlugins={[remarkGfm]}
+                        components={customComponents}
+                        skipHtml={true}
+                        unwrapDisallowed={true}
+                      >
+                        {message.reasoningContent || ''}
+                      </ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              <div className="markdown-content">
+                <ReactMarkdown 
+                  rehypePlugins={[rehypeRaw]} 
+                  remarkPlugins={[remarkGfm]}
+                  components={customComponents}
+                  skipHtml={true}
+                  unwrapDisallowed={true}
+                >
+                  {message.content.replace(/<think>[\s\S]*?<\/think>/g, '')}
+                </ReactMarkdown>
+              </div>
+            </>
           )}
           
           {showTimestamp && (
@@ -270,4 +312,4 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
   );
 };
 
-export default MessageDisplay; 
+export default MessageDisplay;

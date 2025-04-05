@@ -277,7 +277,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
           });
         },
         // 当AI回复内容更新（流式输出）
-        onUpdate: (content, messageId, sessionId) => {
+        onUpdate: (content, messageId, sessionId, metadata) => {
           setMessages(prev => {
             // 检查是否已存在此ID的消息
             const existingIndex = prev.findIndex(m => m.id === messageId);
@@ -287,7 +287,8 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
               const newMessages = [...prev];
               newMessages[existingIndex] = {
                 ...newMessages[existingIndex],
-                content
+                content,
+                reasoningContent: metadata?.reasoning || newMessages[existingIndex].reasoningContent
               };
               return newMessages;
             } else {
@@ -297,6 +298,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
                 sessionId: sessionId,
                 role: 'assistant' as const,
                 content: content || '',
+                reasoningContent: metadata?.reasoning || '',
                 timestamp: new Date()
               }];
             }

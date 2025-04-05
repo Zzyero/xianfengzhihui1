@@ -10,7 +10,7 @@ export interface ChatCallbacks {
   // AI回复开始生成回调
   onStart?: () => void;
   // AI回复内容更新回调
-  onUpdate?: (content: string, messageId: string, sessionId: string) => void;
+  onUpdate?: (content: string, messageId: string, sessionId: string, metadata?: {reasoning?: string}) => void;
   // AI回复完成回调
   onComplete?: (message: Message) => void;
   // 会话更新回调
@@ -103,16 +103,17 @@ class ChatService {
         messages: historyMessages,
         callbacks: {
           onStart: callbacks.onStart,
-          onUpdate: (content) => {
-            callbacks.onUpdate?.(content, aiMessageId, currentSessionId);
+          onUpdate: (content, reasoning, messageId, sessionId) => {
+            callbacks.onUpdate?.(content, aiMessageId, currentSessionId!, {reasoning});
           },
-          onComplete: async (fullContent) => {
+          onComplete: async (fullContent, metadata) => {
             // 保存AI消息
             const aiMessage: Message = {
               id: aiMessageId,
               sessionId: currentSessionId!,
               role: 'assistant',
               content: fullContent,
+              reasoningContent: metadata?.reasoning,
               timestamp: new Date()
             };
             
@@ -131,7 +132,9 @@ class ChatService {
           }
         },
         signal: this.abortController.signal,
-        customPrompt
+        customPrompt,
+        aiMessageId,
+        currentSessionId
       });
     } catch (error: any) {
       callbacks.onError?.(new Error(error.message || '发送消息失败'));
@@ -146,14 +149,16 @@ class ChatService {
     messages: Message[];
     callbacks: {
       onStart?: () => void;
-      onUpdate?: (content: string) => void;
-      onComplete?: (fullContent: string) => void;
+      onUpdate?: (content: string, reasoning?: string, messageId?: string, sessionId?: string) => void;
+      onComplete?: (fullContent: string, metadata?: {reasoning?: string}) => void;
       onError?: (error: Error) => void;
     };
     signal?: AbortSignal;
     customPrompt?: string;
+    aiMessageId?: string;
+    currentSessionId?: string;
   }): Promise<void> {
-    const { model, messages, callbacks, signal, customPrompt } = options;
+    const { model, messages, callbacks, signal, customPrompt, aiMessageId, currentSessionId } = options;
 
     try {
       callbacks.onStart?.();
@@ -243,13 +248,23 @@ class ChatService {
           stream: true
         }, requestOptions);
 
+        let reasoningContent = ''; // 添加变量保存思考内容
+
         for await (const chunk of stream) {
           const content = chunk.choices[0]?.delta?.content || '';
+          // 获取思考内容（reasoning_content）
+          const reasoning = (chunk.choices[0]?.delta as any)?.reasoning_content || '';
+          
+          if (reasoning) {
+            // 如果有思考内容，将其累加到reasoningContent变量中
+            reasoningContent += reasoning;
+          }
+          
           fullContent += content;
-          callbacks.onUpdate?.(fullContent);
+          callbacks.onUpdate?.(fullContent, reasoningContent, aiMessageId, currentSessionId);
         }
 
-        callbacks.onComplete?.(fullContent);
+        callbacks.onComplete?.(fullContent, { reasoning: reasoningContent });
       } else {
         // 非流式响应
         console.log('开始执行非流式请求...');
@@ -265,14 +280,16 @@ class ChatService {
           
           console.log('非流式请求完成，获取内容');
           fullContent = completion.choices[0]?.message?.content || '';
+          // 获取思考内容
+          const reasoningContent = (completion.choices[0]?.message as any)?.reasoning_content || '';
           console.log(`获取到的内容长度: ${fullContent.length}字符`);
           
           // 先调用 onUpdate 回调更新界面显示
-          callbacks.onUpdate?.(fullContent);
+          callbacks.onUpdate?.(fullContent, reasoningContent, aiMessageId, currentSessionId);
           console.log('已调用onUpdate回调');
           
           // 然后调用 onComplete 回调
-          callbacks.onComplete?.(fullContent);
+          callbacks.onComplete?.(fullContent, { reasoning: reasoningContent });
           console.log('已调用onComplete回调');
         } catch (error) {
           console.error('非流式请求失败:', error);
