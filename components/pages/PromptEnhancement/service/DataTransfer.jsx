@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { DownloadIcon, UploadIcon, Settings2Icon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import db from '../service/db';
 
 /**
@@ -185,18 +186,23 @@ const ExportData = () => {
   };
 
   return (
-    <>
-      <Button 
-        variant="outline"
-        size="sm"
-        className="new-chat-button flex items-center gap-1"
-        onClick={() => setOpen(true)}
-        title="导入/导出数据"
-      >
-        <Settings2Icon className="h-5 w-5" />
-        <span>导入/导出数据</span>
-      </Button>
-      
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button 
+            variant="outline"
+            size="sm"
+            className="new-chat-button flex items-center gap-1"
+            onClick={() => setOpen(true)}
+          >
+            <Settings2Icon className="h-5 w-5" />
+            <span>导入/导出数据</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent style={{ backgroundColor: '#f9fafb', color: 'black' }}>
+          <p>导入/导出应用数据，方便备份和恢复</p>
+        </TooltipContent>
+      </Tooltip>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -221,7 +227,7 @@ const ExportData = () => {
                     id="sessions" 
                     checked={exportOptions.sessions}
                     onCheckedChange={(checked) => 
-                      setExportOptions({...exportOptions, sessions: checked})
+                      setExportOptions({...exportOptions, sessions: checked, messages: exportOptions.sessions ? checked : false})
                     }
                   />
                   <Label htmlFor="sessions">会话记录</Label>
@@ -306,7 +312,7 @@ const ExportData = () => {
           </Tabs>
         </DialogContent>
       </Dialog>
-    </>
+    </TooltipProvider>
   );
 };
 

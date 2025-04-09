@@ -76,9 +76,6 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
     if (!formData.url.trim()) {
       newErrors.url = "请输入API URL";
     }
-    if (!formData.apiKey.trim()) {
-      newErrors.apiKey = "API密钥不能为空";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -92,13 +89,40 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
     e.preventDefault();
     
     if (validateForm()) {
-      onAdd({
-        name: formData.name,
-        apiId: formData.apiId,
-        url: formData.url,
-        apiKey: formData.apiKey,
-        parameters: formData.parameters || undefined,
-      });
+      try {
+        // 检查并验证parameters是否为有效的JSON字符串
+        let parameters = formData.parameters;
+        if (parameters) {
+          try {
+            // 尝试解析JSON，如果成功，确保它是一个字符串
+            JSON.parse(parameters);
+            // 解析成功，不需要额外处理，保持字符串格式
+          } catch (error) {
+            // 不是有效的JSON，提示用户
+            setErrors(prev => ({
+              ...prev,
+              parameters: "参数格式无效，请输入正确的JSON格式"
+            }));
+            return;
+          }
+        }
+        
+        // 提交有效数据
+        onAdd({
+          name: formData.name,
+          apiId: formData.apiId,
+          url: formData.url,
+          apiKey: formData.apiKey,
+          parameters: parameters || undefined,
+          type: 'api',
+        });
+      } catch (error) {
+        console.error("处理表单数据时出错:", error);
+        setErrors(prev => ({
+          ...prev,
+          general: "提交表单时发生错误"
+        }));
+      }
     }
   };
 
@@ -131,12 +155,12 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
             onChange={(e) => handleInputChange('apiId', e.target.value)}
             required
             id="api-model-id"
-            placeholder="输入API模型ID，如gpt-4、gpt-3.5-turbo等"
+            placeholder="输入API模型ID，如qwen-plus、qwen-plus-pro等"
             className={errors.apiId ? "error" : ""}
             style={{color: '#111827', backgroundColor: 'white'}}
           />
           {errors.apiId && <span className="error-message">{errors.apiId}</span>}
-          <p className="text-xs text-gray-500 mt-1">API模型ID用于API调用，必须与API提供方的模型标识符一致</p>
+          <p className="text-xs text-gray-500 mt-1">API模型ID用于API调用，必须与API的模型标识符一致</p>
         </div>
 
         {/* API URL */}
@@ -153,27 +177,27 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
             style={{color: '#111827', backgroundColor: 'white'}}
           />
           {errors.url && <span className="error-message">{errors.url}</span>}
-          <p className="text-xs text-gray-500 mt-1">请输入API完整URL，如OpenAI: https://api.openai.com/v1，或阿里云通义千问API地址</p>
+          <p className="text-xs text-gray-500 mt-1">请输入API完整URL</p>
         </div>
 
         {/* API密钥 */}
         <div className="form-field">
-          <Label htmlFor="apiKey">API密钥</Label>
+          <Label htmlFor="apiKey">API密钥 (可选)</Label>
           <Input
             type="password"
             value={formData.apiKey}
             onChange={(e) => handleInputChange('apiKey', e.target.value)}
-            required
             id="model-api-key"
-            placeholder="输入API密钥"
+            placeholder="可选: 输入API密钥"
             className={errors.apiKey ? "error" : ""}
             autoComplete="new-password"
             style={{color: '#111827', backgroundColor: 'white'}}
           />
           {errors.apiKey && <span className="error-message">{errors.apiKey}</span>}
+          <p className="text-xs text-gray-500 mt-1">API密钥用于API调用，如果不需要则留空</p>
         </div>
 
-        {/* 其他参数
+        {/* 其他参数 */}
         <div className="form-field">
           <Label htmlFor="parameters">其他参数 (可选)</Label>
           <Input
@@ -183,11 +207,13 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
             id="model-parameters"
             placeholder="可选: 附加参数 (JSON格式)"
             style={{color: '#111827', backgroundColor: 'white'}}
+            className={errors.parameters ? "error" : ""}
           />
+          {errors.parameters && <span className="error-message">{errors.parameters}</span>}
           <p className="text-xs text-gray-500 mt-1">
-            JSON格式，例如: {"\"model\":\"gpt-4\",\"temperature\":0.7,\"max_tokens\":2000"}
+            JSON格式，例如: {"{\"temperature\":0.7,\"max_tokens\":2000,\"stream\":true,\"top_p\":1}"}
           </p>
-        </div> */}
+        </div>
       </div>
 
       {/* 表单按钮 */}
@@ -198,6 +224,7 @@ const EditModel: React.FC<EditModelProps> = ({ onAdd, onCancel, initialData }) =
         <Button type="submit">
           保存
         </Button>
+        {errors.general && <span className="error-message block mt-2">{errors.general}</span>}
       </div>
     </form>
   );

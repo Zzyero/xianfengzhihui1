@@ -49,6 +49,7 @@ const PromptEnhancementInner: React.FC<{ isactive: boolean }> = ({ isactive }) =
                   selectedModel={state.selectedModel}
                   setSelectedModel={actions.handleModelChange}
                 />
+                
                 <DisableHistory />
               </div>
 
@@ -61,9 +62,6 @@ const PromptEnhancementInner: React.FC<{ isactive: boolean }> = ({ isactive }) =
                 <HistorySidebarControl
                   isOpen={state.sidebarOpen}
                   setIsOpen={actions.setSidebarOpen}
-                  sessions={state.chatSessions}
-                  onSelectSession={actions.handleSelectSession}
-                  activeSessionId={state.activeSessionId}
                   onNewChat={actions.handleNewChat}
                 />
               </div>

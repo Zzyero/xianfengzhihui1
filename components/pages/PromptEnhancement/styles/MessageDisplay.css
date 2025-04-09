@@ -7,6 +7,11 @@
   --code-block-bg: rgba(0, 0, 0, 0.02);
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   --code-text: #333;
+  --reasoning-bg: rgba(30, 41, 59, 0.05);
+  --reasoning-border: rgba(30, 41, 59, 0.1);
+  --reasoning-icon: #3b82f6;
+  --reasoning-text: #1e293b;
+  --reasoning-content-bg: rgba(30, 41, 59, 0.02);
 }
 
 /* 暗色模式变量 */
@@ -16,6 +21,11 @@
   --border-color: #2d2d2d;
   --code-block-bg: rgba(255, 255, 255, 0.05);
   --code-text: #e0e0e0;
+  --reasoning-bg: rgba(255, 255, 255, 0.05);
+  --reasoning-border: rgba(255, 255, 255, 0.1);
+  --reasoning-icon: #60a5fa;
+  --reasoning-text: #e2e8f0;
+  --reasoning-content-bg: rgba(255, 255, 255, 0.03);
 }
 
 /* 消息显示组件样式 */
@@ -378,4 +388,76 @@
     width: 32px;
     height: 32px;
   }
-} 
+  
+  .message-display-wrapper .reasoning-content {
+    padding: 0.75rem;
+    max-height: 300px;
+  }
+}
+
+/* 深度思考容器样式 */
+.message-display-wrapper .reasoning-container {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: 100%;
+  border: 1px solid var(--reasoning-border);
+  background-color: var(--reasoning-bg);
+}
+
+/* 思考过程切换按钮 */
+.message-display-wrapper .reasoning-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--reasoning-text);
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.message-display-wrapper .reasoning-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .message-display-wrapper .reasoning-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 深度思考图标 */
+.message-display-wrapper .reasoning-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--reasoning-icon);
+  margin-right: 0.25rem;
+  flex-shrink: 0;
+}
+
+.message-display-wrapper .reasoning-brain-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--reasoning-icon);
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.message-display-wrapper .reasoning-label {
+  flex-grow: 1;
+  text-align: left;
+}
+
+/* 深度思考内容 */
+.message-display-wrapper .reasoning-content {
+  padding: 1rem;
+  background-color: var(--reasoning-content-bg);
+  border-top: 1px solid var(--reasoning-border);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  overflow-y: auto;
+  line-height: 1.6;
+}
