@@ -16,11 +16,8 @@ interface Heading {
 
 /**
  * 帮助页面组件
- * 显示应用程序的帮助信息和文档
  */
 export function HelpPage() {
-  // 当前活跃的文档
-  const [activeDoc, setActiveDoc] = useState('Introducer.md');
   // 文档内容
   const [markdownContent, setMarkdownContent] = useState('');
   // 文档中的标题列表
@@ -40,7 +37,7 @@ export function HelpPage() {
         setHeadingMap(new Map()); // 重置标题映射
         
         // 从public目录加载文档
-        const response = await fetch(`/help/documents/${activeDoc}`);
+        const response = await fetch(`/help/documents/Introducer.md`);
         if (!response.ok) {
           throw new Error(`文档加载失败: ${response.status} ${response.statusText}`);
         }
@@ -64,7 +61,7 @@ export function HelpPage() {
     };
 
     fetchMarkdown();
-  }, [activeDoc]);
+  }, []);
   
   /**
    * 为文本生成一个稳定的ID
@@ -123,18 +120,6 @@ export function HelpPage() {
     setHeadingMap(newHeadingMap);
     
     return extractedHeadings;
-  };
-
-  /**
-   * 处理文档切换
-   * @param docPath 文档路径
-   */
-  const handleDocChange = (docPath: string) => {
-    setActiveDoc(docPath);
-    // 内容区域滚动到顶部
-    if (contentRef.current) {
-      contentRef.current.scrollTop = 0;
-    }
   };
 
   /**
@@ -222,9 +207,7 @@ export function HelpPage() {
       
       {/* 侧边栏导航 */}
       <HelpPageSidebar
-        activeDoc={activeDoc}
         headings={headings}
-        onDocChange={handleDocChange}
         onHeadingClick={handleHeadingClick}
       />
     </div>

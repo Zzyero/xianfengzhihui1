@@ -4,15 +4,6 @@ import React, { useState, useEffect } from 'react';
 import './helpPageSidebar.css';
 
 /**
- * 顶层文档类型
- */
-interface DocType {
-  id: string;
-  title: string;
-  path: string;
-}
-
-/**
  * 文档内容标题类型
  */
 interface Heading {
@@ -27,48 +18,22 @@ interface Heading {
  * @returns 侧边栏组件
  */
 export function HelpPageSidebar({
-  activeDoc,
   headings,
-  onDocChange,
   onHeadingClick
 }: {
-  activeDoc: string;
   headings: Heading[];
-  onDocChange: (docPath: string) => void;
   onHeadingClick: (headingId: string) => void;
 }) {
-  // 顶层文档导航数据
-  const docTypes: DocType[] = [
-    { id: 'intro', title: '帮助文档', path: 'Introducer.md' },
-    { id: 'tech', title: '技术文档', path: 'tec.md' }
-  ];
-
-  // 当前选中的文档
-  const [selectedDoc, setSelectedDoc] = useState(() => {
-    return docTypes.find(doc => doc.path === activeDoc) || docTypes[0];
-  });
-
-  // 下拉菜单开关状态
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
   // 折叠状态 (headingId -> isCollapsed)
   const [collapsedState, setCollapsedState] = useState<Record<string, boolean>>({});
 
   // 当前活跃的标题ID
   const [activeHeadingId, setActiveHeadingId] = useState<string>('');
 
-  // 当activeDoc变化时更新selectedDoc
-  useEffect(() => {
-    const doc = docTypes.find(doc => doc.path === activeDoc);
-    if (doc) {
-      setSelectedDoc(doc);
-    }
-  }, [activeDoc]);
-
   // 从localStorage加载折叠状态
   useEffect(() => {
     try {
-      const storedState = localStorage.getItem(`helpSidebar_${activeDoc}`);
+      const storedState = localStorage.getItem(`helpSidebar_state`);
       if (storedState) {
         setCollapsedState(JSON.parse(storedState));
       } else {
@@ -78,23 +43,7 @@ export function HelpPageSidebar({
       console.error('加载导航折叠状态失败', error);
       setCollapsedState({});
     }
-  }, [activeDoc]);
-
-  /**
-   * 处理文档切换
-   */
-  const handleDocSelect = (doc: DocType) => {
-    setSelectedDoc(doc);
-    onDocChange(doc.path);
-    setIsDropdownOpen(false); // 关闭下拉菜单
-  };
-
-  /**
-   * 切换下拉菜单状态
-   */
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+  }, []);
 
   /**
    * 切换标题的折叠状态
@@ -107,7 +56,7 @@ export function HelpPageSidebar({
       };
       
       // 保存到localStorage
-      localStorage.setItem(`helpSidebar_${activeDoc}`, JSON.stringify(newState));
+      localStorage.setItem(`helpSidebar_state`, JSON.stringify(newState));
       
       return newState;
     });
@@ -221,33 +170,7 @@ export function HelpPageSidebar({
 
   return (
     <aside className="help-sidebar">
-      {/* 顶层文档导航 - 下拉菜单 */}
-      <div className="doc-navigation">
-        <div className="dropdown-container">
-          <button 
-            className="dropdown-button" 
-            onClick={toggleDropdown}
-          >
-            <span>{selectedDoc.title}</span>
-            <span className={`dropdown-icon ${isDropdownOpen ? 'open' : ''}`}>
-              ▼
-            </span>
-          </button>
-          <div className={`dropdown-content ${isDropdownOpen ? 'open' : ''}`}>
-            {docTypes.map((doc) => (
-              <button
-                key={doc.id}
-                className={`doc-nav-button ${activeDoc === doc.path ? 'active' : ''}`}
-                onClick={() => handleDocSelect(doc)}
-              >
-                {doc.title}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 当前文档内容导航 */}
+      {/* 内容导航 */}
       <div className="content-navigation">
         <h3 className="nav-title">文档导航</h3>
         <nav>
