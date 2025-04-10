@@ -192,7 +192,7 @@ export function ViewComfyForm(args: {
                                         // @ts-ignore
                                         if (field.inputs.length > 0) {
                                             // 检查是否是文本编码器或上传图片组件
-                                            const isSpecialComponent = field.title === "CLIP文本编码器" || field.title === "加载图像";
+                                            const isSpecialComponent = field.title === "CLIP文本编码" || field.title === "加载图像";
                                             
                                             if (isSpecialComponent) {
                                                 // 特殊组件不显示圆角方框
@@ -527,7 +527,15 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
     // Lora加载器下拉选择框
     if (input.key?.includes("lora_name")) {
         const loraOptions = [
-            "laiqingde2-000029.safetensors"
+            "安倍晋三.safetensors",
+            "蔡英文.safetensors",
+            "赖清德.safetensors",
+            "默克尔.safetensors",
+            "萨科齐.safetensors",
+            "特朗普.safetensors",
+            "曾小萌迷彩人.safetensors",
+            "山姆大叔.safetensors",
+            "政治漫画画风.safetensors"
         ];
         return (
             <FormSelectInput 
