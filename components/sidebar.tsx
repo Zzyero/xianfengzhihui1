@@ -137,21 +137,13 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
             </nav>
             {/* 底部帮助链接 */}
             <nav className="sticky bottom-0 p-2 bg-background border-t">
-                <Link href="https://baike.baidu.com/item/%E4%B8%AD%E5%9B%BD%E4%BA%BA%E6%B0%91%E8%A7%A3%E6%94%BE%E5%86%9B%E7%BD%91%E7%BB%9C%E7%A9%BA%E9%97%B4%E9%83%A8%E9%98%9F%E4%BF%A1%E6%81%AF%E5%B7%A5%E7%A8%8B%E5%A4%A7%E5%AD%A6/65164733" target="_blank" rel="noopener noreferrer">
-                    {isSmallScreen ? (
-                        <TooltipButton
-                            icon={<LifeBuoy className="size-5" />}
-                            label="Help"
-                            tooltipContent="Help"
-                            variant="outline"
-                        />
-                    ) : (
-                        <Button variant="outline" className="w-full justify-start">
-                            <LifeBuoy className="size-5 mr-2" />
-                            帮助
-                        </Button>
-                    )}
-                </Link>
+                <SidebarButton
+                    icon={<LifeBuoy className="size-5" />}
+                    label="帮助"
+                    isActive={currentTab === TabValue.Help}
+                    onClick={() => onTabChange(TabValue.Help)}
+                    isSmallScreen={isSmallScreen}
+                />
             </nav>
         </aside>
     )

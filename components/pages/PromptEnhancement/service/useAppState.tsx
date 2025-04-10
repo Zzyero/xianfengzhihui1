@@ -233,9 +233,9 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
     const newValue = !isDisableHistory;
     setIsDisableHistory(newValue);
     if (newValue) {
-      toast.success('已禁用聊天历史记录，AI 将只看到当前消息');
+      toast.success('启用单轮对话，AI只能看到当前消息');
     } else {
-      toast.info('已启用聊天历史记录，AI 将看到完整对话');
+      toast.info('启用多轮对话，AI能看到完整对话内容');
     }
   };
 
@@ -277,7 +277,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
           });
         },
         // 当AI回复内容更新（流式输出）
-        onUpdate: (content, messageId, sessionId) => {
+        onUpdate: (content, messageId, sessionId, metadata) => {
           setMessages(prev => {
             // 检查是否已存在此ID的消息
             const existingIndex = prev.findIndex(m => m.id === messageId);
@@ -287,7 +287,8 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
               const newMessages = [...prev];
               newMessages[existingIndex] = {
                 ...newMessages[existingIndex],
-                content
+                content,
+                reasoningContent: metadata?.reasoning || newMessages[existingIndex].reasoningContent
               };
               return newMessages;
             } else {
@@ -297,6 +298,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
                 sessionId: sessionId,
                 role: 'assistant' as const,
                 content: content || '',
+                reasoningContent: metadata?.reasoning || '',
                 timestamp: new Date()
               }];
             }

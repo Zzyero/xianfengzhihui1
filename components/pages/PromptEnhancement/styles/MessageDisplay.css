@@ -1,36 +1,91 @@
 /* 使用命名空间包裹样式避免影响全局 */
 .message-display-wrapper {
   /* 消息显示组件样式 */
-  --text-primary: #1E293B;
+  --text-primary: #2c3e50;
   --text-secondary: #6b7280;
-  --border-color: #e0e0e0;
-  --code-block-bg: rgba(0, 0, 0, 0.02);
-  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  --code-text: #333;
+  --border-color: #eaeaea;
+  --code-block-bg: #f8fafc;
+  --font-mono: 'Fira Code', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --code-text: #2c3e50;
+  --reasoning-bg: rgba(30, 41, 59, 0.05);
+  --reasoning-border: rgba(30, 41, 59, 0.1);
+  --reasoning-icon: #00b7ff;
+  --reasoning-text: #717171;
+  --reasoning-content-bg: rgba(201, 208, 218, 0.228);
+  
+  /* 标题横线变量 */
+  --h1-border-width: 4px;
+  --h2-border-width: 3px;
+  --h3-border-width: 2px;
+  --h1-border-length: 33%;
+  --h2-border-length: 28%;
+  --h3-border-length: 23%;
+  --h4-border-length: 18%;
+  --h5-border-length: 13%;
+  --h6-border-length: 8%;
+  
+  /* 标题横线颜色 - 黑白色调 */
+  --h1-line-color: #333333;
+  --h2-line-color: #555555;
+  --h3-line-color: #777777;
+  --h4-line-color: #999999;
+  --h5-line-color: #aaaaaa;
+  --h6-line-color: #cccccc;
+  
+  /* 链接和引用块颜色 */
+  --link-color: #555555;
+  --link-hover-color: #333333;
+  --blockquote-border: #555555;
+  
+  /* 代码块样式 */
+  --code-bg-lighter: #f5f5f5;
+  --code-bg-darker: #f5f5f5;
+  --code-border: #eaecef;
+  --code-line-highlight: rgba(0, 0, 0, 0.04);
 }
 
 /* 暗色模式变量 */
 .dark .message-display-wrapper {
-  --text-primary: #FFFFFF;
-  --text-secondary: #A3A3A3;
-  --border-color: #2d2d2d;
-  --code-block-bg: rgba(255, 255, 255, 0.05);
-  --code-text: #e0e0e0;
+  --text-primary: #f8fafc;
+  --text-secondary: #e2e8f0;
+  --border-color: hsl(217.2 32.6% 17.5%);
+  --code-block-bg: hsl(220 13% 12%);
+  --code-text: #e2e8f0;
+  --reasoning-bg: rgba(255, 255, 255, 0.05);
+  --reasoning-border: rgba(255, 255, 255, 0.1);
+  --reasoning-icon: #00b7ff;
+  --reasoning-text: #e2e8f0;
+  --reasoning-content-bg: rgba(255, 255, 255, 0.03);
+  
+  /* 暗色模式标题横线颜色 */
+  --h1-line-color: #e0e0e0;
+  --h2-line-color: #c0c0c0;
+  --h3-line-color: #a0a0a0;
+  --h4-line-color: #888888;
+  --h5-line-color: #707070;
+  --h6-line-color: #555555;
+  
+  /* 暗色模式链接和引用块 */
+  --link-color: #c0c0c0;
+  --link-hover-color: #e0e0e0;
+  --blockquote-border: #a0a0a0;
+  
+  /* 暗色模式代码块样式 */
+  --code-bg-lighter: hsl(222 13% 14%);
+  --code-bg-darker: hsl(224 13% 10%);
+  --code-border: hsl(224 16% 16%);
+  --code-line-highlight: rgba(255, 255, 255, 0.06);
 }
 
 /* 消息显示组件样式 */
 .message-display-wrapper .message {
   display: flex;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
+  margin-bottom: 0.75rem; /* 减少消息之间的间距 */
+  padding: 0.4rem; /* 减小内边距 */
   border-radius: 0.5rem;
   transition: background-color 0.2s;
   width: 100%;
 }
-/* 
-.message-display-wrapper .message:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-} */
 
 .message-display-wrapper .user-message {
   flex-direction: row-reverse;
@@ -38,7 +93,7 @@
 
 .message-display-wrapper .message-avatar {
   flex-shrink: 0;
-  margin: 0 0.75rem;
+  margin: 0 0.5rem; /* 减少头像和消息内容的间距 */
 }
 
 .message-display-wrapper .avatar-content {
@@ -49,17 +104,17 @@
   height: 100%;
   font-size: 0.75rem;
   font-weight: bold;
-  background-color: #2563eb;
+  background-color: #c2dced;
   color: #fff;
 }
 
 /* 暗色模式下的头像样式 */
 .dark .message-display-wrapper .avatar-content {
-  background-color: #3b82f6;
+  background-color: #777777;
 }
 
 .message-display-wrapper .user-message .avatar-content {
-  background-color: #6b7280;
+  background-color: #c2dced;
 }
 
 .dark .message-display-wrapper .user-message .avatar-content {
@@ -67,7 +122,7 @@
 }
 
 .message-display-wrapper .message-content {
-  padding: 0.75rem;
+  padding: 0.6rem; /* 减小消息内容内边距 */
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -76,12 +131,12 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  background-color: #dbeafe;
+  background-color: #e5e7eb;
   color: #000;
 }
 
 .dark .message-display-wrapper .user-message .message-content {
-  background-color: #1e3a8a;
+  background-color: #374151;
   color: #fff;
 }
 
@@ -97,8 +152,8 @@
 
 /* 时间戳样式 */
 .message-display-wrapper .message-timestamp {
-  font-size: 0.75rem;
-  margin-top: 0.5rem;
+  font-size: 0.7rem; /* 减小时间戳字体 */
+  margin-top: 0.3rem; /* 减少顶部间距 */
   opacity: 0.7;
   color: #000;
   text-align: right;
@@ -110,58 +165,198 @@
 
 /* Markdown 内容样式 */
 .message-display-wrapper .markdown-content {
-  line-height: 1.6;
-  color: var(--text-primary, #1E293B);
+  line-height: 1.6; /* 减小行高 */
+  color: var(--text-primary);
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   word-wrap: break-word;
   word-break: break-word;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
+/* 标题基础样式 */
 .message-display-wrapper .markdown-content h1,
 .message-display-wrapper .markdown-content h2,
 .message-display-wrapper .markdown-content h3,
 .message-display-wrapper .markdown-content h4,
 .message-display-wrapper .markdown-content h5,
 .message-display-wrapper .markdown-content h6 {
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
+  margin-top: 1.2em; /* 减少标题顶部间距 */
+  margin-bottom: 0.4em; /* 减少标题底部间距 */
   font-weight: 600;
+  position: relative;
+  scroll-margin-top: 20px; /* 减小滚动边距 */
+  scroll-margin-bottom: 30px; /* 减小滚动边距 */
+  border-bottom: 1px solid #eaeaea; /* 添加默认底边框 */
+  padding-bottom: 0.2em; /* 添加底部内边距 */
 }
 
+/* 暗色模式下标题底边框 */
+.dark .message-display-wrapper .markdown-content h1,
+.dark .message-display-wrapper .markdown-content h2,
+.dark .message-display-wrapper .markdown-content h3,
+.dark .message-display-wrapper .markdown-content h4,
+.dark .message-display-wrapper .markdown-content h5,
+.dark .message-display-wrapper .markdown-content h6 {
+  border-bottom-color: var(--border-color);
+}
+
+/* h1标题 */
 .message-display-wrapper .markdown-content h1 {
-  font-size: 1.5rem;
-  border-bottom: 1px solid #eaecef;
-  padding-bottom: 0.3em;
+  font-size: 2.2rem; /* 减小标题字体大小 */
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: var(--h1-border-width) solid #eaeaea;
+  padding-bottom: 0.25em; /* 减少内边距 */
+  letter-spacing: -0.5px;
+  position: relative;
 }
 
+.message-display-wrapper .markdown-content h1::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: var(--h1-border-length);
+  height: var(--h1-border-width);
+  background-color: var(--h1-line-color);
+}
+
+/* h2标题 */
 .message-display-wrapper .markdown-content h2 {
-  font-size: 1.3rem;
-  border-bottom: 1px solid #eaecef;
-  padding-bottom: 0.3em;
+  font-size: 1.8rem; /* 减小字体大小 */
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: var(--h2-border-width) solid #f0f0f0;
+  padding-bottom: 0.25em; /* 减少内边距 */
+  position: relative;
 }
 
+.message-display-wrapper .markdown-content h2::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: var(--h2-border-length);
+  height: var(--h2-border-width);
+  background-color: var(--h2-line-color);
+}
+
+/* h3标题 */
 .message-display-wrapper .markdown-content h3 {
-  font-size: 1.2rem;
+  font-size: 1.4rem; /* 减小字体大小 */
+  font-weight: 500;
+  color: var(--text-primary);
+  border-bottom: var(--h3-border-width) solid #e0e0e0;
+  padding-bottom: 0.25em; /* 减少内边距 */
+  padding-left: 8px; /* 减少内边距 */
+  position: relative;
 }
 
+.message-display-wrapper .markdown-content h3::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: var(--h3-border-length);
+  height: var(--h3-border-width);
+  background-color: var(--h3-line-color);
+}
+
+/* h4标题 */
 .message-display-wrapper .markdown-content h4 {
-  font-size: 1.1rem;
+  font-size: 1.2rem; /* 减小字体大小 */
+  font-weight: 400;
+  color: var(--text-primary);
+  padding-left: 6px; /* 减少内边距 */
+  position: relative;
+  border-bottom: 1px solid #f0f0f0; /* 添加边框 */
 }
 
-.message-display-wrapper .markdown-content h5, .message-display-wrapper .markdown-content h6 {
-  font-size: 1rem;
+.message-display-wrapper .markdown-content h4::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: var(--h4-border-length);
+  height: 1px;
+  background-color: var(--h4-line-color);
+}
+
+/* h5和h6标题 */
+.message-display-wrapper .markdown-content h5,
+.message-display-wrapper .markdown-content h6 {
+  font-size: 1rem; /* 减小字体大小 */
+  font-weight: 500;
+  color: #7f8c8d;
+  position: relative;
+  border-bottom: 1px solid #f8f8f8; /* 更浅的边框 */
+}
+
+.message-display-wrapper .markdown-content h5::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: var(--h5-border-length);
+  height: 1px;
+  background-color: var(--h5-line-color);
+}
+
+.message-display-wrapper .markdown-content h6::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: var(--h6-border-length);
+  height: 1px;
+  background-color: var(--h6-line-color);
+}
+
+/* 暗色模式下标题 */
+.dark .message-display-wrapper .markdown-content h1 {
+  color: var(--text-primary);
+  border-bottom-color: hsl(217.2 32.6% 17.5%);
+}
+
+.dark .message-display-wrapper .markdown-content h2 {
+  color: var(--text-primary);
+  border-bottom-color: hsl(217.2 32.6% 17.5%);
+}
+
+.dark .message-display-wrapper .markdown-content h3 {
+  color: var(--text-primary);
+  border-bottom-color: hsl(217.2 32.6% 17.5%);
+}
+
+.dark .message-display-wrapper .markdown-content h4 {
+  border-bottom-color: hsl(217.2 32.6% 15%);
+}
+
+.dark .message-display-wrapper .markdown-content h5 {
+  color: #94a3b8;
+  border-bottom-color: hsl(217.2 32.6% 12%);
+}
+
+.dark .message-display-wrapper .markdown-content h6 {
+  color: #94a3b8;
+  border-bottom-color: hsl(217.2 32.6% 10%);
 }
 
 .message-display-wrapper .markdown-content p {
-  margin: 0.75em 0;
+  margin: 0.5em 0; /* 减少段落间距 */
+  line-height: 1.6; /* 减小行高 */
+  font-size: 1rem; /* 减小字体大小 */
+  color: var(--text-primary);
 }
 
-.message-display-wrapper .markdown-content ul, .message-display-wrapper .markdown-content ol {
-  margin: 0.75em 0;
-  padding-left: 2em;
+.message-display-wrapper .markdown-content ul, 
+.message-display-wrapper .markdown-content ol {
+  margin: 0.6rem 0; /* 减少列表外边距 */
+  padding-left: 1.5em; /* 减少左侧内边距 */
+  color: var(--text-primary);
 }
 
 .message-display-wrapper .markdown-content ul {
@@ -173,34 +368,60 @@
 }
 
 .message-display-wrapper .markdown-content li {
-  margin: 0.3em 0;
+  margin: 0.3rem 0; /* 减少列表项间距 */
+  line-height: 1.6; /* 减小行高 */
 }
 
 .message-display-wrapper .markdown-content blockquote {
-  margin: 0.75em 0;
-  padding: 0 1em;
-  color: #6a737d;
-  border-left: 0.25em solid #dfe2e5;
+  border-left: 4px solid var(--blockquote-border);
+  padding: 0.75rem 1.2rem; /* 减少内边距 */
+  margin: 1.2rem 0; /* 减少外边距 */
+  background-color: #f8f9fa;
+  border-radius: 0 6px 6px 0;
+  color: var(--text-primary);
+  font-style: italic;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 暗色模式下引用块 */
+.dark .message-display-wrapper .markdown-content blockquote {
+  border-left-color: var(--blockquote-border);
+  background-color: hsl(217.2 32.6% 17.5%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .message-display-wrapper .markdown-content code {
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  padding: 0.2em 0.4em;
+  font-family: var(--font-mono);
+  padding: 0.15em 0.3em; /* 减少内边距 */
   margin: 0;
   font-size: 85%;
-  background-color: rgba(27, 31, 35, 0.05);
+  background-color: var(--code-bg-lighter);
   border-radius: 3px;
+  color: var(--code-text);
+  border: 1px solid var(--code-border); /* 添加细边框 */
+}
+
+/* 暗色模式下行内代码 */
+.dark .message-display-wrapper .markdown-content code {
+  background-color: var(--code-bg-lighter);
+  border-color: var(--code-border);
 }
 
 /* 代码块容器样式 */
 .message-display-wrapper .code-block-container {
   position: relative;
-  border-radius: 6px;
+  border-radius: 6px; /* 减小圆角 */
   overflow: hidden;
-  border: 1px solid var(--border-color, #e0e0e0);
-  background-color: var(--code-block-bg, rgba(0, 0, 0, 0.02));
+  border: 1px solid var(--code-border);
+  background-color: var(--code-block-bg);
   max-width: 100%;
-  margin-bottom: 1rem;
+  margin: 1.2rem 0; /* 减少外边距 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12); /* 减小阴影 */
+}
+
+/* 暗色模式下代码块 */
+.dark .message-display-wrapper .code-block-container {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); /* 减小阴影 */
 }
 
 /* 代码块头部导航栏 */
@@ -208,30 +429,39 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.25rem 1rem;
-  background-color: rgba(0, 0, 0, 0.03);
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
-  font-family: var(--font-mono, monospace);
-  font-size: 0.8rem;
+  padding: 0.2rem 0.75rem; /* 减少内边距 */
+  background-color: var(--code-bg-darker);
+  border-bottom: 1px solid var(--code-border);
+  font-family: var(--font-mono);
+  font-size: 0.75rem; /* 减小字体大小 */
   z-index: 10;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
 }
 
+.dark .message-display-wrapper .code-block-header {
+  background-color: var(--code-bg-darker);
+}
+
 /* 代码语言标签 */
 .message-display-wrapper .code-language {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.2rem; /* 减少间距 */
   font-weight: 600;
   color: #555;
   text-transform: uppercase;
-  font-size: 0.75rem;
-  min-width: 40px;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-size: 0.7rem; /* 减小字体大小 */
+  min-width: 35px;
+  padding: 2px 5px; /* 减少内边距 */
+  border-radius: 3px; /* 减小圆角 */
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .message-display-wrapper .code-language {
+  color: #aaa;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* 复制按钮 */
@@ -239,19 +469,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.5rem;
-  color: var(--text-secondary, #6a737d);
+  padding: 0.2rem 0.4rem; /* 减少内边距 */
+  color: var(--text-secondary);
   background: transparent;
-  border-radius: 4px;
+  border-radius: 3px; /* 减小圆角 */
   transition: all 0.2s;
   flex-shrink: 0;
-  font-size: 0.75rem;
+  font-size: 0.7rem; /* 减小字体大小 */
   cursor: pointer;
 }
 
 .message-display-wrapper .copy-button:hover {
   background-color: rgba(0, 0, 0, 0.05);
-  color: var(--text-primary, #1E293B);
+  color: var(--text-primary);
+}
+
+.dark .message-display-wrapper .copy-button:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .message-display-wrapper .markdown-content pre {
@@ -260,122 +494,243 @@
   max-width: 100%;
   overflow-x: auto;
   box-sizing: border-box;
+  background-color: var(--code-bg-lighter); /* 设置背景色 */
+  background-image: linear-gradient(to bottom, var(--code-bg-lighter), var(--code-bg-darker)); /* 添加渐变效果 */
+  border-radius: 0 0 6px 6px; /* 底部圆角 */
 }
 
 .message-display-wrapper .markdown-content pre code {
-  padding: 1rem;
+  padding: 0.8rem 1.2rem; /* 减少内边距 */
   margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-size: 0.9rem; /* 减小字体大小 */
+  line-height: 1.5; /* 减小行高 */
   display: block;
-  background-color: transparent;
+  background-color: transparent; /* 透明背景，使用父元素背景 */
+  border: none; /* 移除边框 */
   border-radius: 0;
-  color: var(--code-text, #333);
-  font-family: var(--font-mono, monospace);
-  white-space: pre-wrap; /* 允许代码自动换行 */
-  word-break: break-word; /* 确保长词可以断行 */
-  overflow-wrap: break-word; /* 确保长词自动换行 */
+  color: var(--code-text);
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
   width: 100%;
   max-width: 100%;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1); /* 减轻阴影 */
 }
 
-.dark .message-display-wrapper .markdown-content pre code {
-  color: var(--code-text);
+/* 代码块行号和高亮 */
+.message-display-wrapper .markdown-content pre code .line {
+  display: block;
+  padding: 0 0 0 0.5rem;
+  border-left: 3px solid transparent;
+}
+
+.message-display-wrapper .markdown-content pre code .line:nth-child(even) {
+  background-color: var(--code-line-highlight);
+}
+
+.message-display-wrapper .markdown-content pre code .line.highlighted {
+  background-color: rgba(255, 238, 128, 0.1);
+  border-left: 3px solid #f1c40f;
+}
+
+.dark .message-display-wrapper .markdown-content pre code .line.highlighted {
+  background-color: rgba(255, 238, 128, 0.05);
+  border-left: 3px solid #f1c40f;
 }
 
 .message-display-wrapper .markdown-content table {
   border-collapse: collapse;
-  margin: 0.75em 0;
   width: 100%;
-  overflow: auto;
+  margin: 1.2rem 0; /* 减少外边距 */
+  border-radius: 6px; /* 减小圆角 */
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08); /* 减轻阴影 */
 }
 
 .message-display-wrapper .markdown-content table th,
 .message-display-wrapper .markdown-content table td {
-  padding: 0.5em 1em;
-  border: 1px solid #dfe2e5;
+  padding: 0.6rem 0.8rem; /* 减少内边距 */
+  text-align: left;
+  border: 1px solid #e0e0e0;
 }
 
 .message-display-wrapper .markdown-content table th {
+  background-color: #f2f6fa;
   font-weight: 600;
-  background-color: #f6f8fa;
+  color: var(--text-primary);
 }
 
-.message-display-wrapper .markdown-content table tr:nth-child(2n) {
-  background-color: #f6f8fa;
+.message-display-wrapper .markdown-content table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.message-display-wrapper .markdown-content table tr:hover {
+  background-color: #f2f6fa;
+}
+
+/* 暗色模式下表格样式 */
+.dark .message-display-wrapper .markdown-content table {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2); /* 减轻阴影 */
+}
+
+.dark .message-display-wrapper .markdown-content table th,
+.dark .message-display-wrapper .markdown-content table td {
+  border: 1px solid hsl(217.2 32.6% 17.5%);
+}
+
+.dark .message-display-wrapper .markdown-content table th {
+  background-color: hsl(217.2 32.6% 17.5%);
+}
+
+.dark .message-display-wrapper .markdown-content table tr:nth-child(even) {
+  background-color: hsl(222.2 84% 6%);
+}
+
+.dark .message-display-wrapper .markdown-content table tr:hover {
+  background-color: hsl(217.2 32.6% 17.5%);
 }
 
 .message-display-wrapper .markdown-content hr {
-  height: 0.25em;
+  height: 0.15em; /* 减小高度 */
   padding: 0;
-  margin: 1.5em 0;
+  margin: 1.2em 0; /* 减少外边距 */
   background-color: #e1e4e8;
   border: 0;
+}
+
+.dark .message-display-wrapper .markdown-content hr {
+  background-color: hsl(217.2 32.6% 17.5%);
 }
 
 .message-display-wrapper .markdown-content img {
   max-width: 100%;
   height: auto;
+  border-radius: 6px; /* 减小圆角 */
+  margin: 1.2rem 0; /* 减少外边距 */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* 减轻阴影 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.message-display-wrapper .markdown-content img:hover {
+  transform: translateY(-2px); /* 减小悬停移动距离 */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12); /* 减轻阴影 */
+}
+
+/* 暗色模式下图片样式 */
+.dark .message-display-wrapper .markdown-content img {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); /* 减轻阴影 */
+  border: 1px solid hsl(217.2 32.6% 17.5%);
+  filter: brightness(0.9) contrast(1.1);
+}
+
+.dark .message-display-wrapper .markdown-content img:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* 减轻阴影 */
 }
 
 .message-display-wrapper .markdown-content a {
-  color: #0366d6;
+  color: var(--link-color);
   text-decoration: none;
+  border-bottom: 1px dashed var(--link-color);
+  transition: all 0.2s ease;
+  padding: 0 2px;
 }
 
 .message-display-wrapper .markdown-content a:hover {
-  text-decoration: underline;
+  color: var(--link-hover-color);
+  border-bottom: 1px solid var(--link-hover-color);
+  background-color: rgba(85, 85, 85, 0.05);
 }
 
-/* 行内代码 */
-.message-display-wrapper .inline-code {
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  padding: 0.2em 0.4em;
-  font-size: 85%;
-  background-color: rgba(27, 31, 35, 0.05);
-  border-radius: 3px;
+/* 暗色模式下链接 */
+.dark .message-display-wrapper .markdown-content a {
+  color: var(--link-color);
+  border-bottom: 1px dashed var(--link-color);
 }
 
-/* 代码块 */
-.message-display-wrapper .code-block {
-  margin: 0;
-  padding: 1em;
-  background-color: #f6f8fa;
-  border-radius: 3px;
-  overflow: auto;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  font-size: 90%;
+.dark .message-display-wrapper .markdown-content a:hover {
+  color: var(--link-hover-color);
+  border-bottom: 1px solid var(--link-hover-color);
+  background-color: rgba(200, 200, 200, 0.1);
 }
 
-/* 纯文本样式 */
-.message-display-wrapper .plain-text {
-  white-space: pre-wrap;
-  line-height: 1.6;
+/* 深度思考容器样式 */
+.message-display-wrapper .reasoning-container {
+  margin-top: 0.6rem; /* 减少外边距 */
+  margin-bottom: 0.8rem; /* 减少外边距 */
+  border-radius: 0.4rem; /* 减小圆角 */
+  overflow: hidden;
+  width: 100%;
+  border: 1px solid var(--reasoning-border);
+  background-color: var(--reasoning-bg);
 }
 
-/* 主题适配 */
-.message-display-wrapper .light {
-  --background: #FFFFFF;
-  --text-primary: #1E293B;
-  --text-secondary: #64748B;
-  --border-color: #e0e0e0;
-  --code-block-bg: rgba(0, 0, 0, 0.02);
-  --code-text: #333;
+/* 思考过程切换按钮 */
+.message-display-wrapper .reasoning-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.4rem 0.8rem; /* 减少内边距 */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem; /* 减小字体大小 */
+  color: var(--reasoning-text);
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
-.message-display-wrapper .dark {
-  --background: #1F1F1F;
-  --text-primary: #FFFFFF;
-  --text-secondary: #A3A3A3;
-  --border-color: #2d2d2d;
-  --code-block-bg: rgba(255, 255, 255, 0.05);
-  --code-text: #e0e0e0;
+.message-display-wrapper .reasoning-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .message-display-wrapper .reasoning-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 深度思考图标 */
+.message-display-wrapper .reasoning-icon {
+  width: 0.9rem; /* 减小图标尺寸 */
+  height: 0.9rem; /* 减小图标尺寸 */
+  color: var(--reasoning-icon);
+  margin-right: 0.2rem; /* 减少外边距 */
+  flex-shrink: 0;
+}
+
+.message-display-wrapper .reasoning-brain-icon {
+  width: 1rem; 
+  height: 1rem; 
+  color: var(--reasoning-icon);
+  margin-right: 0.4rem; 
+  flex-shrink: 0;
+}
+
+.message-display-wrapper .reasoning-label {
+  flex-grow: 1;
+  text-align: left;
+}
+
+/* 深度思考内容 */
+.message-display-wrapper .reasoning-content {
+  padding: 0.8rem; 
+  background-color: var(--reasoning-content-bg);
+  border-top: 1px solid var(--reasoning-border);
+  font-size: 0.8rem; 
+  color: var(--text-secondary);
+  overflow-y: auto;
+  line-height: 1.5; 
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .message-display-wrapper .message-avatar {
-    width: 32px;
-    height: 32px;
+    width: 28px; 
+    height: 28px; 
   }
-} 
+  
+  .message-display-wrapper .reasoning-content {
+    padding: 0.6rem;
+    max-height: 250px;
+  }
+}

@@ -6,6 +6,7 @@ import PlaygroundPage from "@/components/pages/playground/playground-page";
 import ViewComfyPage from "@/components/pages/view-comfy/view-comfy-page";
 import SmartPSPage from "@/components/pages/smartPS/smartPS-page";
 import PromptEnhancementPage from "@/components/pages/PromptEnhancement/PromptEnhancementPage";
+import { HelpPage } from "@/components/pages/help/helpPage";
 import { ViewComfyProvider } from "@/app/providers/view-comfy-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
@@ -223,6 +224,8 @@ export default function Home() {
                         {currentTab === TabValue.WorkflowApi && <ViewComfyPage />}
                         {/* 智能PS页面 */}
                         {currentTab === TabValue.SmartPS && <SmartPSPage />}
+                        {/* 帮助页面 */}
+                        {currentTab === TabValue.Help && <HelpPage />}
                         {/* 提示词库页面 */}
                         {currentTab === TabValue.PromptLibrary && (
                             <div className="flex flex-col h-full">

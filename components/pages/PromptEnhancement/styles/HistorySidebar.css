@@ -3,6 +3,7 @@
   background-color: #f9fafb;
   border-color: #e5e7eb;
   font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
 .history-button:hover {
@@ -14,6 +15,24 @@
 .history-button.pinned {
   background-color: #dbeafe;
   border-color: #93c5fd;
+}
+
+/* 黑夜模式下的历史记录按钮 */
+.dark .history-button {
+  background-color: hsl(222.2 84% 4.9%);
+  border-color: hsl(217.2 32.6% 17.5%);
+  color: #e2e8f0;
+}
+
+.dark .history-button:hover {
+  background-color: hsl(222.2 84% 6.9%);
+  border-color: hsl(217.2 32.6% 20%);
+}
+
+.dark .history-button.pinned {
+  background-color: hsl(213 100% 15%);
+  border-color: hsl(213 100% 35%);
+  color: #e2e8f0;
 }
 
 /* 历史控制按钮容器 */
@@ -28,11 +47,24 @@
   background-color: #f9fafb;
   border-color: #e5e7eb;
   font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
 .new-chat-button:hover {
   background-color: #f3f4f6;
   border-color: #d1d5db;
+}
+
+/* 黑夜模式下的新建聊天按钮 */
+.dark .new-chat-button {
+  background-color: hsl(222.2 84% 4.9%);
+  border-color: hsl(217.2 32.6% 17.5%);
+  color: #e2e8f0;
+}
+
+.dark .new-chat-button:hover {
+  background-color: hsl(222.2 84% 6.9%);
+  border-color: hsl(217.2 32.6% 20%);
 }
 
 /* 侧边栏样式 */
@@ -42,11 +74,18 @@
   top: 0;
   height: 100%;
   width: 320px;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, background-color 0.3s ease;
   transform: translateX(100%);
   z-index: 50;
-  background-color: #fff;
+  background-color: #f8f8f8;
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* 黑夜模式下的侧边栏 */
+.dark .history-sidebar {
+  background-color: hsl(222.2 84% 5.9%);
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
 }
 
 /* 侧边栏打开状态 */
@@ -64,6 +103,12 @@
   overflow: hidden;
 }
 
+/* 黑夜模式下的侧边栏内容区 */
+.dark .sidebar-content {
+  border-left: 1px solid hsl(217.2 32.6% 17.5%);
+  box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.2);
+}
+
 /* 侧边栏宽度调整把手 */
 .resize-handle {
   position: absolute;
@@ -72,10 +117,15 @@
   height: 100%;
   width: 4px;
   cursor: ew-resize;
+  transition: background-color 0.2s ease;
 }
 
 .resize-handle:hover {
   background-color: #e5e7eb;
+}
+
+.dark .resize-handle:hover {
+  background-color: hsl(217.2 32.6% 20%);
 }
 
 /* 侧边栏内部容器 */
@@ -85,22 +135,64 @@
   overflow-y: auto;
 }
 
+/* 自定义滚动条样式 */
+.sidebar-inner::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-inner::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-inner::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 4px;
+}
+
+.sidebar-inner::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(107, 114, 128, 0.7);
+}
+
+.dark .sidebar-inner::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.5);
+}
+
+.dark .sidebar-inner::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.7);
+}
+
 /* 侧边栏头部 */
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
-  padding: 0.25rem;
-  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 2px solid #3498db;
+  position: sticky;
+  top: 0;
+  background-color: #f8f8f8;
+  z-index: 10;
+  box-shadow: 0 4px 6px -6px rgba(0, 0, 0, 0.1);
+}
+
+.dark .sidebar-header {
+  border-bottom: 2px solid #3b82f6;
+  background-color: hsl(222.2 84% 5.9%);
+  box-shadow: 0 4px 6px -6px rgba(0, 0, 0, 0.3);
 }
 
 .sidebar-header h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #000;
+  color: #2c3e50;
   text-align: center;
   margin: 0 auto;
+  letter-spacing: 0.5px;
+}
+
+.dark .sidebar-header h3 {
+  color: #f1f5f9;
 }
 
 /* 搜索框容器 */
@@ -117,6 +209,11 @@
   height: 1rem;
   width: 1rem;
   color: #9ca3af;
+  z-index: 1;
+}
+
+.dark .search-icon {
+  color: #94a3b8;
 }
 
 /* 搜索输入框 */
@@ -125,6 +222,23 @@
   color: #000;
   border-color: #e5e7eb;
   background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.dark .search-input {
+  color: #e2e8f0;
+  border-color: hsl(217.2 32.6% 17.5%);
+  background-color: hsl(222.2 84% 4.9%);
+}
+
+.dark .search-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
 }
 
 /* 会话列表 */
@@ -132,6 +246,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  position: relative;
 }
 
 /* 会话项 */
@@ -141,21 +256,40 @@
   padding: 0.75rem;
   border-radius: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
+  transition: all 0.2s ease;
   color: #000;
   position: relative;
+  border: 1px solid transparent;
 }
 
 .session-item:hover {
-  background-color: #f3f4f6;
+  background-color: #edf2f7;
 }
 
 .session-item.active {
-  background-color: #dbeafe;
+  background-color: rgba(52, 152, 219, 0.1);
+  border-left: 3px solid #3498db;
 }
 
 .session-item.starred {
   border-left: 3px solid #2563eb;
+}
+
+.dark .session-item {
+  color: #e2e8f0;
+}
+
+.dark .session-item:hover {
+  background-color: hsl(217.2 32.6% 17.5%);
+}
+
+.dark .session-item.active {
+  background-color: rgba(59, 130, 246, 0.2);
+  border-left: 3px solid #60a5fa;
+}
+
+.dark .session-item.starred {
+  border-left: 3px solid #3b82f6;
 }
 
 /* 拖拽样式 */
@@ -169,6 +303,14 @@
   transform: translateY(2px);
 }
 
+.dark .session-item.dragging {
+  background-color: hsl(217.2 32.6% 17.5%);
+}
+
+.dark .session-item.drag-over {
+  border: 2px dashed #3b82f6;
+}
+
 /* 拖拽把手 */
 .session-drag-handle {
   cursor: grab;
@@ -177,10 +319,15 @@
   display: flex;
   align-items: center;
   opacity: 0.3;
+  transition: opacity 0.2s ease;
 }
 
 .session-item:hover .session-drag-handle {
   opacity: 0.7;
+}
+
+.dark .session-drag-handle {
+  color: #94a3b8;
 }
 
 /* 会话内容容器 */
@@ -215,7 +362,29 @@
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
-  color: #000;
+  color: #34495e;
+  transition: color 0.2s ease;
+}
+
+.session-item:hover .title-content span {
+  color: #3498db;
+}
+
+.session-item.active .title-content span {
+  color: #3498db;
+  font-weight: 600;
+}
+
+.dark .title-content span {
+  color: #f1f5f9;
+}
+
+.dark .session-item:hover .title-content span {
+  color: #60a5fa;
+}
+
+.dark .session-item.active .title-content span {
+  color: #60a5fa;
 }
 
 /* 标题编辑输入框 */
@@ -224,6 +393,14 @@
   height: 1.75rem;
   padding: 0.25rem 0.5rem;
   min-width: 0;
+  border-radius: 0.25rem;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .title-edit-input {
+  color: #e2e8f0;
+  background-color: hsl(222.2 84% 4.9%);
+  border-color: hsl(217.2 32.6% 17.5%);
 }
 
 /* 会话操作按钮 */
@@ -231,7 +408,7 @@
   display: flex;
   align-items: center;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s ease;
 }
 
 .session-item:hover .session-actions {
@@ -251,29 +428,51 @@
   justify-content: center;
   color: #6b7280;
   background-color: transparent;
-  border-radius: 0.25rem;
-  transition: background-color 0.2s, color 0.2s;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.dark .star-button,
+.dark .edit-button,
+.dark .delete-button {
+  color: #94a3b8;
 }
 
 .star-button:hover,
 .edit-button:hover,
 .delete-button:hover {
-  background-color: #f3f4f6;
-  color: #111827;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #3498db;
 }
 
-/* 收藏按钮激活状态 */
+.dark .star-button:hover,
+.dark .edit-button:hover,
+.dark .delete-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #60a5fa;
+}
+
 .star-button.starred {
   color: #eab308;
+}
+
+.dark .star-button.starred {
+  color: #facc15;
 }
 
 /* 会话信息 */
 .session-info {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.25rem;
   font-size: 0.75rem;
   color: #6b7280;
+}
+
+.dark .session-info {
+  color: #94a3b8;
 }
 
 /* 会话预览文本 */
@@ -287,11 +486,22 @@
   -webkit-box-orient: vertical;
 }
 
-/* 搜索中、无会话提示 */
+.dark .session-preview {
+  color: #94a3b8;
+}
+
+/* 搜索中指示 */
 .searching-indicator,
-.no-sessions {
+.no-results-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 1rem;
-  text-align: center;
   color: #6b7280;
   font-size: 0.875rem;
+}
+
+.dark .searching-indicator,
+.dark .no-results-indicator {
+  color: #94a3b8;
 } 

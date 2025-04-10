@@ -19,6 +19,7 @@ export interface Message {
   role: 'user' | 'assistant' | 'system'; // 消息角色
   content: string;          // 消息内容
   timestamp: Date;          // 时间戳
+  reasoningContent?: string; // 思考内容
 }
 
 export interface ChatSession {
@@ -46,6 +47,7 @@ export interface Model {
   parameters?: string;      // 其他参数
   apiId?: string;           // API调用的模型标识符
   timestamp: Date;          // 创建/更新时间
+  type?: string;            // 模型类型，如'api'
 }
 
 export interface InputHistory {
@@ -386,8 +388,20 @@ const db = {
    * @param model 模型对象
    */
   saveModel: async (model: Model): Promise<IDBValidKey> => {
+    // 确保parameters是字符串类型
+    let modelToSave = {...model};
+    
+    if (modelToSave.parameters && typeof modelToSave.parameters !== 'string') {
+      try {
+        modelToSave.parameters = JSON.stringify(modelToSave.parameters);
+      } catch (error) {
+        // 如果无法转为JSON字符串，设为undefined
+        modelToSave.parameters = undefined;
+      }
+    }
+    
     const modelWithTimestamp = {
-      ...model,
+      ...modelToSave,
       timestamp: model.timestamp || new Date()
     };
     
@@ -538,15 +552,16 @@ const db = {
     try {
       const models = await this.getAllModels();
       if (models.length === 0) {
-        // 添加默认模型
+        // 添加默认模型，注意parameters是一个格式良好的JSON字符串
         const defaultModel: Model = {
           id: `${Date.now()}`,
-          name: 'Your Model',
-          url: 'Your Model Url',
+          name: 'Set Your Model Name',
+          url: 'Set Your Model Url',
           apiKey: '',
-          apiId: 'Your Model Id',
-          parameters: '{"temperature":0.7,"max_tokens":2000}',
-          timestamp: new Date()
+          apiId: 'Set Your Model Id',
+          parameters: '{"temperature":0.7,"max_tokens":2000,"stream":true,"top_p":1}', // 正确的JSON格式字符串
+          timestamp: new Date(),
+          type: 'api'
         };
         await this.saveModel(defaultModel);
       }

@@ -1,0 +1,564 @@
+/* 变量定义 */
+:root {
+  /* 标题横线颜色 */
+  --h1-line-color: #333333;
+  --h2-line-color: #555555;
+  --h3-line-color: #777777;
+  --h4-line-color: #999999;
+  --h5-line-color: #aaaaaa;
+  --h6-line-color: #cccccc;
+  
+  /* 链接颜色 */
+  --link-color: #555555;
+  --link-hover-color: #333333;
+  
+  /* 引用块颜色 */
+  --blockquote-border: #555555;
+  
+  /* 代码块样式 */
+  --code-bg-lighter: #fafbfc;
+  --code-bg-darker: #f3f4f6;
+  --code-border: #eaecef;
+  --code-line-highlight: rgba(0, 0, 0, 0.04);
+}
+
+/* 暗色模式变量 */
+.dark:root {
+  /* 暗色模式标题横线 */
+  --h1-line-color: #e0e0e0;
+  --h2-line-color: #c0c0c0;
+  --h3-line-color: #a0a0a0;
+  --h4-line-color: #888888;
+  --h5-line-color: #707070;
+  --h6-line-color: #555555;
+  
+  /* 暗色模式链接 */
+  --link-color: #c0c0c0;
+  --link-hover-color: #e0e0e0;
+  
+  /* 暗色模式引用块 */
+  --blockquote-border: #a0a0a0;
+  
+  /* 暗色模式代码块样式 */
+  --code-bg-lighter: hsl(222 13% 14%);
+  --code-bg-darker: hsl(224 13% 10%);
+  --code-border: hsl(224 16% 16%);
+  --code-line-highlight: rgba(255, 255, 255, 0.06);
+}
+
+.help-page-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #ffffff;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* 暗色模式下页面容器样式 */
+.dark .help-page-container {
+  background-color: hsl(222.2 84% 4.9%);
+  color: #e2e8f0;
+}
+
+/* 内容区域样式 */
+.content-container {
+  flex: 1;
+  padding: 2.5rem 1rem 2.5rem 1.8rem; /* 减少内边距 */
+  overflow-y: auto;
+  line-height: 1.6; /* 减小行高 */
+  width: calc(100% - 300px); /* 减去侧边栏宽度 */
+  background-image: linear-gradient(to bottom, #f9f9f9, #ffffff);
+  color: #2c3e50;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.02); /* 减轻阴影 */
+}
+
+/* 暗色模式下内容区域样式 */
+.dark .content-container {
+  background-image: linear-gradient(to bottom, hsl(222.2 84% 4.9%), hsl(220 13% 10%));
+  color: #e2e8f0;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.15); /* 减轻阴影 */
+}
+
+/* 明确设置侧边栏在右侧 */
+.help-sidebar {
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 300px; /* 导航栏宽度 */
+  z-index: 10;
+  overflow-y: auto; /* 添加滚动功能 */
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.04); /* 减轻阴影 */
+  border-left: 1px solid #eaeaea;
+}
+
+/* 暗色模式下侧边栏样式 */
+.dark .help-sidebar {
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15); /* 减轻阴影 */
+  border-left: 1px solid hsl(217.2 32.6% 17.5%);
+}
+
+/* 滚动条样式 - 适用于WebKit浏览器 */
+.content-container::-webkit-scrollbar, 
+.help-sidebar::-webkit-scrollbar {
+  width: 6px; /* 减小滚动条宽度 */
+}
+
+.content-container::-webkit-scrollbar-track, 
+.help-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content-container::-webkit-scrollbar-thumb, 
+.help-sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px; /* 减小圆角 */
+}
+
+.content-container::-webkit-scrollbar-thumb:hover, 
+.help-sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(107, 114, 128, 0.7);
+}
+
+/* 暗色模式下滚动条样式 */
+.dark .content-container::-webkit-scrollbar-thumb, 
+.dark .help-sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.5);
+}
+
+.dark .content-container::-webkit-scrollbar-thumb:hover, 
+.dark .help-sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.7);
+}
+
+/* 滚动条样式 - Firefox */
+.content-container, .help-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.dark .content-container, 
+.dark .help-sidebar {
+  scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
+}
+
+/* 所有标题的基础样式 */
+.help-heading {
+  scroll-margin-top: 20px; /* 减小滚动边距 */
+  scroll-margin-bottom: 30px; /* 减小滚动边距 */
+  transition: color 0.3s ease;
+  border-bottom: 1px solid #eaeaea; /* 添加默认底边框 */
+  padding-bottom: 0.2em; /* 添加底部内边距 */
+}
+
+/* 暗色模式下标题底边框 */
+.dark .help-heading {
+  border-bottom-color: var(--border-color);
+}
+
+/* 标题激活效果 */
+.active-heading {
+  animation: headingHighlight 1.5s ease; /* 减少动画时间 */
+}
+
+@keyframes headingHighlight {
+  0% {
+    background-color: rgba(100, 100, 100, 0.15);
+    border-radius: 5px; /* 减小圆角 */
+  }
+  70% {
+    background-color: rgba(100, 100, 100, 0.15);
+    border-radius: 5px; /* 减小圆角 */
+  }
+  100% {
+    background-color: transparent;
+    border-radius: 0;
+  }
+}
+
+/* 暗色模式下标题高亮动画 */
+.dark .active-heading {
+  animation: darkHeadingHighlight 1.5s ease; /* 减少动画时间 */
+}
+
+@keyframes darkHeadingHighlight {
+  0% {
+    background-color: rgba(200, 200, 200, 0.2);
+    border-radius: 5px; /* 减小圆角 */
+  }
+  70% {
+    background-color: rgba(200, 200, 200, 0.2);
+    border-radius: 5px; /* 减小圆角 */
+  }
+  100% {
+    background-color: transparent;
+    border-radius: 0;
+  }
+}
+
+/* Markdown 渲染样式 */
+.content-container h1 {
+  font-size: 2.2rem; /* 减小字体大小 */
+  margin-top: 1.2em; /* 减少顶部间距 */
+  margin-bottom: 0.4rem; /* 减少底部间距 */
+  border-bottom: 4px solid #eaeaea;
+  color: #2c3e50;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  position: relative;
+}
+
+.content-container h1::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 33%; /* 占用宽度约1/3 */
+  height: 4px;
+  background-color: var(--h1-line-color);
+}
+
+/* 暗色模式下h1标题 */
+.dark .content-container h1 {
+  color: #f8fafc;
+  border-bottom-color: hsl(217.2 32.6% 17.5%);
+}
+
+.content-container h2 {
+  font-size: 1.8rem; /* 减小字体大小 */
+  margin-top: 1.2em; /* 减少顶部间距 */
+  margin-bottom: 0.4em; /* 减少底部间距 */
+  color: #34495e;
+  font-weight: 500;
+  border-bottom: 3px solid #f0f0f0;
+  position: relative;
+}
+
+.content-container h2::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 28%; /* 宽度略小于h1 */
+  height: 3px;
+  background-color: var(--h2-line-color);
+}
+
+/* 暗色模式下h2标题 */
+.dark .content-container h2 {
+  color: #f1f5f9;
+  border-bottom-color: hsl(217.2 32.6% 17.5%);
+}
+
+.content-container h3 {
+  font-size: 1.4rem; /* 减小字体大小 */
+  margin-top: 1.2em; /* 减少顶部间距 */
+  margin-bottom: 0.4em; /* 减少底部间距 */
+  font-weight: 400;
+  border-bottom: 2px solid #e0e0e0;
+  padding-left: 8px; /* 减少左侧内边距 */
+  position: relative;
+}
+
+.content-container h3::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 23%; /* 继续递减 */
+  height: 2px;
+  background-color: var(--h3-line-color);
+}
+
+/* 暗色模式下h3标题 */
+.dark .content-container h3 {
+  color: #f1f5f9;
+  border-bottom-color: hsl(217.2 32.6% 17.5%);
+}
+
+.content-container h4 {
+  font-size: 1.2rem; /* 减小字体大小 */
+  margin-top: 1.2em; /* 减少顶部间距 */
+  margin-bottom: 0.4em; /* 减少底部间距 */
+  font-weight: 300;
+  padding-left: 6px; /* 减少左侧内边距 */
+  position: relative;
+  border-bottom: 1px solid #f0f0f0; /* 添加边框 */
+}
+
+.content-container h4::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 18%; /* 继续递减 */
+  height: 1px;
+  background-color: var(--h4-line-color);
+}
+
+.dark .content-container h4 {
+  border-bottom-color: hsl(217.2 32.6% 15%);
+}
+
+.content-container h5,
+.content-container h6 {
+  font-size: 1rem; /* 减小字体大小 */
+  color: #7f8c8d;
+  margin-top: 1.2em; /* 减少顶部间距 */
+  margin-bottom: 0.4em; /* 减少底部间距 */
+  font-weight: 500;
+  scroll-margin-top: 20px;
+  position: relative;
+  border-bottom: 1px solid #f8f8f8; /* 更浅的边框 */
+}
+
+.content-container h5::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 13%; /* 继续递减 */
+  height: 1px;
+  background-color: var(--h5-line-color);
+}
+
+.content-container h6::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 8%; /* 最小宽度 */
+  height: 1px;
+  background-color: var(--h6-line-color);
+}
+
+.dark .content-container h5,
+.dark .content-container h6 {
+  color: #a0a0a0;
+}
+
+.dark .content-container h5 {
+  border-bottom-color: hsl(217.2 32.6% 12%);
+}
+
+.dark .content-container h6 {
+  border-bottom-color: hsl(217.2 32.6% 10%);
+}
+
+.content-container p {
+  margin-bottom: 0.8rem; /* 减少底部间距 */
+  color: #34495e;
+  line-height: 1.6; /* 减小行高 */
+  font-size: 1rem; /* 减小字体大小 */
+}
+
+/* 暗色模式下段落文本 */
+.dark .content-container p {
+  color: #e2e8f0;
+}
+
+.content-container ul, .content-container ol {
+  margin-bottom: 0.6rem; /* 减少底部间距 */
+  padding-left: 1.5rem; /* 减少左侧内边距 */
+  color: #34495e;
+}
+
+/* 暗色模式下列表样式 */
+.dark .content-container ul,
+.dark .content-container ol {
+  color: #e2e8f0;
+}
+
+.content-container li {
+  margin-bottom: 0.3rem;
+  line-height: 1.6; /* 减小行高 */
+}
+
+.content-container blockquote {
+  border-left: 4px solid var(--blockquote-border);
+  padding: 0.75rem 1.2rem; /* 减少内边距 */
+  margin: 1.2rem 0; /* 减少外边距 */
+  background-color: #f8f9fa;
+  border-radius: 0 5px 5px 0; /* 减小圆角 */
+  color: #2c3e50;
+  font-style: italic;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04); /* 减轻阴影 */
+}
+
+/* 暗色模式下引用块 */
+.dark .content-container blockquote {
+  border-left: 4px solid var(--blockquote-border);
+  background-color: hsl(217.2 32.6% 17.5%);
+  color: #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); /* 减轻阴影 */
+}
+
+.content-container code {
+  background-color: var(--code-bg-lighter);
+  padding: 0.15em 0.3em; /* 减少内边距 */
+  border-radius: 3px; /* 减小圆角 */
+  font-family: 'Fira Code', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.9em; /* 减小字体大小 */
+  border: 1px solid var(--code-border); /* 添加细边框 */
+}
+
+/* 暗色模式下行内代码 */
+.dark .content-container code {
+  background-color: var(--code-bg-lighter);
+  color: #e2e8f0;
+  border-color: var(--code-border);
+}
+
+.content-container pre {
+  background-color: var(--code-bg-lighter);
+  padding: 0; /* 移除内边距，使用代码元素的内边距 */
+  border-radius: 6px; /* 减小圆角 */
+  overflow-x: auto;
+  margin-bottom: 1.2rem; /* 减少底部间距 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12); /* 减轻阴影 */
+  position: relative;
+  border: 1px solid var(--code-border); /* 添加边框 */
+  background-image: linear-gradient(to bottom, var(--code-bg-lighter), var(--code-bg-darker)); /* 添加渐变效果 */
+}
+
+/* 暗色模式下代码块 */
+.dark .content-container pre {
+  background-color: var(--code-bg-lighter);
+  background-image: linear-gradient(to bottom, var(--code-bg-lighter), var(--code-bg-darker));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); /* 减轻阴影 */
+  border-color: var(--code-border);
+}
+
+.content-container pre code {
+  background-color: transparent;
+  padding: 0.8rem 1.2rem; /* 添加内边距 */
+  color: #2c3e50;
+  border: none;
+  font-size: 0.9em; /* 减小字体大小 */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1); /* 减轻阴影 */
+  display: block;
+  line-height: 1.5;
+}
+
+.dark .content-container pre code {
+  color: #e2e8f0;
+}
+
+/* 代码块行样式 */
+.content-container pre code .line {
+  display: block;
+  padding: 0 0 0 0.5rem;
+  border-left: 3px solid transparent;
+}
+
+.content-container pre code .line:nth-child(even) {
+  background-color: var(--code-line-highlight);
+}
+
+.dark .content-container pre code .line:nth-child(even) {
+  background-color: var(--code-line-highlight);
+}
+
+.content-container a {
+  color: var(--link-color);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--link-color);
+  transition: all 0.2s ease;
+  padding: 0 2px;
+}
+
+.content-container a:hover {
+  color: var(--link-hover-color);
+  border-bottom: 1px solid var(--link-hover-color);
+  background-color: rgba(85, 85, 85, 0.05);
+}
+
+/* 暗色模式下链接 */
+.dark .content-container a {
+  color: var(--link-color);
+  border-bottom: 1px dashed var(--link-color);
+}
+
+.dark .content-container a:hover {
+  color: var(--link-hover-color);
+  border-bottom: 1px solid var(--link-hover-color);
+  background-color: rgba(200, 200, 200, 0.1);
+}
+
+.content-container table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2rem 0; /* 减少外边距 */
+  border-radius: 6px; /* 减小圆角 */
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08); /* 减轻阴影 */
+}
+
+.content-container th, .content-container td {
+  border: 1px solid #e0e0e0;
+  padding: 0.6rem 0.8rem; /* 减少内边距 */
+  text-align: left;
+}
+
+.content-container th {
+  background-color: #f2f6fa;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.content-container tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.content-container tr:hover {
+  background-color: #f2f6fa;
+}
+
+/* 暗色模式下表格样式 */
+.dark .content-container table {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2); /* 减轻阴影 */
+}
+
+.dark .content-container th,
+.dark .content-container td {
+  border: 1px solid hsl(217.2 32.6% 17.5%);
+}
+
+.dark .content-container th {
+  background-color: hsl(217.2 32.6% 17.5%);
+  color: #f1f5f9;
+}
+
+.dark .content-container tr:nth-child(even) {
+  background-color: hsl(222.2 84% 6%);
+}
+
+.dark .content-container tr:hover {
+  background-color: hsl(217.2 32.6% 17.5%);
+}
+
+.content-container .doc-image {
+  max-width: 100%;
+  border-radius: 6px; /* 减小圆角 */
+  margin: 1.2rem 0; /* 减少外边距 */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* 减轻阴影 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.content-container .doc-image:hover {
+  transform: translateY(-2px); /* 减小悬停移动距离 */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12); /* 减轻阴影 */
+}
+
+/* 暗色模式下图片样式 */
+.dark .content-container .doc-image {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); /* 减轻阴影 */
+  border: 1px solid hsl(217.2 32.6% 17.5%);
+  filter: brightness(0.9) contrast(1.1);
+}
+
+.dark .content-container .doc-image:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* 减轻阴影 */
+}
