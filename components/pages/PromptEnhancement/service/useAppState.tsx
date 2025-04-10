@@ -233,9 +233,9 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
     const newValue = !isDisableHistory;
     setIsDisableHistory(newValue);
     if (newValue) {
-      toast.success('已禁用聊天历史记录，AI 将只看到当前消息');
+      toast.success('启用单轮对话，AI只能看到当前消息');
     } else {
-      toast.info('已启用聊天历史记录，AI 将看到完整对话');
+      toast.info('启用多轮对话，AI能看到完整对话内容');
     }
   };
 

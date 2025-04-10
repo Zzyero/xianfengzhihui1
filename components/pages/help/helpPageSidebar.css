@@ -1,8 +1,7 @@
 .help-sidebar {
   width: 300px;
-  height: 100vh; /* 使用视口高度 */
+  height: 100%; /* 使用视口高度 */
   border-left: 1px solid #eaeaea;
-  padding: 20px 0;
   display: flex;
   flex-direction: column;
   background-color: #f8f8f8;
@@ -38,7 +37,7 @@
   margin-bottom: 15px; /* 减少下方间距 */
   padding-bottom: 12px;
   padding-top: 15px;
-  border-bottom: 2px solid #3498db;
+  border-bottom: 2px solid #94a3b8;
   position: sticky;
   top: 0;
   background-color: #f8f8f8;
@@ -50,7 +49,7 @@
 /* 暗色模式下导航标题 */
 .dark .nav-title {
   color: #f1f5f9;
-  border-bottom: 2px solid #3b82f6;
+  border-bottom: 2px solid #e2e8f0;
   background-color: hsl(222.2 84% 5.9%);
   box-shadow: 0 4px 6px -6px rgba(0, 0, 0, 0.3);
 }
@@ -105,7 +104,7 @@
   transition: transform 0.3s ease;
   margin-left: 5px;
   margin-right: 8px; /* 增加右侧间距 */
-  color: #3498db;
+  color: #34495e;
   flex-shrink: 0; /* 防止图标被压缩 */
   display: flex;
   justify-content: center;
@@ -116,7 +115,7 @@
 
 /* 暗色模式下折叠图标 */
 .dark .collapse-icon {
-  color: #60a5fa;
+  color: #e2e8f0;
 }
 
 .collapse-icon.collapsed {
@@ -127,7 +126,6 @@
 .heading-item {
   padding: 8px 10px; /* 减少水平内边距 */
   cursor: pointer;
-  color: #34495e;
   transition: all 0.2s ease;
   font-size: 14px;
   flex: 1;
@@ -139,12 +137,8 @@
   width: calc(100% - 26px); /* 确保宽度，减去图标宽度 */
 }
 
-.heading-item:hover {
-  color: #3498db;
-}
 
 .heading-item.active {
-  color: #3498db;
   font-weight: 500;
   background-color: rgba(52, 152, 219, 0.1);
 }
@@ -154,12 +148,7 @@
   color: #e2e8f0;
 }
 
-.dark .heading-item:hover {
-  color: #60a5fa;
-}
-
 .dark .heading-item.active {
-  color: #60a5fa;
   background-color: rgba(59, 130, 246, 0.2);
 }
 
@@ -198,7 +187,7 @@
 
 .level-3 > .heading-item-wrapper > .heading-item {
   font-size: 13px;
-  color: #3498db;
+  color: #7f8c8d;
   padding-top: 8px;
   padding-bottom: 8px;
 }
@@ -207,26 +196,26 @@
 .level-5 > .heading-item-wrapper > .heading-item,
 .level-6 > .heading-item-wrapper > .heading-item {
   font-size: 12px;
-  color: #7f8c8d;
+  color: rgb(155, 155, 155);
   padding-top: 7px;
   padding-bottom: 7px;
 }
 
 /* 暗色模式下不同级别标题样式 */
 .dark .level-1 > .heading-item-wrapper > .heading-item {
-  color: #f1f5f9;
+  color: #f8f8f8;
 }
 
 .dark .level-2 > .heading-item-wrapper > .heading-item {
-  color: #e2e8f0;
+  color: rgb(209, 209, 209);
 }
 
 .dark .level-3 > .heading-item-wrapper > .heading-item {
-  color: #60a5fa;
+  color: rgb(161, 161, 161);
 }
 
 .dark .level-4 > .heading-item-wrapper > .heading-item,
 .dark .level-5 > .heading-item-wrapper > .heading-item,
 .dark .level-6 > .heading-item-wrapper > .heading-item {
-  color: #94a3b8;
+  color: rgb(104, 104, 104);
 } 

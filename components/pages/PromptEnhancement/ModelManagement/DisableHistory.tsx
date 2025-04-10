@@ -24,14 +24,14 @@ const DisableHistory: React.FC = () => {
             variant="outline"
             size="sm"
           >
-            {isDisableHistory ? '历史记录：关闭' : '历史记录：开启'}
+            {isDisableHistory ? '单轮对话' : '多轮对话'}
           </Button>
         </TooltipTrigger>
         <TooltipContent style={{ backgroundColor: '#f9fafb', color: 'black' }}>
           <p>
             {isDisableHistory 
-              ? '当前禁用历史记录，AI只能看到当前消息' 
-              : '当前启用历史记录，AI能看到完整对话内容'}
+              ? '当前为单轮对话，AI只能看到当前消息' 
+              : '当前为多轮对话，AI能看到完整对话内容'}
           </p>
         </TooltipContent>
       </Tooltip>
