@@ -2,27 +2,190 @@
   "prompts": [
     {
       "prompt": "",
-      "promptEn": "XUER Qing dynasty Dresses,1girl,solo,long hair,smile,brown hair,black hair,hair ornament,long sleeves,holding,standing,full body,flower,hair flower,wide sleeves,hand on hip,chinese clothes,floral print,holding umbrella,realistic,oil-paper umbrella，east asian architecture,night,depth of field,blurry background,looking away,chinese clothes,floral print,smoke,realistic,\nhighly detailed,ultra-high resolution,32K UHD,sharp    focus,best-quality,masterpiece,The outline of a woman,double exposure,\nunconventional supreme masterpiece,masterful details,temperate atmosphere,\ncinematic photo This is a poster about the Qing and Han Dynasties，It has a realistic picture effect，The picture is messy and extremely rich in details，(The theme text of the poster is: \"XUER\":1.2)，One line apart,(the subtitle below reads: \"Qing and Han Dynasties\":1.2),\n\n",
+      "promptEn": "Trump\nThis is a comic book style picture, there is an old man, yellow hair, blue suit, red tie, Beijing is the universe, he is located behind the earth, the right hand is a boat on the surface of the earth, the other hand is holding the plane on the earth, the ship and the plane have the logo of the American flag.",
+      "parameters": {
+        "steps": "35",
+        "sampler": "dpm_adaptive",
+        "seed": "954836278540513",
+        "scheduler": "karras",
+        "denoise": "1",
+        "cfg": "",
+        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 3 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613561790.png",
+      "id": "1744613565278",
+      "createdAt": "2025-04-14T06:52:45.278Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "Trump\n\nIt is a comic-book style image of a character in a blue suit and red tie standing on a cracked step, using a broom to sweep a glass display case that reads \"Human Rights\" on a higher step. The steps he was standing on were cracked, and there were many white bones under them. The meaning of this painting may be to criticize the hypocrisy of certain countries in pursuing and safeguarding human rights, or to accuse them of ignoring human rights issues or even creating human rights crises.",
+      "parameters": {
+        "steps": "35",
+        "sampler": "dpm_adaptive",
+        "seed": "954836278540517",
+        "scheduler": "normal",
+        "denoise": "1",
+        "cfg": "",
+        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 3 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613568968.png",
+      "id": "1744613569726",
+      "createdAt": "2025-04-14T06:52:49.726Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "Trump\n\nIt is a comic-book style image of a character in a blue suit and red tie standing on a cracked step, using a broom to sweep a glass display case that reads \"Human Rights\" on a higher step. The steps he was standing on were cracked, and there were many white bones under them. The meaning of this painting may be to criticize the hypocrisy of certain countries in pursuing and safeguarding human rights, or to accuse them of ignoring human rights issues or even creating human rights crises.",
+      "parameters": {
+        "steps": "35",
+        "sampler": "dpm_adaptive",
+        "seed": "954836278540520",
+        "scheduler": "ddim_uniform",
+        "denoise": "1",
+        "cfg": "",
+        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 3 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613572800.png",
+      "id": "1744613573772",
+      "createdAt": "2025-04-14T06:52:53.772Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "laiqingde2, dressed in a black suit, is in the top half of the frame, inside the plane, leaning out of the window with the trophy in his hand, and the ground below is covered with trash and white skulls.",
+      "parameters": {
+        "steps": "35",
+        "sampler": "heunpp2",
+        "seed": "954836278540573",
+        "scheduler": "ddim_uniform",
+        "denoise": "1",
+        "cfg": "",
+        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 6 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613576961.png",
+      "id": "1744613577708",
+      "createdAt": "2025-04-14T06:52:57.708Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "laiqingde2, The overall picture of the comic is the interior of the plane, laiqingde wearing a black suit sitting on the plane seat, holding a book in his hand and reading",
+      "parameters": {
+        "steps": "35",
+        "sampler": "dpm_adaptive",
+        "seed": "954836278540580",
+        "scheduler": "ddim_uniform",
+        "denoise": "1",
+        "cfg": "",
+        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 6 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613580751.png",
+      "id": "1744613581533",
+      "createdAt": "2025-04-14T06:53:01.533Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "laiqingde2, The comic as a whole is divided into two parts, the top half is a flying plane, laiqingde out of the window of the plane, holding the trophy in his hands, the bottom half is an island on the shore, the island and the sea are filled with garbage and skulls",
+      "parameters": {
+        "steps": "35",
+        "sampler": "dpm_adaptive",
+        "seed": "954836278540582",
+        "scheduler": "ddim_uniform",
+        "denoise": "1",
+        "cfg": "",
+        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 6 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613584151.png",
+      "id": "1744613585123",
+      "createdAt": "2025-04-14T06:53:05.123Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "Trump\nThe cartoon offers a poignant satire of an elderly man dressed in a blue suit and a red tie shooting his right feet. His facial expression is one of acute distress. Clutched in his right hand is a gun, with the muzzle pointed downwards, indicating a self-inflicted wound that is seeping red blood. A chilling detail is the inscription \"IRAN\" on his shoes, which, along with the pool of blood on the floor, adds a layer of political commentary to the scene.",
       "parameters": {
         "steps": "25",
-        "sampler": "euler",
-        "seed": "555176039573955",
-        "scheduler": "simple",
+        "sampler": "uni_pc",
+        "seed": "1037",
+        "scheduler": "beta",
+        "denoise": "1",
+        "cfg": "",
+        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 3 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613588022.png",
+      "id": "1744613588804",
+      "createdAt": "2025-04-14T06:53:08.804Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "meiguolao,\n\n\nThe image is a political satire cartoon featuring two caricatured figures. The figure on the left is dressed in a patriotic American theme, wearing a top hat with stars and stripes, similar to the American flag. This character also sports a bow tie and a suit with a pattern of stars, and the pants have a stripe pattern that mirrors the flag's design. The figure's behavior is aggressive, as it is depicted holding a large gun with both hands, and the gun is firing, indicated by the flames and bullets shown in the image.\n\nThe figure on the right is wearing a suit with a red tie and has a bandana covering its eyes, which is a common depiction of a burglar or someone engaging in covert activities. This character is also holding a gun and is shown in a firing stance. Notably, the figure has a speech bubble with the word \"Taiwan\" in Chinese characters, which is a focal point of the image and suggests a commentary on political issues related to Taiwan.\n\nThe background is a soft pink, which contrasts with the violent action depicted, possibly to enhance the讽刺 (satirical) nature of the cartoon. The overall tone of the image is one of political commentary, using exaggeration and symbolism to convey a message about the relationship between the figures and the concept of Taiwan. The image is likely intended to provoke thought or discussion about political dynamics or policies.",
+      "parameters": {
+        "steps": "35",
+        "sampler": "dpmpp_2m",
+        "seed": "1024",
+        "scheduler": "beta",
         "denoise": "1",
         "cfg": "",
         "negative": ""
       },
-      "tags": [
-        {
-          "id": "1743491813768",
-          "name": "sdfsdfs",
-          "color": "#aafe56"
-        }
-      ],
-      "imageUrl": "/images/prompts/1743491797917.png",
-      "id": "1743491799863",
-      "createdAt": "2025-04-01T07:16:39.863Z",
-      "updatedAt": "2025-04-01T07:16:54.819Z"
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613592072.png",
+      "id": "1744613592876",
+      "createdAt": "2025-04-14T06:53:12.876Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "meiguolao,\n\nThe image depicts a caricature of a figure dressed in an American patriotic theme.1 man is wearing a top hat adorned with stars and stripes, reminiscent of the American flag. The outfit is completed with a suit that carries the same patriotic color scheme, and the pants have a striped pattern that echoes the flag's design.\n\nThe figure's behavior is aggressive and combative; it is holding a large, green military-style weapon with both hands, and the weapon is actively firing, as indicated by the flames and smoke emanating from the barrel. The character's facial expression is one of fierce determination or possibly fanaticism, which, combined with the attire, suggests a critique or satire of American foreign policy or military actions.\n\nThe setting is chaotic, with a dark, possibly war-torn background that includes explosions and debris, which further emphasizes the violent nature of the scene. The overall tone of the image is one of political satire, using exaggeration and symbolism to convey a message or commentary.",
+      "parameters": {
+        "steps": "35",
+        "sampler": "euler",
+        "seed": "1024",
+        "scheduler": "beta",
+        "denoise": "1",
+        "cfg": "",
+        "negative": ""
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613595797.png",
+      "id": "1744613596713",
+      "createdAt": "2025-04-14T06:53:16.713Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "meiguolao,\nThe image is a political satire cartoon depicting a character dressed in an American patriotic theme. The character is wearing a top hat with stars and stripes, reflecting the design of the American flag. The attire includes a blue suit with white stars on the lapels, which further emphasizes the patriotic motif.\n\nThe character's behavior is chaotic and destructive; it is holding a bomb with a lit fuse in one hand and a box labeled \"DEMOCRACY\" in the other. The bomb has Chinese characters on it, which translate to \"chaos\" or \"turmoil,\" suggesting a commentary on the state of democracy or the impact of the character's actions on democratic principles.\n\nThe character's expression is one of wild abandon or recklessness, with a wide-open mouth and eyes that appear to be in a state of frenzy or excitement. The background is a simple blue, which contrasts with the character's dynamic pose and the explosive elements in the scene.\n\nThe overall tone of the image is critical and satirical, using exaggeration to convey a message about the character's actions and their perceived effect on democracy. The cartoon likely intends to provoke thought or discussion about political stability, the state of democracy, or the influence of certain actions on democratic processes.\n\n",
+      "parameters": {
+        "steps": "35",
+        "sampler": "euler_ancestral",
+        "seed": "1030",
+        "scheduler": "beta",
+        "denoise": "1",
+        "cfg": "",
+        "negative": ""
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613599300.png",
+      "id": "1744613601184",
+      "createdAt": "2025-04-14T06:53:21.184Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "A political cartoon:\nA political satire cartoon with a simple background, featuring ugly characters with enlarged heads,1man,1laiqingde is dressed in a suit, holding a book in front with one hand and a wad of cash behind with the other, his eyes looking up and a sly smile on his face.",
+      "parameters": {
+        "steps": "23",
+        "sampler": "dpmpp_2m",
+        "seed": "403638930550798",
+        "scheduler": "ddim_uniform",
+        "denoise": "1",
+        "cfg": "",
+        "negative": ""
+      },
+      "tags": [],
+      "imageUrl": "/images/prompts/1744613604760.png",
+      "id": "1744613605601",
+      "createdAt": "2025-04-14T06:53:25.601Z"
     }
   ]
 }
