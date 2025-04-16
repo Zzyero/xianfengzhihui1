@@ -89,8 +89,29 @@ export function workflowAPItoViewComfy(source: WorkflowApiJSON): IViewComfyBase 
                         key: `${key}-${value.class_type}`
                     });
                     break;
+                
+                // 处理LoRA加载器
+                case "LoraLoader":
+                    // 处理LoRA相关输入
+                    basicInputs.push({
+                        title: getTitleFromValue(value.class_type, value),
+                        inputs: inputs,
+                        key: `${key}-${value.class_type}`
+                    });
+                    break;
+                
+                // 处理Latent相关类型
+                case "EmptyLatentImage":
+                case "EmptySD3LatentImage":
+                    // 处理Latent图像相关输入
+                    basicInputs.push({
+                        title: getTitleFromValue(value.class_type, value),
+                        inputs: inputs,
+                        key: `${key}-${value.class_type}`
+                    });
+                    break;
 
-                // 处理其他类型
+                // 处理其他包含Latent的类型
                 default:
                     // 处理种子值
                     for (const input of inputs) {
