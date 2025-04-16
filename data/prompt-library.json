@@ -1,70 +1,164 @@
 {
   "prompts": [
     {
-      "tags": [],
+      "prompt": "一幅政治漫画，画中唐纳德·特朗普站在一个巨大的天平前，用力将写有“美国利益”的一端压下，手中拿着关税文件，致使“全球贸易”的一端严重失衡。特写镜头捕捉到他扭曲的表情和狡黠的笑容，身后隐约飘动着中美两国的国旗。破碎的全球贸易链坠入下方的黑暗之中，电影般的暗色调突显了经济的混乱。这幅戏剧性的构图象征着保护主义政策，通过断裂的供应链图案等复杂细节展现了紧张的外交关系，强烈的氛围中，立体的光线突出了自私的决心。",
+      "promptEn": "political cartoon of Donald Trump standing before a colossal balance scale, forcefully pressing down the 'US Interests' side with tariff documents, causing extreme imbalance against the 'Global Trade' side. Close-up of his contorted expression with a sly grin, backlit by faintly waving Chinese and American flags. Shattered global trade chains falling into darkness below, cinematic dark tones emphasizing economic disruption. Dramatic composition symbolizing protectionist policies, intricate details showing strained diplomatic relations through broken supply chain motifs, ominous atmosphere with volumetric lighting highlighting selfish determination.",
       "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "seed": "1102277200849674",
-        "scheduler": "simple",
+        "steps": "23",
+        "sampler": "dpm_adaptive",
+        "seed": "6920302444320",
+        "scheduler": "ddim_uniform",
         "denoise": "1",
-        "cfg": "7",
-        "negative": ""
-      },
-      "prompt": "一个男人正在",
-      "promptEn": "a man happy says something",
-      "imageUrl": "/images/prompts/1742303960665.png",
-      "id": "1742303962200",
-      "createdAt": "2025-03-18T13:19:22.200Z",
-      "updatedAt": "2025-03-29T23:40:54.106Z"
-    },
-    {
-      "tags": [],
-      "parameters": {
-        "steps": "35",
-        "cfg": "",
-        "sampler": "euler",
-        "seed": "109270284300615",
-        "scheduler": "simple",
-        "denoise": "1",
-        "model": "/comfyui/liblibai-models/models/4d23592a53e541688b95f8f4578af1c61e323170.safetensors",
-        "negative": ""
-      },
-      "prompt": "",
-      "promptEn": "sanguo a man happiles doing something",
-      "imageUrl": "/images/prompts/1742366555196.png",
-      "id": "1742366556584",
-      "createdAt": "2025-03-19T06:42:36.584Z",
-      "updatedAt": "2025-03-19T06:42:36.584Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "\nErase, remove",
-      "parameters": {
-        "steps": "",
-        "sampler": "",
-        "seed": "",
-        "scheduler": "normal",
-        "denoise": "1.0",
         "cfg": "",
         "negative": ""
       },
       "tags": [
         {
-          "id": "1743497162987",
-          "name": "万物消除",
-          "color": "#4d577c"
+          "id": "1744471611386",
+          "name": "特朗普",
+          "color": "#68bbc8"
         },
         {
-          "id": "1743497184330",
-          "name": "哒哒哒",
-          "color": "#f4ce0"
+          "id": "1744471617049",
+          "name": "贸易战",
+          "color": "#90cc2a"
+        },
+        {
+          "id": "1744471623623",
+          "name": "中国",
+          "color": "#19c345"
+        },
+        {
+          "id": "1744471626718",
+          "name": "美国",
+          "color": "#ff746d"
         }
       ],
-      "imageUrl": "/images/prompts/1743497048062.png",
-      "id": "1743497049380",
-      "createdAt": "2025-04-01T08:44:09.380Z",
-      "updatedAt": "2025-04-01T08:46:25.375Z"
+      "imageUrl": "/images/prompts/1744471440369.png",
+      "id": "1744471637853",
+      "createdAt": "2025-04-12T15:27:17.853Z"
+    },
+    {
+      "prompt": "这幅漫画描绘的是美国的国家象征“山姆大叔”的漫画形象，他站在画面的右侧。他身着传统的爱国服饰，包括一顶饰有星条图案的高顶礼帽、一件蓝色外套和红白相间的条纹裤。他的右手拿着一个红色的汽油罐，罐子上有一个黑色的喷嘴，暗示他即将倾倒燃料。他的左手叉腰，脸上带着自信的微笑。在他身后，一道木栅栏横跨画面底部，将前景与背景隔开。栅栏左侧有一座燃烧的房子，屋顶上写着“欧洲”一词，表明欧洲正处于火海之中。上方的天空一片阴暗，暗示着一场即将来临的风暴或危机。整幅漫画的基调是批评和讽刺，可能是在评论美国在欧洲的角色或行为。",
+      "promptEn": "The image is a political cartoon depicting a caricature of Uncle Sam, the national personification of the United States, standing on the right side of the frame. He is dressed in his traditional patriotic attire, including a top hat adorned with stars and stripes, a blue coat, and red and white striped pants. In his right hand, he holds a red gasoline can with a black nozzle, suggesting he is about to pour fuel. His left hand is placed on his hip, and he has a confident smile on his face. Behind him, a wooden fence stretches across the bottom of the image, separating the foreground from the background. On the left side of the fence, there is a burning house with the word \\\"Europe\\\" written on its roof, indicating that Europe is on fire. The sky above is dark, suggesting an impending storm or crisis. The overall tone of the cartoon is critical and satirical, likely commenting on the United States' role or actions in relation to Europe. ",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "seed": "1403360976142985",
+        "scheduler": "sgm_uniform",
+        "denoise": "1",
+        "cfg": "",
+        "negative": ""
+      },
+      "tags": [
+        {
+          "id": "1744471661482",
+          "name": "美国",
+          "color": "#38b919"
+        },
+        {
+          "id": "1744471664606",
+          "name": "欧洲",
+          "color": "#ab2a9c"
+        },
+        {
+          "id": "1744471670727",
+          "name": "火上浇油",
+          "color": "#9a7b7"
+        },
+        {
+          "id": "1744471674627",
+          "name": "山姆大叔",
+          "color": "#4292d5"
+        }
+      ],
+      "imageUrl": "/images/prompts/1744471650087.png",
+      "id": "1744471752107",
+      "createdAt": "2025-04-12T15:29:12.107Z"
+    },
+    {
+      "prompt": "一幅政治漫画描绘了（丑陋：1.2）唐纳德·特朗普摇摇欲坠地站在锈迹斑斑的钢铁关税墙顶，墙上写着“贸易战”，他拿着扩音器大声叫嚷，扩音器喷出“25%关税”的全息影像。（下方是破碎的集装箱船和哭泣的拟人化全球商人，他们被困在断裂的供应链枷锁中：1.1）。他那怪异的冷笑扭曲着，带着狂妄自大，被形似倒置股票图表的阴森乌云所环绕。锈迹斑斑的屏障上布满了抗议涂鸦，经济崩溃通过旋风中破碎的世贸组织文件来象征。电影般的明暗对比灯光，带有毒绿色的点缀，逼真的纹理展现出破裂的全球化图案，贸易破坏的超现实主义拟人化形象，浮动的关税百分比符号萦绕在画面中。",
+      "promptEn": "Politicaal cartoon of( ugly:1.2) Donald Trump teetering atop a corroded steel tariff wall marked 'TRADE WAR', bellowing through a megaphone spewing '25% TARIFFS' holograms. (Below lies shattered container ships and weeping anthropomorphic globe merchants trapped in broken supply chain shackles:1.1). His grotesque smirk contorted with megalomania, framed by ominous storm clouds shaped like inverted stock charts. Rust-textured barrier covered in protest graffiti, economic collapse symbolized through disintegrating WTO documents in the whirlwind. Cinematic chiaroscuro lighting with toxic green accents, photorealistic textures showcasing cracked globalization motifs, surrealistic personification of trade destruction with floating tariff percentage symbols haunting the composition.",
+      "parameters": {
+        "steps": "23",
+        "sampler": "dpm_adaptive",
+        "seed": "712115299191250",
+        "scheduler": "ddim_uniform",
+        "denoise": "1",
+        "cfg": "",
+        "negative": ""
+      },
+      "tags": [
+        {
+          "id": "1744471919760",
+          "name": "特朗普",
+          "color": "#db1677"
+        },
+        {
+          "id": "1744471922647",
+          "name": "贸易战",
+          "color": "#536ba3"
+        }
+      ],
+      "imageUrl": "/images/prompts/1744471892375.png",
+      "id": "1744471923343",
+      "createdAt": "2025-04-12T15:32:03.343Z"
+    },
+    {
+      "prompt": "这是一幅背景简单的政治讽刺漫画，人物形象丑陋，头大，赖清德身穿西装，一只手拿着一本书，另一只手拿着一叠现金，他的眼睛向上看，脸上带着狡黠的微笑。",
+      "promptEn": "A political cartoon:\nA political satire cartoon with a simple background, featuring ugly characters with enlarged heads,1man,1laiqingde is dressed in a suit, holding a book in front with one hand and a wad of cash behind with the other, his eyes looking up and a sly smile on his face.",
+      "parameters": {
+        "steps": "23",
+        "sampler": "dpmpp_2m",
+        "seed": "403638930550798",
+        "scheduler": "ddim_uniform",
+        "denoise": "1",
+        "cfg": "",
+        "negative": ""
+      },
+      "tags": [
+        {
+          "id": "1744472096379",
+          "name": "赖清德",
+          "color": "#9e7a4f"
+        },
+        {
+          "id": "1744472101815",
+          "name": "美元",
+          "color": "#e2fb47"
+        }
+      ],
+      "imageUrl": "/images/prompts/1744472061933.png",
+      "id": "1744472104582",
+      "createdAt": "2025-04-12T15:35:04.582Z"
+    },
+    {
+      "prompt": "一张印有美元符号的台湾地图。",
+      "promptEn": "cartoon style，A map of Taiwan with dollar signs on it.",
+      "parameters": {
+        "steps": "35",
+        "sampler": "dpm_adaptive",
+        "seed": "1052484061926043",
+        "scheduler": "ddim_uniform",
+        "denoise": "1",
+        "cfg": "",
+        "negative": ""
+      },
+      "tags": [
+        {
+          "id": "1744472138370",
+          "name": "台湾",
+          "color": "#bf235e"
+        },
+        {
+          "id": "1744472141018",
+          "name": "美元",
+          "color": "#e42e76"
+        }
+      ],
+      "imageUrl": "/images/prompts/1744472125760.png",
+      "id": "1744472166001",
+      "createdAt": "2025-04-12T15:36:06.001Z"
     }
   ]
 }
