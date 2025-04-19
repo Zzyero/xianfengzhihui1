@@ -218,7 +218,13 @@ export function ViewComfyForm(args: {
                                                                 size="icon"
                                                                 variant="ghost"
                                                                 className="text-muted-foreground"
-                                                                onClick={() => inputFieldArray.remove(index)}
+                                                                onClick={() => {
+                                                                    // 删除索引对应组件
+                                                                    inputFieldArray.remove(index);
+                                                                    // 更新表单值
+                                                                    const currentValues = form.getValues();
+                                                                    form.reset(currentValues);
+                                                                }}
                                                             >
                                                                 <Trash2 className="size-5" />
                                                             </Button>
@@ -415,7 +421,13 @@ function AdvancedInputSection(args: { advancedFieldArray: UseFieldArrayReturn<an
                                         size="icon"
                                         variant="ghost"
                                         className="text-muted-foreground"
-                                        onClick={() => advancedFieldArray.remove(index)}
+                                        onClick={() => {
+                                            // 删除索引对应组件
+                                            advancedFieldArray.remove(index);
+                                            // 更新表单值
+                                            const currentValues = form.getValues();
+                                            form.reset(currentValues);
+                                        }}
                                     >
                                         <Trash2 className="size-5" />
                                     </Button>
