@@ -19,7 +19,12 @@
 # misc
 .DS_Store
 *.pem
+# 保留comfy子文件夹结构，但忽略其中的文件
 comfy/*
+!comfy/inputs/
+!comfy/workflows/
+comfy/inputs/*
+comfy/workflows/*
 public/masks/
 
 # debug

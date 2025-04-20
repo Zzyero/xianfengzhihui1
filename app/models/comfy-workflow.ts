@@ -29,26 +29,30 @@ export class ComfyWorkflow {
 
     // 设置 ViewComfy 输入参数
     public async setViewComfy(viewComfy: IInput[]) {
-        // 遍历所有输入参数
-        for (const input of viewComfy) {
-            const path = input.key.split("-");
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            let obj: any = this.workflow;
-            // 根据路径定位到需要设置的对象
-            for (let i = 0; i < path.length - 1; i++) {
-                if (i === path.length - 1) {
-                    continue;
+        try {
+            // 遍历所有输入参数
+            for (const input of viewComfy) {
+                const path = input.key.split("-");
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                let obj: any = this.workflow;
+                // 根据路径定位到需要设置的对象
+                for (let i = 0; i < path.length - 1; i++) {
+                    if (i === path.length - 1) {
+                        continue;
+                    }
+                    obj = obj[path[i]];
                 }
-                obj = obj[path[i]];
+                // 如果输入是文件类型，创建文件并保存路径
+                if (input.value instanceof File) {
+                    const filePath = await this.createFileFromInput(input.value);
+                    obj[path[path.length - 1]] = filePath;
+                } else {
+                    // 直接设置值
+                    obj[path[path.length - 1]] = input.value;
+                }
             }
-            // 如果输入是文件类型，创建文件并保存路径
-            if (input.value instanceof File) {
-                const filePath = await this.createFileFromInput(input.value);
-                obj[path[path.length - 1]] = filePath;
-            } else {
-                // 直接设置值
-                obj[path[path.length - 1]] = input.value;
-            }
+        } catch (error) {
+            console.error(error);
         }
 
         // 处理工作流中的特殊节点
@@ -106,7 +110,7 @@ export class ComfyWorkflow {
         const fileName = `${this.getFileNamePrefix()}${file.name}`;
         const filePath = path.join(COMFY_INPUTS_DIR, fileName);
         const fileBuffer = await file.arrayBuffer();
-        await fs.writeFile(filePath, Buffer.from(fileBuffer));
+        await fs.writeFile(filePath, new Uint8Array(fileBuffer));
         return filePath;
     }
 }

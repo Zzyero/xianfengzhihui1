@@ -192,7 +192,7 @@ export function ViewComfyForm(args: {
                                         // @ts-ignore
                                         if (field.inputs.length > 0) {
                                             // 检查是否是文本编码器或上传图片组件
-                                            const isSpecialComponent = field.title === "CLIP文本编码器" || field.title === "加载图像";
+                                            const isSpecialComponent = field.title === "CLIP文本编码" || field.title === "加载图像";
                                             
                                             if (isSpecialComponent) {
                                                 // 特殊组件不显示圆角方框
@@ -218,7 +218,13 @@ export function ViewComfyForm(args: {
                                                                 size="icon"
                                                                 variant="ghost"
                                                                 className="text-muted-foreground"
-                                                                onClick={() => inputFieldArray.remove(index)}
+                                                                onClick={() => {
+                                                                    // 删除索引对应组件
+                                                                    inputFieldArray.remove(index);
+                                                                    // 更新表单值
+                                                                    const currentValues = form.getValues();
+                                                                    form.reset(currentValues);
+                                                                }}
                                                             >
                                                                 <Trash2 className="size-5" />
                                                             </Button>
@@ -415,7 +421,13 @@ function AdvancedInputSection(args: { advancedFieldArray: UseFieldArrayReturn<an
                                         size="icon"
                                         variant="ghost"
                                         className="text-muted-foreground"
-                                        onClick={() => advancedFieldArray.remove(index)}
+                                        onClick={() => {
+                                            // 删除索引对应组件
+                                            advancedFieldArray.remove(index);
+                                            // 更新表单值
+                                            const currentValues = form.getValues();
+                                            form.reset(currentValues);
+                                        }}
                                     >
                                         <Trash2 className="size-5" />
                                     </Button>
@@ -527,7 +539,15 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
     // Lora加载器下拉选择框
     if (input.key?.includes("lora_name")) {
         const loraOptions = [
-            "laiqingde2-000029.safetensors"
+            "安倍晋三.safetensors",
+            "蔡英文.safetensors",
+            "赖清德.safetensors",
+            "默克尔.safetensors",
+            "萨科齐.safetensors",
+            "特朗普.safetensors",
+            "曾小萌迷彩人.safetensors",
+            "山姆大叔.safetensors",
+            "政治漫画画风.safetensors"
         ];
         return (
             <FormSelectInput 
