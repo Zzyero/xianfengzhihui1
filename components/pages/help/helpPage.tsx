@@ -157,6 +157,116 @@ export function HelpPage() {
     }
   };
 
+  /**
+   * 从alt标签中提取图片尺寸信息和说明文字
+   * @param alt 图片alt属性文本
+   * @returns 处理后的alt文本、尺寸类名、样式和说明文字
+   */
+  const extractImageSize = (alt: string) => {
+    // 默认尺寸类为空（使用默认样式）
+    let sizeClass = '';
+    let alignClass = '';
+    let cleanAlt = alt || '';
+    let captionText = ''; // 图片说明文字
+    let customStyle: Record<string, any> = {}; // 自定义样式对象
+    
+    // 检查是否包含尺寸标记 [size:值]
+    const sizeMatch = cleanAlt.match(/\[size:(.*?)\]/);
+    
+    if (sizeMatch) {
+      const sizeValue = sizeMatch[1].trim().toLowerCase();
+      
+      // 移除尺寸标记
+      cleanAlt = cleanAlt.replace(sizeMatch[0], '').trim();
+      
+      // 处理预定义尺寸
+      if (['tiny', 'x-small', 'small', 'medium', 'large', 'x-large', 'full'].includes(sizeValue)) {
+        sizeClass = `img-${sizeValue}`;
+      } 
+      // 处理百分比尺寸
+      else if (sizeValue.endsWith('%')) {
+        const percentage = parseInt(sizeValue, 10);
+        if (!isNaN(percentage) && percentage > 0 && percentage <= 100) {
+          customStyle.maxWidth = sizeValue;
+        }
+      }
+    }
+    
+    // 检查是否包含宽度设置 [width:值]
+    const widthMatch = cleanAlt.match(/\[width:(.*?)\]/);
+    if (widthMatch) {
+      const widthValue = widthMatch[1].trim();
+      
+      // 移除宽度标记
+      cleanAlt = cleanAlt.replace(widthMatch[0], '').trim();
+      
+      // 添加到自定义样式
+      if (widthValue.endsWith('px') || widthValue.endsWith('%') || 
+          widthValue.endsWith('em') || widthValue.endsWith('rem') ||
+          !isNaN(parseInt(widthValue, 10))) {
+        // 如果没有单位，默认添加px
+        const width = widthValue.match(/^\d+$/) ? `${widthValue}px` : widthValue;
+        customStyle.width = width;
+      }
+    }
+    
+    // 检查是否包含高度设置 [height:值]
+    const heightMatch = cleanAlt.match(/\[height:(.*?)\]/);
+    if (heightMatch) {
+      const heightValue = heightMatch[1].trim();
+      
+      // 移除高度标记
+      cleanAlt = cleanAlt.replace(heightMatch[0], '').trim();
+      
+      // 添加到自定义样式
+      if (heightValue.endsWith('px') || heightValue.endsWith('%') || 
+          heightValue.endsWith('em') || heightValue.endsWith('rem') ||
+          !isNaN(parseInt(heightValue, 10))) {
+        // 如果没有单位，默认添加px
+        const height = heightValue.match(/^\d+$/) ? `${heightValue}px` : heightValue;
+        customStyle.height = height;
+      }
+    }
+    
+    // 检查是否包含对齐标记 [align:left|right]
+    const alignMatch = cleanAlt.match(/\[align:(.*?)\]/);
+    
+    if (alignMatch) {
+      const alignValue = alignMatch[1].trim().toLowerCase();
+      
+      // 移除对齐标记
+      cleanAlt = cleanAlt.replace(alignMatch[0], '').trim();
+      
+      // 处理对齐方式
+      if (['left', 'right'].includes(alignValue)) {
+        alignClass = `img-${alignValue}`;
+      }
+    }
+    
+    // 检查是否包含说明文字标记 [text:文本]
+    const textMatch = cleanAlt.match(/\[text:(.*?)\]/);
+    
+    if (textMatch) {
+      captionText = textMatch[1].trim();
+      
+      // 移除说明文字标记
+      cleanAlt = cleanAlt.replace(textMatch[0], '').trim();
+    }
+    
+    // 检查是否只设置了宽度或高度中的一个
+    if ((customStyle.width && !customStyle.height) || (!customStyle.width && customStyle.height)) {
+      // 设置objectFit为contain，保持原始图片比例
+      customStyle.objectFit = 'contain';
+    }
+    
+    return { 
+      alt: cleanAlt, 
+      classes: `${sizeClass} ${alignClass}`.trim(), 
+      style: customStyle,
+      caption: captionText
+    };
+  };
+
   // 创建符合类型要求的自定义组件配置
   const components = {
     h1: ({ node, ...props }: any) => {
@@ -189,12 +299,75 @@ export function HelpPage() {
       const id = headingMap.get(text) || generateStableId(text, 6);
       return <h6 id={id} className="help-heading" {...props} />;
     },
+    p: ({ children, ...props }: any) => {
+      // 检查段落内容是否只包含清除浮动标记
+      const text = typeof children === 'string' ? children : '';
+      if (text === '[clear]') {
+        return <div className="clear-float"></div>;
+      }
+      
+      return <p {...props}>{children}</p>;
+    },
     img: ({ node, src, alt, ...props }: any) => {
       // 处理图片路径，使用public目录下的图片
       const imgSrc = src?.startsWith('/') || src?.startsWith('http')
         ? src
         : `/help/images/${src}`;
-      return <img src={imgSrc} alt={alt || ''} className="doc-image" {...props} />;
+      
+      // 提取图片尺寸信息和说明文字
+      const { alt: cleanAlt, classes, style, caption } = extractImageSize(alt || '');
+      
+      // 处理特殊宽度情况
+      const customStyle = { ...style };
+      
+      // 处理width:100%的情况，确保不溢出
+      if (customStyle.width === '100%') {
+        customStyle.boxSizing = 'border-box';
+        customStyle.marginLeft = 0;
+        customStyle.marginRight = 0;
+      }
+      
+      // 合并类名
+      const className = `doc-image ${classes}`.trim();
+      
+      // 如果有说明文字，则创建一个包含图片和说明文字的容器
+      if (caption) {
+        // 检查是否有对齐类
+        const isLeftAligned = classes.includes('img-left');
+        const isRightAligned = classes.includes('img-right');
+        const isFullWidth = classes.includes('img-full') || customStyle.width === '100%';
+        
+        // 创建figure类名，如果有对齐方式，添加对应的类
+        const figureClassName = `image-figure ${isLeftAligned ? 'img-left' : ''} ${isRightAligned ? 'img-right' : ''} ${isFullWidth ? 'img-full' : ''}`.trim();
+        
+        // 如果图片设置了对齐，从图片类中移除对齐类，避免重复对齐
+        const imgClassName = className
+          .replace('img-left', '')
+          .replace('img-right', '')
+          .trim();
+        
+        return (
+          <figure className={figureClassName} style={isFullWidth ? { width: '100%' } : undefined}>
+            <img 
+              src={imgSrc} 
+              alt={cleanAlt} 
+              className={imgClassName}
+              style={customStyle}
+              {...props} 
+            />
+            <figcaption className="image-caption">{caption}</figcaption>
+          </figure>
+        );
+      }
+      
+      // 没有说明文字，直接返回图片
+      return <img 
+        src={imgSrc} 
+        alt={cleanAlt} 
+        className={className}
+        style={customStyle}
+        {...props} 
+      />;
     }
   };
 

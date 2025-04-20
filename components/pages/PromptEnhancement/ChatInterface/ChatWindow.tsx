@@ -68,30 +68,43 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   // 消息列表更新时的副作用处理
   useEffect(() => {
     const currentLength = messages.length;
-    if (currentLength > prevMessagesLengthRef.current && currentLength > 0) {
-      const lastMessage = messages[currentLength - 1];
-      // 用户发送新消息，启用自动滚动
-      if (lastMessage.role === 'user') {
-        console.log("用户发送新消息，启用自动滚动");
+    const prevLength = prevMessagesLengthRef.current;
+    
+    // 新增消息时
+    if (currentLength > prevLength) {
+      // 用户新发消息或首次加载消息，应该启用自动滚动
+      if (currentLength === 1 || (currentLength > 0 && messages[currentLength - 1].role === 'user')) {
+        console.log("用户发送新消息或首次加载消息，启用自动滚动");
         setShouldAutoScroll(true);
       }
     }
-    // 若允许自动滚动且有底部标记元素，执行滚动操作
+    
+    // 执行自动滚动
     if (shouldAutoScroll && messagesEndRef.current) {
-      console.log("执行自动滚动");
-      messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
+      // 使用requestAnimationFrame确保DOM已更新
+      requestAnimationFrame(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+        console.log("执行自动滚动到底部");
+      });
     }
+    
     // 更新上一次消息列表长度
     prevMessagesLengthRef.current = currentLength;
   }, [messages, shouldAutoScroll]);
 
   // AI 输入状态变化时的副作用处理
   useEffect(() => {
-    // AI 停止输入，禁用自动滚动
-    if (prevIsTypingRef.current && !isTyping) {
-      console.log("AI停止输入，禁用自动滚动");
-      setShouldAutoScroll(false);
+    // AI 开始输入时，启用自动滚动
+    if (!prevIsTypingRef.current && isTyping) {
+      console.log("AI开始输入，启用自动滚动");
+      setShouldAutoScroll(true);
+      
+      // 确保立即滚动到底部
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
+      }
     }
+    
     // 更新上一次 AI 输入状态
     prevIsTypingRef.current = isTyping;
   }, [isTyping]);

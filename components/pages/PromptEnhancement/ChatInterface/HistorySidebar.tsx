@@ -94,18 +94,29 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
   const handleDeleteSession = async (e: React.MouseEvent, sessionId: string) => {
     e.stopPropagation(); // 阻止事件冒泡
     
-    // 不允许删除当前活动对话
-    if (sessionId === activeSessionId) {
-      toast.error('不能删除当前正在使用的对话');
-      return;
-    }
-    
     try {
       // 确保从数据库中彻底删除会话及其消息
       await db.deleteSession(sessionId);
       
       // 本地状态更新
-      setFilteredSessions(prev => prev.filter(s => s.id !== sessionId));
+      const updatedSessions = filteredSessions.filter(s => s.id !== sessionId);
+      setFilteredSessions(updatedSessions);
+      
+      // 如果删除的是当前选中的会话，则选择另一个会话或创建新会话
+      if (sessionId === activeSessionId) {
+        if (updatedSessions.length > 0) {
+          // 优先选择置顶的会话，其次选择最新的会话
+          const nextSession = updatedSessions.find(s => s.starred) || 
+                            updatedSessions.sort((a, b) => 
+                              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                            )[0];
+          onSelectSession(nextSession.id);
+        } else {
+          // 如果没有会话了，可以在此处触发新建会话逻辑
+          // 该组件没有直接创建会话的能力，所以通知父组件处理
+          onSelectSession(''); // 传递空ID表示需要创建新会话
+        }
+      }
       
       toast.success('会话已删除');
     } catch (error) {
@@ -297,7 +308,6 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
                           variant="ghost"
                           size="icon"
                           className="delete-button"
-                          disabled={session.id === activeSessionId}
                           onClick={(e) => handleDeleteSession(e, session.id)}
                         >
                           <Trash className="h-3 w-3" />
@@ -305,7 +315,7 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
                       </div>
                     </div>
                     <div className="session-info">
-                      <span className="message-count">{session.messageCount-1} 条消息</span>
+                      <span className="message-count">{session.messageCount} 条消息</span>
                       <span className="session-time">
                         {new Date(session.timestamp).toLocaleDateString()}
                       </span>

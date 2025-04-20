@@ -167,11 +167,44 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
    */
   const createNewSession = async (title?: string, firstMessage?: string): Promise<string | undefined> => {
     try {
-      // 创建临时会话ID
-      const tempSessionId = `temp_${Date.now().toString()}`;
-      setActiveSessionId(tempSessionId);
-      setMessages([]);
-      return tempSessionId;
+      // 创建一个新的会话ID
+      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      
+      // 创建会话对象
+      const newSession: ChatSession = {
+        id: sessionId,
+        title: title || "新对话",
+        lastMessage: firstMessage || "",
+        timestamp: new Date(),
+        messageCount: firstMessage ? 1 : 0,
+        starred: false
+      };
+      
+      // 保存会话到数据库
+      await db.saveSession(newSession);
+      
+      // 如果有初始消息，保存到数据库
+      if (firstMessage) {
+        const userMessage: Message = {
+          id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+          sessionId: sessionId,
+          role: 'user',
+          content: firstMessage,
+          timestamp: new Date()
+        };
+        await db.addMessage(userMessage);
+      }
+      
+      // 更新会话列表
+      await loadSessions();
+      
+      // 设置活动会话ID
+      setActiveSessionId(sessionId);
+      
+      // 保存最后使用的会话ID
+      await db.saveLastUsedSessionId(sessionId);
+      
+      return sessionId;
     } catch (error) {
       console.error('创建会话失败:', error);
       toast.error('创建新对话失败');
@@ -189,17 +222,20 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
       setIsGenerating(false);
     }
     
-    // 创建新的临时会话
+    // 创建新会话并保存到数据库
     try {
-      const tempSessionId = `temp_${Date.now().toString()}`;
-      setActiveSessionId(tempSessionId);
-      setMessages([]);
+      const newSessionId = await createNewSession("新对话");
       
-      // 重置模板相关状态
-      setActiveTemplateId(null);
-      setCustomPrompt('');
-      
-      toast.info('请输入内容以开始新对话');
+      if (newSessionId) {
+        // 重置消息列表
+        setMessages([]);
+        
+        // 重置模板相关状态
+        setActiveTemplateId(null);
+        setCustomPrompt('');
+        
+        toast.info('已创建新对话');
+      }
     } catch (error) {
       console.error('创建新对话失败:', error);
       toast.error('创建新对话失败');
@@ -215,11 +251,19 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
       ChatService.abortRequest();
       setIsGenerating(false);
     }
+
+    // 如果会话ID为空，创建新会话
+    if (!sessionId) {
+      await handleNewChat();
+      return;
+    }
     
     // 设置新的活动会话ID
     setActiveSessionId(sessionId);
     // 保存最后使用的会话ID到数据库
     db.saveLastUsedSessionId(sessionId);
+    // 加载会话消息
+    await loadSessionMessages(sessionId);
     // 重置模板状态
     setActiveTemplateId(null);
     setCustomPrompt('');
@@ -257,77 +301,108 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
    * 处理发送消息
    */
   const handleSendMessage = async (content: string): Promise<void> => {
-    // 设置生成状态
-    setIsGenerating(true);
-
-    ChatService.sendMessage(
-      content,
-      activeSessionId,
-      selectedModel,
-      {
-        // 当用户消息保存完成
-        onUserMessageSaved: (userMessage) => {
-          setMessages(prev => {
-            // 检查是否存在相同ID的消息，确保不重复添加
-            const messageExists = prev.some(m => m.id === userMessage.id);
-            if (messageExists) {
-              return prev;
-            }
-            return [...prev, userMessage];
-          });
-        },
-        // 当AI回复内容更新（流式输出）
-        onUpdate: (content, messageId, sessionId, metadata) => {
-          setMessages(prev => {
-            // 检查是否已存在此ID的消息
-            const existingIndex = prev.findIndex(m => m.id === messageId);
-            
-            if (existingIndex >= 0) {
-              // 更新现有消息
-              const newMessages = [...prev];
-              newMessages[existingIndex] = {
-                ...newMessages[existingIndex],
-                content,
-                reasoningContent: metadata?.reasoning || newMessages[existingIndex].reasoningContent
-              };
-              return newMessages;
-            } else {
-              // 添加新消息
-              return [...prev, {
-                id: messageId,
-                sessionId: sessionId,
-                role: 'assistant' as const,
-                content: content || '',
-                reasoningContent: metadata?.reasoning || '',
-                timestamp: new Date()
-              }];
-            }
-          });
-        },
-        // 当AI回复完成
-        onComplete: () => {
+    if (!content.trim()) return;
+    
+    try {
+      setIsGenerating(true);
+      
+      // 对于临时会话，创建并保存新会话
+      let currentSessionId = activeSessionId;
+      if (!currentSessionId) {
+        // 创建新会话并保存到数据库
+        const newSessionId = await createNewSession("新对话", content);
+        if (newSessionId) {
+          setActiveSessionId(newSessionId);
+          currentSessionId = newSessionId;
+        } else {
+          // 创建失败，中止操作
           setIsGenerating(false);
-        },
-        // 当会话更新
-        onSessionUpdated: () => {
-          loadSessions();
-        },
-        // 当发生错误
-        onError: (error) => {
-          console.error('消息服务错误:', error);
-          toast.error(error.message || '发送消息失败');
-          setIsGenerating(false);
+          return;
         }
-      },
-      // 自定义提示词参数
-      activeTemplateId ? customPrompt : undefined,
-      // 是否禁用历史记录
-      isDisableHistory
-    ).catch(error => {
+      }
+      
+      // 使用ChatService处理消息发送
+      await ChatService.sendMessage(
+        content,
+        currentSessionId,
+        selectedModel || '', // 使用当前选定的模型，若未选择则使用空字符串
+        {
+          // 用户消息保存成功回调
+          onUserMessageSaved: (message) => {
+            setMessages(prev => [...prev, message]);
+          },
+          // AI回复开始生成回调
+          onStart: () => {
+            setIsGenerating(true);
+          },
+          // AI回复内容更新回调
+          onUpdate: (content, messageId, sessionId, metadata) => {
+            // 更新临时会话ID为服务端返回的会话ID
+            if (sessionId !== activeSessionId) {
+              setActiveSessionId(sessionId);
+            }
+            
+            // 处理消息更新，根据是否已存在该消息ID来新增或更新
+            setMessages(prev => {
+              const existingMsgIndex = prev.findIndex(m => m.id === messageId);
+              if (existingMsgIndex >= 0) {
+                // 更新已有消息
+                const updatedMessages = [...prev];
+                updatedMessages[existingMsgIndex] = {
+                  ...updatedMessages[existingMsgIndex],
+                  content,
+                  reasoningContent: metadata?.reasoning
+                };
+                return updatedMessages;
+              } else {
+                // 添加新消息
+                return [...prev, {
+                  id: messageId,
+                  sessionId: sessionId,
+                  role: 'assistant',
+                  content,
+                  reasoningContent: metadata?.reasoning,
+                  timestamp: new Date()
+                }];
+              }
+            });
+          },
+          // AI回复完成回调
+          onComplete: (message) => {
+            setIsGenerating(false);
+            // 更新消息列表（替换最终版本）
+            setMessages(prev => {
+              const existingMsgIndex = prev.findIndex(m => m.id === message.id);
+              if (existingMsgIndex >= 0) {
+                const updatedMessages = [...prev];
+                updatedMessages[existingMsgIndex] = message;
+                return updatedMessages;
+              }
+              return [...prev, message];
+            });
+          },
+          // 错误回调
+          onError: (error) => {
+            console.error('聊天错误:', error);
+            setIsGenerating(false);
+            toast.error(`发送消息失败: ${error.message}`);
+          },
+          // 会话更新回调
+          onSessionUpdated: async () => {
+            // 重新加载会话列表以获取最新状态
+            await loadSessions();
+          }
+        },
+        // 传递自定义提示词
+        customPrompt,
+        // 传递历史记录禁用状态
+        isDisableHistory
+      );
+    } catch (error: any) {
       console.error('发送消息失败:', error);
-      toast.error('发送消息失败');
       setIsGenerating(false);
-    });
+      toast.error(`发送消息失败: ${error.message || '未知错误'}`);
+    }
   };
 
   /**
@@ -385,11 +460,24 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
       setActiveTemplateId(null);
       setCustomPrompt('');
       toast.info(`已取消模板: ${template.name}`);
+      // 取消选中时清除存储的模板ID
+      db.saveLastUsedTemplateId('')
+        .catch(error => {
+          console.error('保存模板ID失败:', error);
+        });
     } else {
       // 选中新模板，设置自定义提示词
       setActiveTemplateId(template.id);
       setCustomPrompt(template.content);
       toast.success(`已应用模板: ${template.name}`);
+      // 保存最后使用的模板ID到数据库
+      db.saveLastUsedTemplateId(template.id)
+        .then(() => {
+          console.log(`已保存最后使用的模板ID: ${template.id}`);
+        })
+        .catch(error => {
+          console.error('保存模板ID失败:', error);
+        });
     }
   };
   
@@ -468,6 +556,8 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
           // 如果有最后使用的会话ID，直接使用它
           setActiveSessionId(lastUsedSessionId);
           console.log(`回到上次选择的会话: ${lastUsedSessionId}`);
+          // 加载该会话的消息
+          await loadSessionMessages(lastUsedSessionId);
         }
         else if (sessions.length > 0) {
           // 按时间戳排序，获取最新的会话
@@ -479,12 +569,32 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
           setActiveSessionId(latestSessionId);
           await loadSessionMessages(latestSessionId);
         } else {
-          // 如果没有会话，创建一个新会话
+          // 如果没有会话，创建一个新会话并保存到数据库
           const newSessionId = await createNewSession("新对话");
           if (newSessionId) {
             setActiveSessionId(newSessionId);
             setMessages([]);
+            console.log(`创建初始会话: ${newSessionId}`);
           }
+        }
+
+        // 获取最后使用的模板
+        const lastUsedTemplateId = await db.getLastUsedTemplateId();
+        if(lastUsedTemplateId){
+          setActiveTemplateId(lastUsedTemplateId);
+          // 查找并设置对应模板内容
+          const templateList = await db.getAllTemplates();
+          const template = templateList.find(t => t.id === lastUsedTemplateId);
+          if (template) {
+            setCustomPrompt(template.content);
+            console.log(`已加载上次使用的模板: ${template.name}`);
+          } else {
+            // 如果找不到对应模板（可能已被删除），清除选中状态
+            setActiveTemplateId(null);
+            db.saveLastUsedTemplateId('').catch(console.error);
+          }
+        } else {
+          setActiveTemplateId(null);
         }
       } catch (error) {
         console.error('应用初始化失败:', error);

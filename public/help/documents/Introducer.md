@@ -1,312 +1,216 @@
-# 先锋·智绘
+# 漫画生成软件介绍
 
-先锋·智绘是基于ViewComfy、ComfyUI的智能绘画生图工具。
+## 一、漫画生成软件简介
+  
+漫画是一种以某现象、人物、事件为题材，运用夸张、比喻、象征等手法，对社会问题、政治现象、文化现象等进行讽刺、批评或表达的艺术形式。通过幽默或者讽刺的方式，漫画不仅能引发读者的思考和共鸣，还能够通过轻松的视觉表现形式传达深刻的观点和情感，在舆论宣传中被广泛使用。但漫画创作本身具有一定门槛，且宣传报道突发的热点事件往往要求创作者在较短时间内完成创作，这就对漫画创作者提出了较高的要求。
+  
+本软件主要包括漫画图像生成、智能修图、提示词增强等功能，主要支撑政治漫画和宣传漫画的成品制作，能够快速生成漫画底图并智能修改画面，提高漫画创作效率。
 
-## 示例图片
+---
 
-下面是一个示例图片：
+## 二、功能介绍
+  
+### (一) 漫画生成
+  
+#### 1、通用漫画生成
+   
+   
+   输入文本描述，输出与描述基本相符的多种风格、多种场景的漫画，可以用于描述现象、宣传观点。
 
-![示例图片](example.jpg)
+1. **下图一**：
 
-## 安装和演示
+   A cartoon-style image of an officer facing a group of people holding signs demonstrating.
 
-### 安装步骤
-1. 安装 [Node.js v20.18](https://nodejs.org/) 或更高版本（推荐 v20.18）
+   （一幅漫画风格的图片，画面上是一个军官面对着一群举着牌子示威的人）  
+   
+   ![图片1 [width:60%]](image1.png)
+     
+2. **下图**二：
+     
+   A comic-book style image of an entire Taiwanese island marked with dollar signs.
 
-2. 克隆仓库
-```bash
-git clone git@gitee.com:zzy17539555805/pioneer---smart-painting.git
-```
+   （一幅漫画风格的图片，画面上是一整个台湾岛屿，岛上标着很多美元符号）
 
-3. 安装依赖并启动开发服务器
-```bash
-npm install
-npm run dev
-```
+   ![图片2 [width:60%]](image2.jpeg)
+     
 
-## 项目结构
+#### 2、特定人物漫画生成
+  
+   可生成带有特定人物形象的漫画，目前支持的政治人物形象有赖清德、蔡英文、山姆大叔、特朗普等，漫画人物形象有身着迷彩、常服、体能的漫画军人形象等，该功能需要收集特 定人物的漫画数据进行训练，后续将持续扩展支持人物数量。
 
-### 📁 app - 核心接口以及功能组件
-- **api/** - API路由目录
-  - `comfy/` - ComfyUI相关API
-    - `route.ts` - 解析请求中的工作流配置,处理 viewComfy 配置参数,处理上传的文件,运行工作流并返回生成的图片流
-  - `playground/` - 预览和测试相关API
-    - `preview-images/route.ts` - 实现了一个完整的文件上传和删除的API端点，用于处理预览图片的上传和管理
-    - `route.ts` - Next.js API 路由处理文件，主要用于读取 ViewComfy 配置文件
-- **fonts/** - 加载字体
-- **helpers/** - 处理 ComfyUI 工作流程中的错误，格式化ComfyUI错误输出
-- **interfaces/** - 用于定义项目中使用的数据类型
-- **models/** - 提供稳定的数据结构和错误处理机制
-  - `comfy-workflow.ts` - 管理 ComfyUI 工作流配置
-  - `error.ts` - 工作流错误处理系统
-- **providers/** - 状态管理系统，整个应用的核心，管理着所有视图配置和工作流状态
-- **services/**
-  - `comfyui-api-service.ts` - 与 ComfyUI 后端建立 WebSocket 连接，用于实时接收工作流执行状态
-  - `comfyui-service.ts` - 协调工作流执行和结果处理
-- `constants.ts` - 集中管理配置常量
-- `favicon.ico` - 网页图标
-- `globals.css` - 提供全局样式基础和两个主题的样式
-- `layout.tsx` - 整个应用的根布局文件，定义了基础页面结构
-- `page.tsx` - 主页面组件，包括顶部导航栏、侧边栏、主内容区域、部署模态框
-- `styles.scss` - 生成图片时的动画
+   1. （1）、部分政治人物形象:
 
-### 📁 comfy - 存储工作流的json文件，保存工作流配置
-- **inputs/**
-- **workflows/**
+      ![图片3 [width:20%]](image3.png)
+      ![图片4 [width:20%]](image4.png)
+      ![图片5 [width:20%]](image5.png)
+      ![图片6 [width:20%]](image6.jpeg)
 
-### 📁 components - 存放所有组件
-- **pages/** - 页面级组件集合
-  - `playground/` - 工作流配置界面
-    - `playground-form.tsx` - 表单管理组件
-    - `playground-page.tsx` - 页面组件
-    - `PlaygroundForm` - 定义一个动画
-  - `view-comfy/`
-    - `view-comfy-form-editor.tsx` - 工作流配置编辑器，管理表单状态，导出配置文件
-    - `view-comfy-page.tsx` - 工作流配置编辑器主界面
-  - `ui/` - 组件库
-    - 完整的UI组件集合，包括alert-dialog、button、card等基础组件
-  - `view-comfy/view-comfy-form.tsx` - 工作流输入输出转换前端核心文件
-- `header.tsx` - 提供页面顶部导航栏
-- `images-preview.tsx` - 生成图片预览
-- `loader.tsx` - 圆点旋转加载动画
-- `sidebar` - 侧边栏按钮
-- `styles` - 提供表单、文本区域、复选框的基本样式
-- `theme-provider.tsx` - 主题明暗切换功能
-- `toggle.tsx` - 主题切换按钮
-- `top-nav.tsx` - 导航栏按钮组件
-- `workflow-switcher` - 工作流搜索功能以及ui
+   2. （2）、宣传漫画人物形象:
 
-### 📁 hooks - 所有可复用逻辑
-- **playground/**
-  - `use-post-playground.ts` - 处理与comfyui通信，传递生成请求并接收生成的图像数据
-- `use-media-query.ts` - 监听媒体查询，自适应调整ui窗口
-- `use-toast.ts` - 提示临时消息系统
+      ![图片7 [width:20%]](image7.png)
+      ![图片8 [width:20%]](image8.png)
+      ![图片9 [width:20%]](image9.png)
+      ![图片10 [width:20%]](image10.jpeg)
+---
 
-### 📁 lib - 复用代码
-- `api-error-handler.tsx` - 统一处理api请求的所有错误
-- `utils.ts` - 通用功能支持
-- `workflow-api-parser.ts` - 将 API 返回的工作流数据转换为前端可用的格式
+### (二) 智能修图
+  
+#### 1、局部重绘
 
-### 📁 node_modules - 运行npm install后安装的运行依赖
+   可对底图进行部分区域重绘，在已有底图的基础上，涂抹需要重新绘制的区域，并填写提示词描述进行区域重绘，方便修改漫画中效果不好的部分。
+   
+   ![图片11 [width:20rem] [text:原图]](image11.png) 
+   ![图片12 [width:20rem] [text:涂抹重绘区域]](image12.png)
+   ![图片13 [width:20rem] [text:最终图片]](image13.jpeg)
+#### 2、去除背景
 
-### 📁 pages - 将 pages 目录下文件转换为网站的路由
+   上传图片后可一键去除背景，抠出画面的主体。
 
-## 使用方法
+   ![图片14 [width:20rem] [text:原图]](image14.jpeg) 
+   ![图片15 [width:20rem] [text:去除背景后]](image15.png)
 
-### 表单编辑器
-你可以将 ComfyUI 的 workflow_api.json 文件拖放到表单编辑器中。它会生成一个新的表单，你可以用它来配置在操作界面中显示的输入项。
+#### 3、高清修复
 
-### 操作界面
-操作界面是一个简化的用户界面，你可以在这里运行你的工作流。
+   可增大图片的分辨率，使图片更加清晰。
 
-### 查看模式
-查看模式只会加载操作界面页面，可以轻松转换为网页应用。如果你想与他人分享你的工作流，但不想分享 workflow_api.json，也不需要他们安装 ComfyUI。
 
-#### 启用查看模式
-1. 将生成的 view_comfy.json 放入项目根目录
-2. 编辑 .env 文件：
-```bash
-.env 文件 ->
-NEXT_PUBLIC_VIEW_MODE="true"
-VIEW_COMFY_FILE_NAME="view_comfy.json"
+   ![图片16 [width:20rem] [text:原图(158KB)]](image16.jpeg) 
+   ![图片17 [width:20rem] [text:放大后(13.3MB)]](image17.jpeg)
 
-npm run dev
-```
+#### 4、一键精修
+   在生成的图像中可能会出现去噪不完全的情况，其表现在主体轮廓周围会出现彩色噪点，一键精修功能可去除噪点，使画面更加平滑、细致。对生成的漫画、人脸、物体表面有较好 的修复效果。
 
-### 表单编辑器高级功能
-你也可以直接将 view_comfy.json 拖放到表单编辑器中进行编辑，而无需 workflow_api.json。
 
-## Docker部署
+   ![图片18 [width:20rem] [text:原图]](image18.jpeg) 
+   ![图片19 [width:20rem] [text:精修后]](image19.png)
 
-```bash
-docker build -t viewcomfy .
+#### 5、去除水印
 
-docker run -it --name viewcomfy-container -p 3000:3000 viewcomfy
-```
+   涂抹图片上的水印部分，可去除图片中的水印。
 
-## 技术栈
-先锋·智绘是一个 Next.js 应用 - [Next.js 文档](https://nextjs.org/docs)
 
-## 贡献
-欢迎通过反馈、建议、问题或拉取请求做出贡献。
+   ![图片20 [width:20rem] [text:原图]](image20.png) 
+   ![图片21 [width:20rem] [text:去除水印后]](image21.jpeg)
 
-# 提示词库功能说明
+#### 6、物体消除
 
-## 功能概述
-提示词库是一个用于管理和使用提示词的功能模块，支持以下主要功能：
-- 添加新的提示词（支持中英文）
-- 编辑现有提示词
-- 删除提示词（包括关联图片）
-- 导入提示词
-- 图片上传和预览
-- 标签管理
-- 参数配置
-- 自动清理未使用图片
+   涂抹画面中需要消除的部分，可将其用合适的背景填充替换。
 
-## 页面切换逻辑
-提示词库实现了智能的页面切换逻辑，主要包括以下几个方面：
 
-### 1. 初始页面加载
-- 默认情况下，系统会根据 `viewMode` 的值决定显示哪个页面：
-  - 如果 `viewMode` 为 true，显示 Playground 页面
-  - 如果 `viewMode` 为 false，显示 WorkflowApi 页面
-- 这个逻辑在 `app/page.tsx` 中通过 `useState` 的初始化函数实现
+   ![图片22 [width:20rem] [text:原图]](image22.png) 
+   ![图片23 [width:20rem] [text:消除物体后]](image23.jpeg)
 
-### 2. 提示词详情页面
-- 提示词详情页面通过动态路由 `/prompt-library/[id]` 实现
-- 从详情页返回时，会自动切换到主页的提示词库标签页
-- 编辑或删除操作完成后，也会自动返回到主页的提示词库标签页
 
-### 3. 页面刷新处理
-- 当用户刷新页面时，系统会保持在当前页面
-- 如果在详情页刷新，会保持在详情页面
+---
 
-### 4. 编辑状态处理
-- 系统会检查 URL 中的 `edit` 参数
-- 如果存在 `edit` 参数，会自动打开编辑表单并加载对应的提示词数据
-- 编辑完成后会返回到主页的提示词库标签页
+### (三) 画廊
+  
+   由于生成模型的效果取决于模型参数的设置，对于同一画面描述需要更改参数多次生成才可 能达到满意的效果，画廊中记录着生成效果较好的图片信息，包含其文本描述、参数设置等 ，并支持手动添加标签以供查找，其能够方便使用者学习上手软件，熟悉不同参数的效果。 
 
-## 删除功能说明
-提示词库的删除功能包含以下特性：
 
-### 1. 删除流程
-- 当用户点击删除按钮时，会先显示确认对话框
-- 确认删除后，系统会：
-  1. 删除提示词数据
-  2. 删除关联的图片文件
-  3. 更新提示词列表
+   ![图片24 [width:40rem] [text:画廊界面]](image24.png) 
 
-### 2. 图片删除
-- 系统会自动删除存储在 `public/images/prompts` 目录下的图片文件
-- 删除操作通过 API 路由 `/api/upload` 处理
-- 包含安全检查，防止目录遍历攻击
 
-### 3. 错误处理
-- 如果图片删除失败，系统会记录错误但不会影响提示词数据的删除
-- 所有删除操作都有错误处理和日志记录
+   ![图片25 [width:40rem] [text:图片详细信息]](image25.png)
 
-## 图片管理功能
-提示词库实现了完整的图片管理机制：
+---
 
-### 1. 图片存储
-- 所有图片存储在 `public/images/prompts` 目录下
-- 图片文件名使用时间戳生成，确保唯一性
-- 支持 PNG、JPG 等常见图片格式
+### (四) 提示词增强
 
-### 2. 图片清理机制
-- 系统会自动维护图片文件与提示词数据的一致性
-- 在以下情况下会触发图片清理：
-  1. 删除提示词时，自动删除关联的图片
-  2. 保存提示词数据时，自动清理未使用的图片
-  3. 导入新数据时，自动清理不再使用的图片
+   由于生图模型需要输入专业的英文提示词才能达到良好的表现效果，专业英文提示词书写具 有特定格式，但需要一定的生图经验和英语基础，本功能基于国产大语言模型，能够实现理 解用户意图、生成专业的英文提示词，降低生图门槛。
 
-### 3. 清理流程
-- 获取 `prompt-library.json` 中所有使用的图片列表
-- 扫描 `public/images/prompts` 目录中的所有图片
-- 删除不在使用列表中的图片文件
-- 记录清理操作的日志，包括成功和失败的文件
+1. 原输入：
 
-### 4. 错误处理
-- 如果某个文件删除失败，会记录错误但继续处理其他文件
-- 所有清理操作都有完整的错误处理和日志记录
-- 清理失败不会影响提示词数据的正常使用
 
-## 目录结构
-```
-├── app/
-│   └── prompt-library/
-│       └── [id]/           # 提示词详情页面
-│           └── page.tsx    # 提示词详情页面组件
-├── components/
-│   └── prompt-library/     # 提示词库相关组件
-│       ├── prompt-library.tsx # 提示词库主组件
-│       ├── prompt-form.tsx   # 提示词表单组件
-│       ├── prompt-detail.tsx # 提示词详情组件
-│       ├── image-upload.tsx  # 图片上传组件
-│       └── types.ts         # 类型定义
-├── lib/
-│   └── services/
-│       └── prompt-library-service.ts # 提示词库服务
-└── data/
-    └── prompt-library.json  # 提示词数据存储文件
-```
+   ```
+   "写一份讽刺漫画的提示词,画面中心是特朗普化身小丑，
+   踩着"125%关税"标牌堆砌的危楼，左手挥动写着"5000%"的锤子砸向地球仪，
+   右腿被"美股暴跌"铁链缠住。背景中自由女神像头戴"企鹅税"项圈倾倒，
+   抗议人群举着"物价飞涨"横幅如潮水涌来，地面裂痕蔓延出"反制"的岩浆。
+   ```
 
-## 核心文件说明
+2. 增强后：
 
-### 1. 数据类型 (types.ts)
-- `PromptItem`: 提示词数据结构
-  - id: 唯一标识符
-  - prompt: 中文提示词
-  - promptEn: 英文提示词
-  - imageUrl: 图片URL
-  - tags: 标签数组
-  - parameters: 参数配置
-  - createdAt/updatedAt: 创建和更新时间
 
-### 2. API接口 (route.ts)
-- GET `/api/prompt-library`: 获取提示词列表
-- POST `/api/prompt-library`: 保存提示词列表
-- POST `/api/upload`: 处理图片上传
+   ```
+      Satirical Political Cartoon in the Style of Banksy Meets Honore Daumier
+   Central Figure: Donald Trump as grotesque clown with exaggerated red nose and 
+   tiny hands Costume: Oversized stars-and-stripes jester suit with unraveling golden 
+   threads Action 1: Crumbling skyscraper made of "125% Tariff" neon signs under clown 
+   shoes Action 2: Swinging comically large hammer labeled "5000%" smashing cracked 
+   globe (visible fissures showing "EU/China/Mexico" labels)
+   Restraint: "Stock Crash" iron shackle on ankle dragging NASDAQ ticker tape chain
+   Background 1: Leaning Statue of Liberty with "Tech Tax" penguin-shaped collar,
+   torch replaced by burning dollar billsBackground 2: Protest wave carrying 
+   "Inflation Surge" banners with supermarket price tags as cresting foam Foreground: 
+   Lava cracks forming Chinese characters "Retaliatory Measures" in glowing magma
+   Color Palette: High-contrast political cartoon red/blue with corruption yellow 
+   accents Texturing: Crosshatched shadows mimicking newspaper print, speech bubbles 
+   as policy documents Symbolism: Every element dripping with ironic metaphors 
+   about trade wars Perspective: Dutch angle emphasizing instability
+   ```
+   ![图片26 [width:40rem] [text:前端页面展示]](image26.png)
 
-### 3. 服务层 (prompt-library-service.ts)
-- `getPrompts()`: 获取提示词列表
-- `savePrompts()`: 保存提示词列表
-- `importPrompts()`: 导入提示词数据
 
-### 4. 组件
-- `PromptLibrary`: 提示词库主组件，负责展示提示词列表和处理交互
-- `PromptForm`: 提示词表单，用于添加/编辑提示词
-- `ImageUpload`: 图片上传组件，支持URL输入和文件上传
+---
 
-## 主要功能实现
+## 三、任务和部分案例
 
-### 提示词管理
-- 提示词支持中英文双语输入
-- 使用JSON文件存储提示词数据
-- 支持标签管理和筛选
-- 支持预设参数配置（步数、CFG、采样器、种子）
-- 支持从ComfyUI生成的PNG图片中解析提示词和参数
+### （一）赖清德窜访南岛
+   台湾地区领导人赖清德于11月30日至12月6日展开所谓“繁荣南岛 智慧永续”之旅，窜访帕劳、图瓦卢、马绍尔群岛三国。这是赖清德上任后，首次窜访“友邦”并“过境”美国，是台湾 当局领导人就任后的例行操作，意在巩固所谓“邦交”，提升国际能见度，并借此勾连美国反 华势力，强化美台实质关系。
 
-### 图片管理
-- 支持图片URL输入
-- 支持本地图片上传
-- 图片存储在 public/images/prompts 目录
-- 支持图片预览和双击放大
+   生成的配图:
 
-### 数据导入导出
-- 支持从JSON文件导入提示词
-- 数据自动保存到服务器和本地存储
+   ![图片27 [width:30%]](image27.jpeg)
+   ![图片28 [width:30%]](image28.jpeg)
 
-## 使用说明
+   ![图片29 [width:30%]](image29.jpeg)
+   ![图片30 [width:30%]](image30.jpeg)
 
-1. 添加提示词
-   - 点击"添加"按钮
-   - 填写中英文提示词
-   - 选择或上传图片
-   - 添加标签
-   - 配置所需参数
-   - 点击保存
+### （二）台年轻人拒绝服兵役
+   台海网发“台年轻人花式拒绝服兵役”文章，其通过减肥、增重、断手指、躲境外等方式逃兵役。
 
-2. 导入提示词
-   - 点击"导入"按钮
-   - 选择JSON格式的提示词文件
-   - 系统会自动导入数据
+   台湾网文章：
 
-3. 解析ComfyUI图片
-   - 点击"解析图片"按钮
-   - 选择由ComfyUI生成的PNG图片
-   - 系统会自动提取图片中的提示词和参数信息
-   - 提取的信息会自动填充到表单中
-   - 修改或补充信息后点击保存
+   ![图片31 [width:60%]](image31.png)
 
-4. 参数配置
-   - 步数 (steps): 生成图片的迭代次数
-   - CFG: 提示词引导系数
-   - 采样器 (sampler): 使用的采样算法
-   - 种子 (seed): 随机种子值
+   生成的配图：
 
-## 注意事项
-1. 图片上传支持的格式：JPG、PNG、GIF等常见图片格式
-2. 提示词数据会自动保存到服务器
-3. 参数值应该符合实际使用需求
-4. 建议定期备份提示词数据
+   ![图片32 [width:30%]](image32.png)
+   ![图片33 [width:30%]](image33.png)
+
+   ![图片34 [width:30%]](image34.png)
+   ![图片35 [width:30%]](image35.png)
+
+
+
+### （三）充电宝泄密事件警示教育案例
+   ![图片36 [width:60%]](image36.png)
+
+   
+
+
+### （四）不要妄评妄议警示教育案例
+   ![图片37 [width:60%]](image37.png)
+    
+   
+
+### （五）其他政治人物漫画作品
+   ![图片38 [width:30%]](image38.png)
+   ![图片39 [width:30%]](image39.png)
+
+   ![图片40 [width:30%]](image40.png)
+   ![图片41 [width:30%]](image41.png)
+
+   ![图片42 [width:30%]](image42.png)
+   ![图片43 [width:30%]](image43.png)
+
+   
+
+---
+
+## 四、配置要求
+
+1. Windows 10/11系统的工作站
+2. 配置英伟达显卡，显存不少于24G，安装对应版本的CUDA
+3. 大于100G的存储空间

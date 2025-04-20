@@ -65,20 +65,21 @@
 /* 内容区域样式 */
 .content-container {
   flex: 1;
-  padding: 2.5rem 1rem 2.5rem 1.8rem; /* 减少内边距 */
-  overflow-y: auto;
-  line-height: 1.6; /* 减小行高 */
-  width: calc(100% - 300px); /* 减去侧边栏宽度 */
+  padding: 0.5rem 1rem 2.5rem 1.8rem; 
+  overflow-y: auto;  
+  overflow-x: hidden;
+  line-height: 1.6; 
+  width: calc(100% - 300px); 
   background-image: linear-gradient(to bottom, #f9f9f9, #ffffff);
   color: #2c3e50;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.02); /* 减轻阴影 */
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.02); 
 }
 
 /* 暗色模式下内容区域样式 */
 .dark .content-container {
   background-image: linear-gradient(to bottom, hsl(222.2 84% 4.9%), hsl(220 13% 10%));
   color: #e2e8f0;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.15); /* 减轻阴影 */
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.15); 
 }
 
 /* 明确设置侧边栏在右侧 */
@@ -86,23 +87,23 @@
   right: 0;
   top: 0;
   bottom: 0;
-  width: 300px; /* 导航栏宽度 */
+  width: 300px;
   z-index: 10;
-  overflow-y: auto; /* 添加滚动功能 */
-  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.04); /* 减轻阴影 */
+  overflow-y: auto; 
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.04);
   border-left: 1px solid #eaeaea;
 }
 
 /* 暗色模式下侧边栏样式 */
 .dark .help-sidebar {
-  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15); /* 减轻阴影 */
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
   border-left: 1px solid hsl(217.2 32.6% 17.5%);
 }
 
 /* 滚动条样式 - 适用于WebKit浏览器 */
 .content-container::-webkit-scrollbar, 
 .help-sidebar::-webkit-scrollbar {
-  width: 6px; /* 减小滚动条宽度 */
+  width: 6px; 
 }
 
 .content-container::-webkit-scrollbar-track, 
@@ -113,7 +114,7 @@
 .content-container::-webkit-scrollbar-thumb, 
 .help-sidebar::-webkit-scrollbar-thumb {
   background-color: rgba(156, 163, 175, 0.5);
-  border-radius: 3px; /* 减小圆角 */
+  border-radius: 3px;
 }
 
 .content-container::-webkit-scrollbar-thumb:hover, 
@@ -145,11 +146,11 @@
 
 /* 所有标题的基础样式 */
 .help-heading {
-  scroll-margin-top: 20px; /* 减小滚动边距 */
-  scroll-margin-bottom: 30px; /* 减小滚动边距 */
+  scroll-margin-top: 20px;
+  scroll-margin-bottom: 30px;
   transition: color 0.3s ease;
-  border-bottom: 1px solid #eaeaea; /* 添加默认底边框 */
-  padding-bottom: 0.2em; /* 添加底部内边距 */
+  border-bottom: 1px solid #eaeaea; 
+  padding-bottom: 0.2em; 
 }
 
 /* 暗色模式下标题底边框 */
@@ -159,17 +160,17 @@
 
 /* 标题激活效果 */
 .active-heading {
-  animation: headingHighlight 1.5s ease; /* 减少动画时间 */
+  animation: headingHighlight 1.5s ease; 
 }
 
 @keyframes headingHighlight {
   0% {
     background-color: rgba(100, 100, 100, 0.15);
-    border-radius: 5px; /* 减小圆角 */
+    border-radius: 5px; 
   }
   70% {
     background-color: rgba(100, 100, 100, 0.15);
-    border-radius: 5px; /* 减小圆角 */
+    border-radius: 5px; 
   }
   100% {
     background-color: transparent;
@@ -179,17 +180,17 @@
 
 /* 暗色模式下标题高亮动画 */
 .dark .active-heading {
-  animation: darkHeadingHighlight 1.5s ease; /* 减少动画时间 */
+  animation: darkHeadingHighlight 1.5s ease; 
 }
 
 @keyframes darkHeadingHighlight {
   0% {
     background-color: rgba(200, 200, 200, 0.2);
-    border-radius: 5px; /* 减小圆角 */
+    border-radius: 5px;
   }
   70% {
     background-color: rgba(200, 200, 200, 0.2);
-    border-radius: 5px; /* 减小圆角 */
+    border-radius: 5px;
   }
   100% {
     background-color: transparent;
@@ -199,24 +200,15 @@
 
 /* Markdown 渲染样式 */
 .content-container h1 {
-  font-size: 2.2rem; /* 减小字体大小 */
-  margin-top: 1.2em; /* 减少顶部间距 */
-  margin-bottom: 0.4rem; /* 减少底部间距 */
+  font-size: 2.2rem; 
+  margin-top: 1.5rem;
+  margin-bottom: 0.4rem; 
+  text-align: center;
   border-bottom: 4px solid #eaeaea;
   color: #2c3e50;
   font-weight: 700;
   letter-spacing: -0.5px;
   position: relative;
-}
-
-.content-container h1::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 33%; /* 占用宽度约1/3 */
-  height: 4px;
-  background-color: var(--h1-line-color);
 }
 
 /* 暗色模式下h1标题 */
@@ -226,9 +218,9 @@
 }
 
 .content-container h2 {
-  font-size: 1.8rem; /* 减小字体大小 */
-  margin-top: 1.2em; /* 减少顶部间距 */
-  margin-bottom: 0.4em; /* 减少底部间距 */
+  font-size: 1.8rem;
+  margin-top: 1.2em; 
+  margin-bottom: 0.4em; 
   color: #34495e;
   font-weight: 500;
   border-bottom: 3px solid #f0f0f0;
@@ -240,7 +232,7 @@
   position: absolute;
   bottom: -3px;
   left: 0;
-  width: 28%; /* 宽度略小于h1 */
+  width: 28%; 
   height: 3px;
   background-color: var(--h2-line-color);
 }
@@ -252,12 +244,13 @@
 }
 
 .content-container h3 {
-  font-size: 1.4rem; /* 减小字体大小 */
-  margin-top: 1.2em; /* 减少顶部间距 */
-  margin-bottom: 0.4em; /* 减少底部间距 */
+  font-size: 1.4rem; 
+  margin-top: 1.2em; 
+  margin-bottom: 0.4em; 
+  margin-left: 0.5rem;
   font-weight: 400;
   border-bottom: 2px solid #e0e0e0;
-  padding-left: 8px; /* 减少左侧内边距 */
+  padding-left: 8px; 
   position: relative;
 }
 
@@ -266,7 +259,7 @@
   position: absolute;
   bottom: -2px;
   left: 0;
-  width: 23%; /* 继续递减 */
+  width: 23%; 
   height: 2px;
   background-color: var(--h3-line-color);
 }
@@ -278,13 +271,14 @@
 }
 
 .content-container h4 {
-  font-size: 1.2rem; /* 减小字体大小 */
-  margin-top: 1.2em; /* 减少顶部间距 */
-  margin-bottom: 0.4em; /* 减少底部间距 */
+  font-size: 1.2rem; 
+  margin-top: 1.2em; 
+  margin-bottom: 0.4em; 
+  margin-left: 1.5rem;
   font-weight: 300;
-  padding-left: 6px; /* 减少左侧内边距 */
+  padding-left: 6px; 
   position: relative;
-  border-bottom: 1px solid #f0f0f0; /* 添加边框 */
+  border-bottom: 1px solid #f0f0f0; 
 }
 
 .content-container h4::after {
@@ -292,7 +286,7 @@
   position: absolute;
   bottom: -1px;
   left: 0;
-  width: 18%; /* 继续递减 */
+  width: 18%; 
   height: 1px;
   background-color: var(--h4-line-color);
 }
@@ -303,14 +297,14 @@
 
 .content-container h5,
 .content-container h6 {
-  font-size: 1rem; /* 减小字体大小 */
+  font-size: 1rem; 
   color: #7f8c8d;
-  margin-top: 1.2em; /* 减少顶部间距 */
-  margin-bottom: 0.4em; /* 减少底部间距 */
+  margin-top: 1.2em; 
+  margin-bottom: 0.4em; 
   font-weight: 500;
   scroll-margin-top: 20px;
   position: relative;
-  border-bottom: 1px solid #f8f8f8; /* 更浅的边框 */
+  border-bottom: 1px solid #f8f8f8; 
 }
 
 .content-container h5::after {
@@ -318,7 +312,7 @@
   position: absolute;
   bottom: -1px;
   left: 0;
-  width: 13%; /* 继续递减 */
+  width: 13%; 
   height: 1px;
   background-color: var(--h5-line-color);
 }
@@ -328,7 +322,7 @@
   position: absolute;
   bottom: -1px;
   left: 0;
-  width: 8%; /* 最小宽度 */
+  width: 8%; 
   height: 1px;
   background-color: var(--h6-line-color);
 }
@@ -347,10 +341,11 @@
 }
 
 .content-container p {
-  margin-bottom: 0.8rem; /* 减少底部间距 */
+  text-indent: 2em;
+  margin-bottom: 0.8rem; 
   color: #34495e;
-  line-height: 1.6; /* 减小行高 */
-  font-size: 1rem; /* 减小字体大小 */
+  line-height: 2; 
+  font-size: 1rem; 
 }
 
 /* 暗色模式下段落文本 */
@@ -359,8 +354,8 @@
 }
 
 .content-container ul, .content-container ol {
-  margin-bottom: 0.6rem; /* 减少底部间距 */
-  padding-left: 1.5rem; /* 减少左侧内边距 */
+  margin-bottom: 0.6rem; 
+  padding-left: 1.5rem; 
   color: #34495e;
 }
 
@@ -372,18 +367,18 @@
 
 .content-container li {
   margin-bottom: 0.3rem;
-  line-height: 1.6; /* 减小行高 */
+  line-height: 1.6; 
 }
 
 .content-container blockquote {
   border-left: 4px solid var(--blockquote-border);
-  padding: 0.75rem 1.2rem; /* 减少内边距 */
-  margin: 1.2rem 0; /* 减少外边距 */
+  padding: 0.75rem 1.2rem; 
+  margin: 1.2rem 0; 
   background-color: #f8f9fa;
-  border-radius: 0 5px 5px 0; /* 减小圆角 */
+  border-radius: 0 5px 5px 0; 
   color: #2c3e50;
   font-style: italic;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04); /* 减轻阴影 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04); 
 }
 
 /* 暗色模式下引用块 */
@@ -391,16 +386,16 @@
   border-left: 4px solid var(--blockquote-border);
   background-color: hsl(217.2 32.6% 17.5%);
   color: #e2e8f0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); /* 减轻阴影 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); 
 }
 
 .content-container code {
   background-color: var(--code-bg-lighter);
-  padding: 0.15em 0.3em; /* 减少内边距 */
-  border-radius: 3px; /* 减小圆角 */
+  padding: 0.15em 0.3em; 
+  border-radius: 3px; 
   font-family: 'Fira Code', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  font-size: 0.9em; /* 减小字体大小 */
-  border: 1px solid var(--code-border); /* 添加细边框 */
+  font-size: 0.9em; 
+  border: 1px solid var(--code-border); 
 }
 
 /* 暗色模式下行内代码 */
@@ -412,31 +407,33 @@
 
 .content-container pre {
   background-color: var(--code-bg-lighter);
-  padding: 0; /* 移除内边距，使用代码元素的内边距 */
-  border-radius: 6px; /* 减小圆角 */
+  padding: 0; 
+  border-radius: 6px; 
   overflow-x: auto;
-  margin-bottom: 1.2rem; /* 减少底部间距 */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12); /* 减轻阴影 */
+  margin-bottom: 1.2rem; 
+  max-width: 80%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12); 
   position: relative;
-  border: 1px solid var(--code-border); /* 添加边框 */
-  background-image: linear-gradient(to bottom, var(--code-bg-lighter), var(--code-bg-darker)); /* 添加渐变效果 */
+  border: 1px solid var(--code-border); 
+  background-image: linear-gradient(to bottom, var(--code-bg-lighter), var(--code-bg-darker)); 
 }
 
 /* 暗色模式下代码块 */
 .dark .content-container pre {
   background-color: var(--code-bg-lighter);
   background-image: linear-gradient(to bottom, var(--code-bg-lighter), var(--code-bg-darker));
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); /* 减轻阴影 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); 
   border-color: var(--code-border);
 }
 
 .content-container pre code {
   background-color: transparent;
-  padding: 0.8rem 1.2rem; /* 添加内边距 */
+  padding: 0.8rem 1.2rem;
+  max-width: 80%;
   color: #2c3e50;
   border: none;
-  font-size: 0.9em; /* 减小字体大小 */
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1); /* 减轻阴影 */
+  font-size: 0.9em; 
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1); 
   display: block;
   line-height: 1.5;
 }
@@ -489,15 +486,15 @@
 .content-container table {
   border-collapse: collapse;
   width: 100%;
-  margin: 1.2rem 0; /* 减少外边距 */
-  border-radius: 6px; /* 减小圆角 */
+  margin: 1.2rem 0; 
+  border-radius: 6px; 
   overflow: hidden;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08); /* 减轻阴影 */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08); 
 }
 
 .content-container th, .content-container td {
   border: 1px solid #e0e0e0;
-  padding: 0.6rem 0.8rem; /* 减少内边距 */
+  padding: 0.6rem 0.8rem; 
   text-align: left;
 }
 
@@ -517,7 +514,7 @@
 
 /* 暗色模式下表格样式 */
 .dark .content-container table {
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2); /* 减轻阴影 */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2); 
 }
 
 .dark .content-container th,
@@ -539,26 +536,155 @@
 }
 
 .content-container .doc-image {
+  display: inline-block;
   max-width: 100%;
-  border-radius: 6px; /* 减小圆角 */
-  margin: 1.2rem 0; /* 减少外边距 */
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* 减轻阴影 */
+  border-radius: 6px; 
+  margin: 1rem 1rem 1rem 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); 
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+/* 图片尺寸类 */
+.content-container .doc-image.img-small {
+  max-width: 30%;
+}
+
+.content-container .doc-image.img-medium {
+  max-width: 50%;
+}
+
+.content-container .doc-image.img-large {
+  max-width: 70%;
+}
+
+/* 响应式：小屏幕时图片自适应 */
+@media (max-width: 768px) {
+  .content-container .doc-image {
+    max-width: 100%;
+    margin: 1rem 0;
+  }
 }
 
 .content-container .doc-image:hover {
-  transform: translateY(-2px); /* 减小悬停移动距离 */
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12); /* 减轻阴影 */
+  transform: translateY(-2px); 
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12); 
 }
 
 /* 暗色模式下图片样式 */
 .dark .content-container .doc-image {
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); /* 减轻阴影 */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); 
   border: 1px solid hsl(217.2 32.6% 17.5%);
   filter: brightness(0.9) contrast(1.1);
 }
 
 .dark .content-container .doc-image:hover {
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* 减轻阴影 */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
+}
+
+/* 更多图片尺寸选项 */
+.content-container .doc-image.img-tiny {
+  max-width: 20%;
+}
+
+.content-container .doc-image.img-x-small {
+  max-width: 25%;
+}
+
+.content-container .doc-image.img-x-large {
+  max-width: 80%;
+}
+
+/* 全宽图片样式，修复溢出问题 */
+.content-container .doc-image.img-full {
+  max-width: 100%;
+  width: calc(100% - 2px); /* 减去边框宽度 */
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+}
+
+/* 当使用内联样式设置宽度为100%时的特殊处理 */
+.content-container img[style*="width: 100%"],
+.content-container img[style*="width:100%"] {
+  width: calc(100% - 2px) !important; /* 减去边框宽度 */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* 图片浮动布局 */
+.content-container .doc-image.img-left {
+  float: left;
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+.content-container .doc-image.img-right {
+  float: right;
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+/* 清除浮动 */
+.content-container .clear-float {
+  clear: both;
+  display: block;
+  content: "";
+}
+
+/* 图片说明文字容器 */
+.content-container .image-figure {
+  display: inline-block;
+  margin: 0.5rem 0;
+  max-width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* 全宽图片说明文字容器 */
+.content-container .image-figure.img-full,
+.content-container .image-figure[style*="width: 100%"],
+.content-container .image-figure[style*="width:100%"] {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+}
+
+/* 图片说明文字样式 */
+.content-container .image-caption {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.5rem;
+  text-align: center;
+  line-height: 1.4;
+  font-style: italic;
+  max-width: 100%;
+  padding: 0 0.5rem;
+}
+
+/* 暗色模式下的图片说明文字 */
+.dark .content-container .image-caption {
+  color: #a0a0a0;
+}
+
+/* 当图片有浮动时的图片说明文字容器 */
+.content-container .image-figure .doc-image.img-left,
+.content-container .image-figure .doc-image.img-right {
+  float: none;
+  margin: 0;
+}
+
+.content-container .image-figure.img-left {
+  float: left;
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+.content-container .image-figure.img-right {
+  float: right;
+  margin-left: 20px;
+  margin-bottom: 10px;
 }

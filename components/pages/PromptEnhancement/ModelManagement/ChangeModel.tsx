@@ -75,7 +75,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
       await loadModels();
       if (Models.length > 0) {
         Models.forEach(model => {
-          console.log('模型参数:', model.id, model.parameters);
+          console.log('模型参数:', model.name, model.parameters);
         });
       }
     };

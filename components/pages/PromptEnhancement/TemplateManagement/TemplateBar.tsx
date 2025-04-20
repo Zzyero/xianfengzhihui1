@@ -197,22 +197,31 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
       });
       setIsEditDialogOpen(true);
     } else if (isCreateMode) {
-      // 创建模式下不执行操作
+      // 创建模式下不执行任何操作
       return;
     } else {
       // 普通模式：使用模板或复制到剪贴板
-      if (onUseTemplate) {
-        // 如果提供了使用模板回调，则调用它
-        onUseTemplate(template);
-      } else {
-        // 否则复制模板内容到剪贴板
-        navigator.clipboard.writeText(template.content)
-          .then(() => {
-            toast.success("模板内容已复制到剪贴板");
-          })
-          .catch(() => {
-            toast.error("复制失败，请手动复制");
-          });
+      try {
+        if (onUseTemplate) {
+          // 如果提供了使用模板回调，则调用它
+          onUseTemplate(template);
+          
+          // 提供用户反馈
+          toast.success(`已应用模板: ${template.name}`);
+        } else {
+          // 否则复制模板内容到剪贴板
+          navigator.clipboard.writeText(template.content)
+            .then(() => {
+              toast.success("模板内容已复制到剪贴板");
+            })
+            .catch((error) => {
+              console.error("复制失败:", error);
+              toast.error("复制失败，请手动复制");
+            });
+        }
+      } catch (error) {
+        console.error("应用模板时出错:", error);
+        toast.error("应用模板失败");
       }
     }
   };
@@ -240,8 +249,8 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
         // 更新现有模板
         const updatedTemplate: Template = {
           ...editingTemplate,
-          name: templateForm.name,
-          content: templateForm.content,
+          name: templateForm.name.trim(),
+          content: templateForm.content.trim(),
           timestamp: new Date()
         };
         
@@ -254,11 +263,18 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
         
         toast.success("模板已更新");
       } else {
+        // 检查是否有同名模板
+        const existingTemplate = templates.find(t => t.name.toLowerCase() === templateForm.name.trim().toLowerCase());
+        if (existingTemplate) {
+          toast.warning('已存在同名模板，请使用不同的名称');
+          return;
+        }
+        
         // 创建新模板
         const newTemplate: Template = {
           id: Date.now().toString(),
-          name: templateForm.name,
-          content: templateForm.content,
+          name: templateForm.name.trim(),
+          content: templateForm.content.trim(),
           timestamp: new Date()
         };
         

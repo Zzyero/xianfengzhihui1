@@ -1,6 +1,6 @@
 .help-sidebar {
   width: 300px;
-  height: 100%; /* 使用视口高度 */
+  height: 100%; 
   border-left: 1px solid #eaeaea;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@
   flex: 1;
   overflow-y: auto;
   padding: 0 20px;
-  padding-bottom: 60px; /* 减少底部内边距 */
+  padding-bottom: 60px; 
   display: flex;
   flex-direction: column;
   position: relative;
@@ -34,7 +34,7 @@
   font-size: 18px;
   font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 15px; /* 减少下方间距 */
+  margin-bottom: 15px;
   padding-bottom: 12px;
   padding-top: 15px;
   border-bottom: 2px solid #94a3b8;
@@ -64,7 +64,7 @@
 }
 
 .heading-item-container {
-  margin-bottom: 1px; /* 减少项目间距 */
+  margin-bottom: 1px; 
   position: relative;
   z-index: 1;
 }
@@ -78,7 +78,7 @@
   position: relative;
   background-color: #f8f8f8;
   z-index: 2;
-  width: 100%; /* 确保宽度 */
+  width: 100%;
 }
 
 .heading-item-wrapper:hover {
@@ -103,9 +103,9 @@
   font-size: 10px;
   transition: transform 0.3s ease;
   margin-left: 5px;
-  margin-right: 8px; /* 增加右侧间距 */
+  margin-right: 8px; 
   color: #34495e;
-  flex-shrink: 0; /* 防止图标被压缩 */
+  flex-shrink: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -124,7 +124,7 @@
 
 /* 标题项 */
 .heading-item {
-  padding: 8px 10px; /* 减少水平内边距 */
+  padding: 8px 10px; 
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
@@ -134,13 +134,11 @@
   text-overflow: ellipsis;
   border-radius: 4px;
   line-height: 1.3;
-  width: calc(100% - 26px); /* 确保宽度，减去图标宽度 */
+  width: calc(100% - 26px);
 }
 
 
 .heading-item.active {
-  font-weight: 500;
-  background-color: rgba(52, 152, 219, 0.1);
 }
 
 /* 暗色模式下标题项 */
@@ -149,7 +147,6 @@
 }
 
 .dark .heading-item.active {
-  background-color: rgba(59, 130, 246, 0.2);
 }
 
 /* 子标题容器 */
@@ -157,7 +154,7 @@
   max-height: none;
   overflow: visible;
   transition: all 0.3s ease;
-  padding-left: 10px; /* 减少左侧内边距 */
+  padding-left: 10px;
   position: relative;
   z-index: 1;
   width: 100%;

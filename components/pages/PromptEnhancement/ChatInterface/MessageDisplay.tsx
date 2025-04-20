@@ -106,6 +106,8 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
     // 处理字符串元素
     if (typeof element === 'string') {
       return element;
+    } else if (element === null || element === undefined) {
+      return '';
     }
     
     // 处理React元素
@@ -185,6 +187,11 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
             code = codeElement.textContent || '';
           }
         }
+        
+        // 去除首尾空白
+        code = code.trim();
+        
+        // 执行复制
         handleCopyCode(code);
       };
       
@@ -200,6 +207,8 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, showTimestamp 
               size="icon" 
               className="copy-button"
               onClick={handleCopyClick}
+              aria-label="复制代码"
+              title="复制代码到剪贴板"
             >
               <Copy className="h-4 w-4" />
             </Button>

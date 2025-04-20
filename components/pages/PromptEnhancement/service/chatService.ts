@@ -44,13 +44,18 @@ class ChatService {
     disableHistory: boolean = false
   ): Promise<void> {
     try {
-      // 处理会话ID - 如果不存在或是临时ID则创建新会话
-      let currentSessionId = sessionId;
-      if (!currentSessionId || currentSessionId.startsWith('temp_')) {
-        currentSessionId = await this.createNewSession(content);
-        if (!currentSessionId) {
+      // 处理会话ID - 如果不存在则创建新会话
+      let currentSessionId = sessionId || '';
+      if (!currentSessionId && !disableHistory) {
+        // 在非单轮对话模式下创建并保存新会话
+        const newSessionId = await this.createNewSession(content);
+        if (!newSessionId) {
           throw new Error('创建会话失败');
         }
+        currentSessionId = newSessionId;
+      } else if (!currentSessionId && disableHistory) {
+        // 单轮对话模式下，如果没有会话ID，创建一个临时ID但不创建新会话
+        currentSessionId = `session_temp_${Date.now()}`;
       }
 
       // 创建用户消息
@@ -255,6 +260,7 @@ class ChatService {
           // 获取思考内容（reasoning_content）
           const reasoning = (chunk.choices[0]?.delta as any)?.reasoning_content || '';
           
+          // 处理思考内容
           if (reasoning) {
             // 如果有思考内容，将其累加到reasoningContent变量中
             reasoningContent += reasoning;
@@ -335,17 +341,38 @@ class ChatService {
           : firstMessage;
       }
 
+      // 创建会话ID - 使用更加统一的格式
+      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
       const newSession: ChatSession = {
-        id: Date.now().toString(),
+        id: sessionId,
         title: sessionTitle,
         lastMessage: firstMessage || '',
         timestamp: new Date(),
-        messageCount: firstMessage ? 1 : 0
+        messageCount: 0, // 初始化为0，在添加消息后会更新
+        starred: false
       };
 
       await db.saveSession(newSession);
-      db.saveLastUsedSessionId(newSession.id);
-      return newSession.id;
+      
+      // 如果有首条消息，添加到数据库并更新会话信息
+      if (firstMessage) {
+        const userMessage: Message = {
+          id: Date.now().toString(),
+          sessionId: sessionId,
+          role: 'user',
+          content: firstMessage,
+          timestamp: new Date()
+        };
+        
+        await db.addMessage(userMessage);
+        
+        // 更新会话信息以正确反映消息数量
+        await this.updateSessionInfo(sessionId, firstMessage);
+      }
+      
+      await db.saveLastUsedSessionId(sessionId);
+      return sessionId;
     } catch (error) {
       console.error('创建会话失败:', error);
       throw new Error('创建新对话失败');
@@ -359,12 +386,26 @@ class ChatService {
     try {
       const session = await db.getSession(sessionId);
       if (!session) return;
+      
+      // 获取会话的所有消息数量
+      const messages = await db.getMessagesBySession(sessionId);
+      const messageCount = messages.length;
+      
+      // 如果是第一条用户消息且标题是默认的"新对话"，则更新标题
+      let sessionTitle = session.title;
+      if (messageCount === 1 && session.title === "新对话" && messages[0]?.role === 'user') {
+        const userMessage = messages[0].content;
+        sessionTitle = userMessage.length > 15 
+          ? `${userMessage.substring(0, 15)}...` 
+          : userMessage;
+      }
 
       const updatedSession: ChatSession = {
         ...session,
+        title: sessionTitle,
         lastMessage,
         timestamp: new Date(),
-        messageCount: session.messageCount + 1
+        messageCount: messageCount
       };
 
       await db.saveSession(updatedSession);
