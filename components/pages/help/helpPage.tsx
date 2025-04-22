@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { HelpPageSidebar } from './helpPageSidebar';
 import './helpPage.css';
+import { saveDocState, getDocState, getLastVisitedDoc } from './db';
 
 /**
  * 标题类型
@@ -16,8 +17,11 @@ interface Heading {
 
 /**
  * 帮助页面组件
+ * 显示应用程序的帮助信息和文档
  */
 export function HelpPage() {
+  // 当前活跃的文档
+  const [activeDoc, setActiveDoc] = useState('Introducer.md');
   // 文档内容
   const [markdownContent, setMarkdownContent] = useState('');
   // 文档中的标题列表
@@ -28,41 +32,140 @@ export function HelpPage() {
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   // 保存标题的原始文本到ID的映射
   const [headingMap, setHeadingMap] = useState<Map<string, string>>(new Map());
+  // 活跃的标题ID
+  const [activeHeadingId, setActiveHeadingId] = useState<string>('');
+  // 是否正在加载中
+  const [isLoading, setIsLoading] = useState(true);
+  // 是否应该恢复滚动位置
+  const shouldRestoreScroll = useRef(true);
+
+  // 在初始加载时，从数据库恢复上次访问的文档
+  useEffect(() => {
+    const restoreLastVisitedDoc = async () => {
+      try {
+        const lastDocPath = await getLastVisitedDoc();
+        if (lastDocPath) {
+          setActiveDoc(lastDocPath);
+        }
+      } catch (error) {
+        console.error('恢复上次访问文档失败:', error);
+      }
+    };
+
+    restoreLastVisitedDoc();
+  }, []);
 
   // 加载文档内容
   useEffect(() => {
     const fetchMarkdown = async () => {
       try {
+        // 开始加载，先显示加载动画
+        setIsLoading(true);
         setIsDocumentLoaded(false);
         setHeadingMap(new Map()); // 重置标题映射
         
         // 从public目录加载文档
-        const response = await fetch(`/help/documents/Introducer.md`);
+        const response = await fetch(`/help/documents/${activeDoc}`);
         if (!response.ok) {
           throw new Error(`文档加载失败: ${response.status} ${response.statusText}`);
         }
         
         const text = await response.text();
+        
+        // 立即设置文档内容，让它在背景中开始渲染
         setMarkdownContent(text);
         
         // 提取标题
         const extractedHeadings = extractHeadings(text);
         setHeadings(extractedHeadings);
         
-        // 标记文档已加载完成
+        // 保持加载动画显示500ms，同时文档在背景中渲染
         setTimeout(() => {
+          // 关闭加载动画，此时文档已经在背景中渲染完成
+          setIsLoading(false);
           setIsDocumentLoaded(true);
-        }, 300);
+        }, 500);
       } catch (error) {
         console.error('加载Markdown文件失败:', error);
         setMarkdownContent('# 加载文档失败\n\n无法加载请求的文档。请稍后再试。');
         setHeadings([]);
+        
+        // 显示错误信息500ms
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 100);
       }
     };
 
     fetchMarkdown();
-  }, []);
-  
+  }, [activeDoc]);
+
+  // 在文档加载完成后，恢复滚动位置
+  useEffect(() => {
+    const restoreScrollPosition = async () => {
+      if (isDocumentLoaded && shouldRestoreScroll.current && contentRef.current) {
+        shouldRestoreScroll.current = false;
+        
+        try {
+          // 获取当前文档的状态
+          const docState = await getDocState(activeDoc);
+          if (docState) {
+            // 恢复滚动位置
+            const { scrollPosition, activeHeadingId } = docState;
+            const container = contentRef.current;
+            container.scrollTo({
+            top: scrollPosition,
+            behavior: 'smooth' // 平滑滚动效果
+          });
+          // 如果有活跃标题，设置它
+          if (docState.activeHeadingId) {
+            setActiveHeadingId(docState.activeHeadingId);
+          }
+          }
+        } catch (error) {
+          console.error('恢复滚动位置失败:', error);
+        }
+      }
+    };
+
+    restoreScrollPosition();
+  }, [isDocumentLoaded, activeDoc]);
+
+  // 保存当前文档状态
+  const saveDocumentState = () => {
+    if (contentRef.current && isDocumentLoaded) {
+      const scrollPosition = contentRef.current.scrollTop;
+      saveDocState(
+        activeDoc,
+        scrollPosition,
+        activeHeadingId
+      ).catch(error => {
+        console.error('保存文档状态失败:', error);
+      });
+    }
+  };
+
+  // 监听滚动事件，保存文档状态
+  useEffect(() => {
+    const container = contentRef.current;
+    if (!container || !isDocumentLoaded) return;
+
+    let scrollTimeout: number;
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(() => {
+        saveDocumentState();
+      }, 300);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      clearTimeout(scrollTimeout);
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [isDocumentLoaded, activeDoc, activeHeadingId]);
+
   /**
    * 为文本生成一个稳定的ID
    * 使用简单的哈希函数来增加唯一性
@@ -122,6 +225,22 @@ export function HelpPage() {
     return extractedHeadings;
   };
 
+  
+  /**
+   * 处理文档切换
+   * @param docPath 文档路径
+   */
+  const handleDocChange = (docPath: string) => {
+    // 保存当前状态
+    saveDocumentState();
+    
+    // 设置新文档
+    setActiveDoc(docPath);
+    
+    // 设置标记，以便在新文档加载完成后恢复滚动位置
+    shouldRestoreScroll.current = true;
+  };
+
   /**
    * 处理标题点击，滚动到相应位置
    * @param headingId 标题ID
@@ -132,26 +251,19 @@ export function HelpPage() {
       return;
     }
     
+    setActiveHeadingId(headingId);
+    
     const element = document.getElementById(headingId);
     
     if (element) {
-      // 计算元素位置和窗口高度
-      const elementRect = element.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      // 滚动到元素位置，保证元素在视窗中间位置
+      // 滚动到元素位置
       element.scrollIntoView({
         behavior: 'smooth',
         block: 'center' // 使元素在视图中居中
       });
       
-      // 添加高亮效果
-      element.classList.add('active-heading');
-      
-      // 一段时间后移除高亮效果
-      setTimeout(() => {
-        element.classList.remove('active-heading');
-      }, 2000);
+      // 保存状态
+      setTimeout(saveDocumentState, 500);
     } else {
       console.warn(`没有找到ID为 "${headingId}" 的标题元素`);
     }
@@ -347,16 +459,18 @@ export function HelpPage() {
           .trim();
         
         return (
-          <figure className={figureClassName} style={isFullWidth ? { width: '100%' } : undefined}>
-            <img 
-              src={imgSrc} 
-              alt={cleanAlt} 
-              className={imgClassName}
-              style={customStyle}
-              {...props} 
-            />
-            <figcaption className="image-caption">{caption}</figcaption>
-          </figure>
+          <>
+            <figure className={figureClassName} style={isFullWidth ? { width: '100%' } : undefined}>
+              <img 
+                src={imgSrc} 
+                alt={cleanAlt} 
+                className={imgClassName}
+                style={customStyle}
+                {...props} 
+              />
+              <figcaption className="image-caption">{caption}</figcaption>
+            </figure>
+          </>
         );
       }
       
@@ -375,13 +489,19 @@ export function HelpPage() {
     <div className="help-page-container">
       {/* 文档内容区域 */}
       <div className="content-container" ref={contentRef}>
+        {/* 加载动画覆盖层 */}
         <ReactMarkdown components={components}>{markdownContent}</ReactMarkdown>
+
+
       </div>
       
       {/* 侧边栏导航 */}
       <HelpPageSidebar
+        activeDoc={activeDoc}
         headings={headings}
+        onDocChange={handleDocChange}
         onHeadingClick={handleHeadingClick}
+        activeHeadingId={activeHeadingId}
       />
     </div>
   );

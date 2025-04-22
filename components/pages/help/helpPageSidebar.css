@@ -11,6 +11,149 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
+/* 顶层文档导航样式 */
+.doc-navigation {
+  padding: 0.5rem;
+}
+
+/* 下拉菜单容器 */
+.dropdown-container {
+  position: relative;
+  width: 100%;
+}
+.dropdown-container::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: #e0e0e0;
+}
+/* 下拉按钮样式 */
+.dropdown-button {
+  width: 100%;
+  padding: 10px 15px 10px 0;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* 导航风格的下拉按钮 */
+.dropdown-button.nav-style {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2c3e50;
+  padding-top: 15px;
+  position: sticky;
+  top: 0;
+  background-color: #f8f8f8;
+  z-index: 10;
+  letter-spacing: 0.5px;
+  border-radius: 0;
+  border: none;
+}
+
+/* 暗色模式下导航风格的下拉按钮 */
+.dark .dropdown-button.nav-style {
+  color: #f1f5f9;
+  background-color: hsl(222.2 84% 5.9%);
+  box-shadow: 0 4px 6px -6px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-button:hover {
+  background-color: #f5f5f5;
+}
+
+/* 导航风格按钮的悬停效果 */
+.dropdown-button.nav-style:hover {
+  background-color: #f8f8f8;
+  color: #1976d2;
+}
+
+.dark .dropdown-button.nav-style:hover {
+  background-color: hsl(222.2 84% 5.9%);
+  color: #90caf9;
+}
+
+/* 下拉菜单图标 */
+.dropdown-icon {
+  font-size: 1rem;
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+  flex-shrink: 0; /* 防止图标被压缩 */
+  margin-left: 8px;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+/* 下拉菜单内容 */
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  background-color: #ffffff;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  z-index: 20;
+}
+
+/* 导航样式下拉内容的特殊样式 */
+.nav-style + .dropdown-content {
+  top: calc(100% - 2px);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  background-color: #f8f8f8;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dark .nav-style + .dropdown-content {
+  background-color: hsl(222.2 84% 5.9%);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-content.open {
+  max-height: 200px;
+  padding: 10px 0;
+}
+
+/* 文档类型按钮 */
+.doc-nav-button {
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  background-color: transparent;
+  color: #333;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-nav-button:hover {
+  background-color: #f0f0f0;
+  color: #1976d2;
+}
+
+.doc-nav-button.active {
+  color: #1976d2;
+  background-color: #e3f2fd;
+}
+
 /* 暗色模式下侧边栏样式 */
 .dark .help-sidebar {
   background-color: hsl(222.2 84% 5.9%);
@@ -28,6 +171,17 @@
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+/* 为 Chrome隐藏滚动条 */
+.content-navigation::-webkit-scrollbar {
+  display: none;
+}
+
+/* 为 IE、Edge 和 Firefox 隐藏滚动条 */
+.content-navigation {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .nav-title {
@@ -138,15 +292,21 @@
 }
 
 
-.heading-item.active {
+/* 标题项悬停样式 */
+.heading-item:hover {
+  background-color: #f0f0f0;
+  color: #1976d2;
+}
+
+/* 暗色模式下标题项悬停 */
+.dark .heading-item:hover {
+  background-color: hsl(217.2 32.6% 15%);
+  color: #90caf9;
 }
 
 /* 暗色模式下标题项 */
 .dark .heading-item {
   color: #e2e8f0;
-}
-
-.dark .heading-item.active {
 }
 
 /* 子标题容器 */
