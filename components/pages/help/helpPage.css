@@ -200,7 +200,7 @@
 
 /* Markdown 渲染样式 */
 .content-container h1 {
-  font-size: 2.2rem; 
+  font-size: 3rem; 
   margin-top: 1.5rem;
   margin-bottom: 0.4rem; 
   text-align: center;
@@ -218,7 +218,7 @@
 }
 
 .content-container h2 {
-  font-size: 1.8rem;
+  font-size: 2.5rem;
   margin-top: 1.2em; 
   margin-bottom: 0.4em; 
   color: #34495e;
@@ -244,7 +244,7 @@
 }
 
 .content-container h3 {
-  font-size: 1.4rem; 
+  font-size: 2rem; 
   margin-top: 1.2em; 
   margin-bottom: 0.4em; 
   margin-left: 0.5rem;
@@ -271,7 +271,7 @@
 }
 
 .content-container h4 {
-  font-size: 1.2rem; 
+  font-size: 1.6rem; 
   margin-top: 1.2em; 
   margin-bottom: 0.4em; 
   margin-left: 1.5rem;
@@ -297,7 +297,7 @@
 
 .content-container h5,
 .content-container h6 {
-  font-size: 1rem; 
+  font-size: 1.4rem; 
   color: #7f8c8d;
   margin-top: 1.2em; 
   margin-bottom: 0.4em; 
@@ -345,7 +345,7 @@
   margin-bottom: 0.8rem; 
   color: #34495e;
   line-height: 2; 
-  font-size: 1rem; 
+  font-size: 1.2rem; 
 }
 
 /* 暗色模式下段落文本 */
@@ -394,7 +394,7 @@
   padding: 0.15em 0.3em; 
   border-radius: 3px; 
   font-family: 'Fira Code', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  font-size: 0.9em; 
+  font-size: 1.2em; 
   border: 1px solid var(--code-border); 
 }
 
@@ -432,7 +432,7 @@
   max-width: 80%;
   color: #2c3e50;
   border: none;
-  font-size: 0.9em; 
+  font-size: 1.2em; 
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1); 
   display: block;
   line-height: 1.5;
@@ -655,7 +655,7 @@
 
 /* 图片说明文字样式 */
 .content-container .image-caption {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #666;
   margin-top: 0.5rem;
   text-align: center;
