@@ -3,14 +3,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Eraser, Paintbrush, Save, Trash } from 'lucide-react';
+import { Eraser, Paintbrush, Save, Trash, Circle, Square } from 'lucide-react';
 
 interface MaskEditorProps {
     imageUrl: string;
     onSave: (maskData: Blob, maskUrl: string) => void;
+    onCancel?: () => void;
 }
 
-export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
+export function MaskEditor({ imageUrl, onSave, onCancel }: MaskEditorProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
     const maskCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,6 +22,9 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
     const [brushSize, setBrushSize] = useState(20);
     const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
     const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+    const [brushHardness, setBrushHardness] = useState(1.0);
+    const [lastPoint, setLastPoint] = useState<{ x: number, y: number } | null>(null);
+    const [brushShape, setBrushShape] = useState<'circle' | 'square'>('circle');
     
     // 初始化画布和图层
     useEffect(() => {
@@ -73,7 +77,6 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
             ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
             ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = brushSize;
             
             setMaskCtx(ctx);
         };
@@ -145,27 +148,70 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
         if (x < 0 || y < 0) return; // 如果鼠标不在渲染区域内，不开始绘制
         
         setIsDrawing(true);
-        maskCtx.beginPath();
-        maskCtx.moveTo(x, y);
+        setLastPoint({ x, y });
+        drawBrushStroke(x, y);
     };
 
-    // 绘制中
+    // New function to draw a single brush circle with hardness
+    const drawBrushStroke = (x: number, y: number) => {
+        if (!maskCtx) return;
+        const radius = brushSize / 2;
+        maskCtx.globalCompositeOperation = isEraser ? 'destination-out' : 'source-over';
+
+        if (brushShape === 'circle') {
+            // Create radial gradient based on hardness
+            const gradient = maskCtx.createRadialGradient(x, y, 0, x, y, radius);
+            const opaqueStop = Math.max(0, Math.min(1, brushHardness)); // Clamp hardness [0, 1]
+            
+            // Gradient: Opaque center, fades to transparent based on hardness
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); // Center is always opaque white
+            gradient.addColorStop(opaqueStop * 0.9, 'rgba(255, 255, 255, 1)'); // Point where fading starts
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)'); // Edge is transparent
+
+            maskCtx.fillStyle = gradient; 
+            maskCtx.beginPath();
+            maskCtx.arc(x, y, radius, 0, Math.PI * 2, false);
+            maskCtx.fill();
+        } else { // brushShape === 'square'
+            // Draw a solid square for now (hardness not applied)
+            maskCtx.fillStyle = 'rgba(255, 255, 255, 1)';
+            maskCtx.fillRect(x - radius, y - radius, brushSize, brushSize);
+        }
+    }
+
+    // 绘制中 (Modified to draw connected shapes)
     const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-        if (!isDrawing || !maskCtx) return;
+        if (!isDrawing || !maskCtx || !lastPoint) return;
         
         const { x, y } = getCanvasCoordinates(e);
-        if (x < 0 || y < 0) return; // 如果鼠标不在渲染区域内，不继续绘制
-        
-        maskCtx.globalCompositeOperation = isEraser ? 'destination-out' : 'source-over';
-        maskCtx.lineTo(x, y);
-        maskCtx.stroke();
+        if (x < 0 || y < 0) return; // Ignore if outside canvas bounds
+
+        // Calculate distance and angle from the last point
+        const dx = x - lastPoint.x;
+        const dy = y - lastPoint.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx);
+
+        // Draw shapes along the line segment to connect points smoothly
+        const step = brushSize / 4; // Adjust step for density (smaller means denser)
+        for (let i = 0; i < distance; i += step) {
+            const currentX = lastPoint.x + Math.cos(angle) * i;
+            const currentY = lastPoint.y + Math.sin(angle) * i;
+            drawBrushStroke(currentX, currentY);
+        }
+
+        // Draw the final shape at the exact current mouse position
+        drawBrushStroke(x, y);
+
+        // Update the last point
+        setLastPoint({ x, y });
     };
 
     // 结束绘制
     const stopDrawing = () => {
         if (!maskCtx) return;
         setIsDrawing(false);
-        maskCtx.closePath();
+        setLastPoint(null);
     };
 
     // 清除所有蒙版
@@ -179,7 +225,23 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
         if (!maskCtx) return;
         const newSize = value[0];
         setBrushSize(newSize);
-        maskCtx.lineWidth = newSize;
+    };
+
+    // 更新笔刷硬度
+    const updateBrushHardness = (value: number[]) => {
+        setBrushHardness(value[0]);
+    };
+
+    // 处理鼠标滚轮事件
+    const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+        if (!maskCtx) return;
+        
+        e.preventDefault(); // 阻止页面滚动
+        
+        const change = e.deltaY < 0 ? 1 : -1; // 根据滚轮方向确定变化量
+        const newSize = Math.max(1, Math.min(50, brushSize + change)); // 限制大小在 1-50 之间
+        
+        setBrushSize(newSize);
     };
 
     // 保存蒙版
@@ -289,7 +351,7 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
         top: `${cursorPos.y}px`,   // 直接使用像素值
         width: `${brushSize}px`,
         height: `${brushSize}px`,
-        borderRadius: '50%',
+        borderRadius: brushShape === 'circle' ? '50%' : '0%',
         border: '1px solid #000',
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         pointerEvents: 'none',
@@ -298,42 +360,101 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
     };
 
     return (
-        <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-4 mb-4">
-                <Button
-                    type="button"
-                    variant={!isEraser ? "secondary" : "outline"}
-                    onClick={() => setIsEraser(false)}
-                >
-                    <Paintbrush className="size-5 mr-2" />
-                    画笔
-                </Button>
-                <Button
-                    type="button"
-                    variant={isEraser ? "secondary" : "outline"}
-                    onClick={() => setIsEraser(true)}
-                >
-                    <Eraser className="size-5 mr-2" />
-                    橡皮擦
-                </Button>
-                <div className="flex items-center gap-2 flex-1">
-                    <span className="text-sm">笔刷大小:</span>
-                    <Slider
-                        value={[brushSize]}
-                        onValueChange={updateBrushSize}
-                        min={1}
-                        max={50}
-                        step={1}
-                        className="w-[200px]"
-                    />
+        <div className="flex flex-col h-[85vh]">
+            <div className="flex flex-row gap-4 flex-grow">
+                <div className="flex flex-col gap-2 p-2 border-r w-16 items-center">
+                    <Button
+                        type="button"
+                        variant={!isEraser ? "secondary" : "outline"}
+                        size="icon"
+                        onClick={() => setIsEraser(false)}
+                        title="画笔"
+                    >
+                        <Paintbrush className="size-5" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant={isEraser ? "secondary" : "outline"}
+                        size="icon"
+                        onClick={() => setIsEraser(true)}
+                        title="橡皮擦"
+                    >
+                        <Eraser className="size-5" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setBrushShape(prev => prev === 'circle' ? 'square' : 'circle')}
+                        title={brushShape === 'circle' ? '切换为方形笔刷' : '切换为圆形笔刷'}
+                    >
+                        {brushShape === 'circle' ? <Square className="size-5" /> : <Circle className="size-5" />}
+                    </Button>
                 </div>
+                <div className="flex flex-col flex-grow gap-4">
+                    <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-4">
+                        <div className="flex items-center flex-wrap gap-y-2 gap-x-4">
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm whitespace-nowrap">大小:</span>
+                                <Slider
+                                    value={[brushSize]}
+                                    onValueChange={updateBrushSize}
+                                    min={1}
+                                    max={50}
+                                    step={1}
+                                    className="w-[120px]"
+                                />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm whitespace-nowrap">硬度:</span>
+                                <Slider
+                                    value={[brushHardness]}
+                                    onValueChange={updateBrushHardness}
+                                    min={0.1}
+                                    max={1.0}
+                                    step={0.05}
+                                    className="w-[120px]"
+                                />
+                            </div>
+                        </div>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={clearMask}
+                        >
+                            <Trash className="size-5 mr-2" />
+                            清除
+                        </Button>
+                    </div>
+                    <div ref={containerRef} className="relative border rounded-lg overflow-hidden flex-grow" style={containerStyle}>
+                        <canvas
+                            ref={bgCanvasRef}
+                            style={canvasStyle}
+                        />
+                        <canvas
+                            ref={maskCanvasRef}
+                            style={{...canvasStyle, cursor: 'none'}}
+                            onMouseDown={startDrawing}
+                            onMouseMove={handleMouseMove}
+                            onMouseUp={stopDrawing}
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                            onWheel={handleWheel}
+                        />
+                        <div
+                            ref={cursorRef}
+                            style={cursorStyle}
+                        />
+                    </div>
+                </div>
+            </div>
+            <div className="flex justify-end items-center pt-4 border-t mt-4 gap-4">
                 <Button
                     type="button"
                     variant="outline"
-                    onClick={clearMask}
+                    onClick={onCancel}
                 >
-                    <Trash className="size-5 mr-2" />
-                    清除
+                    取消
                 </Button>
                 <Button
                     type="button"
@@ -343,25 +464,6 @@ export function MaskEditor({ imageUrl, onSave }: MaskEditorProps) {
                     <Save className="size-5 mr-2" />
                     保存
                 </Button>
-            </div>
-            <div ref={containerRef} className="relative border rounded-lg overflow-hidden" style={containerStyle}>
-                <canvas
-                    ref={bgCanvasRef}
-                    style={canvasStyle}
-                />
-                <canvas
-                    ref={maskCanvasRef}
-                    style={{...canvasStyle, cursor: 'none'}}
-                    onMouseDown={startDrawing}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={stopDrawing}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                />
-                <div
-                    ref={cursorRef}
-                    style={cursorStyle}
-                />
             </div>
         </div>
     );

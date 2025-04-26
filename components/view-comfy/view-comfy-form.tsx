@@ -822,24 +822,10 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                                 name: newFile.name
                             });
                             
-                            // 添加成功提示
-                            toast({
-                                title: "蒙版已保存",
-                                description: "图片已成功更新",
-                            });
-                            
-                            setShowMaskEditor(false);
+                            setShowMaskEditor(false); // 关闭对话框
                         }}
+                        onCancel={() => setShowMaskEditor(false)} // Add onCancel handler to close dialog
                     />
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => setShowMaskEditor(false)}
-                        >
-                            取消
-                        </Button>
-                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </FormItem>
