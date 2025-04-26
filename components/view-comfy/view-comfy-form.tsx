@@ -133,7 +133,7 @@ export function ViewComfyForm(args: {
                                                         </FormControl>
                                                         <SelectContent>
                                                             <SelectItem value="image_generation">生图</SelectItem>
-                                                            <SelectItem value="smart_ps">智能PS</SelectItem>
+                                                            <SelectItem value="smart_ps">智能修图</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormDescription>

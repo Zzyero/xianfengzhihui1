@@ -218,7 +218,7 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
         <>
             <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center p-4 border-b">
-                    <h1 className="text-2xl font-bold">智能PS</h1>
+                    <h1 className="text-2xl font-bold">智能修图</h1>
                     <QueueManager 
                         onInterrupt={handleInterrupt}
                         onClear={handleClearQueue}
