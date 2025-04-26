@@ -19,7 +19,7 @@
             "inputs": [
               {
                 "title": "CLIP文本编码",
-                "placeholder": "CLIP文本编码",
+                "placeholder": "画面描述",
                 "value": "",
                 "workflowPath": [
                   "6",
@@ -37,7 +37,7 @@
             "key": "6-CLIPTextEncode"
           },
           {
-            "title": "空Latent图像（SD3）",
+            "title": "空Latent图像",
             "inputs": [
               {
                 "title": "Width",
@@ -529,7 +529,7 @@
             "inputs": [
               {
                 "title": "CLIP文本编码",
-                "placeholder": "CLIP文本编码",
+                "placeholder": "画面描述",
                 "value": "",
                 "workflowPath": [
                   "6",
@@ -547,7 +547,7 @@
             "key": "6-CLIPTextEncode"
           },
           {
-            "title": "空Latent图像（SD3）",
+            "title": "空Latent图像",
             "inputs": [
               {
                 "title": "Width",
@@ -3157,7 +3157,7 @@
             "inputs": [
               {
                 "title": "CLIP文本编码器",
-                "placeholder": "CLIP文本编码器",
+                "placeholder": "画面描述",
                 "value": "",
                 "workflowPath": [
                   "6",

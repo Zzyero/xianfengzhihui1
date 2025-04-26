@@ -192,7 +192,7 @@ export function ViewComfyForm(args: {
                                         // @ts-ignore
                                         if (field.inputs.length > 0) {
                                             // 检查是否是文本编码器或上传图片组件
-                                            const isSpecialComponent = field.title === "CLIP文本编码" || field.title === "加载图像";
+                                            const isSpecialComponent = field.title === "CLIP文本编码" || field.title === "加载图像" || field.title === "CLIP文本编码器";
                                             
                                             if (isSpecialComponent) {
                                                 // 特殊组件不显示圆角方框
