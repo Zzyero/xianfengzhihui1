@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import {
-    Settings
+    Settings,
+    X
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -25,6 +26,7 @@ import WorkflowSwitcher from "@/components/workflow-switchter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PreviewOutputsImageGallery } from "@/components/images-preview"
 import { QueueManager } from "@/components/queue-manager";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const apiErrorHandler = new ApiErrorHandler();
 
@@ -33,6 +35,21 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
     const { viewComfyState, viewComfyStateDispatcher } = useViewComfy();
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     const [errorAlertDialog, setErrorAlertDialog] = useState<{ open: boolean, errorTitle: string | undefined, errorDescription: React.JSX.Element, onClose: () => void }>({ open: false, errorTitle: undefined, errorDescription: <></>, onClose: () => { } });
+
+    // 图片预览状态
+    const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+
+    // 打开图片预览
+    const openImagePreview = (imageUrl: string) => {
+        if (imageUrl) {
+            setPreviewImageUrl(imageUrl);
+        }
+    };
+
+    // 关闭图片预览
+    const closeImagePreview = () => {
+        setPreviewImageUrl(null);
+    };
 
     //获取视图配置
     useEffect(() => {
@@ -298,7 +315,8 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                                                                         <img
                                                                             src={output.data}
                                                                             alt={`Generated image ${index}`}
-                                                                            className={cn("max-w-full max-h-full w-auto h-auto object-contain rounded-md transition-all hover:scale-105")}
+                                                                            className={cn("max-w-full max-h-full w-auto h-auto object-contain rounded-md transition-all hover:scale-105 cursor-pointer")}
+                                                                            onClick={() => openImagePreview(output.data)}
                                                                         />
                                                                     </BlurFade>
                                                                 )}
@@ -343,6 +361,29 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                 </main>
                 <ErrorAlertDialog open={errorAlertDialog.open} errorTitle={errorAlertDialog.errorTitle} errorDescription={errorAlertDialog.errorDescription} onClose={errorAlertDialog.onClose} />
             </div>
+            
+            {/* 图片放大预览对话框 */}
+            <Dialog open={!!previewImageUrl} onOpenChange={(isOpen) => { if (!isOpen) closeImagePreview(); }}>
+                <DialogContent className="max-w-5xl p-0 bg-transparent border-none">
+                    <div className="relative">
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white"
+                            onClick={closeImagePreview}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                        {previewImageUrl && (
+                            <img
+                                src={previewImageUrl}
+                                alt="预览图片"
+                                className="w-full h-auto object-contain max-h-[90vh]"
+                            />
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
