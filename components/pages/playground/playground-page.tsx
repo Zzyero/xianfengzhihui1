@@ -16,7 +16,7 @@ import { Header } from "@/components/header";
 import PlaygroundForm from "./playground-form";
 import { Loader } from "@/components/loader";
 import { usePostPlayground } from "@/hooks/playground/use-post-playground";
-import { ActionType, type IViewComfy, type IViewComfyWorkflow, useViewComfy } from "@/app/providers/view-comfy-provider";
+import { ActionType, type IViewComfy, type IViewComfyWorkflow, type IViewComfyJSON, useViewComfy } from "@/app/providers/view-comfy-provider";
 import { ErrorAlertDialog } from "@/components/ui/error-alert-dialog";
 import { ApiErrorHandler } from "@/lib/api-error-handler";
 import type { ResponseError } from "@/app/models/errors";
@@ -45,18 +45,29 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                         const error = await response.json() as ResponseError;
                         throw error;
                     }
-                    const data = await response.json() as IViewComfy;
+                    const data = await response.json() as { viewComfyJSON: IViewComfyJSON };
                     
-                    // 过滤只获取 image_generation 类型的工作流
-                    const imageGenerationWorkflows = {
-                        ...data,
-                        type: 'image_generation' as const  // 使用const断言来固定类型
-                    };
+                    // Filter workflows with type 'image_generation' from the nested structure
+                    const imageGenerationWorkflows = data.viewComfyJSON.workflows.filter(
+                        (workflow: IViewComfy) => workflow.type === 'image_generation'
+                    );
+
+                    // If no image generation workflows are found, handle appropriately (e.g., show an error or default state)
+                    if (imageGenerationWorkflows.length === 0) {
+                         console.error("No image generation workflows found.");
+                         // Optionally set an error state or return early
+                         return; 
+                    }
                     
+                    // Dispatch INIT_VIEW_COMFY to update both the list and the current workflow
                     viewComfyStateDispatcher({
-                        type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
-                        payload: imageGenerationWorkflows
+                        type: ActionType.INIT_VIEW_COMFY, 
+                        payload: { 
+                            ...data.viewComfyJSON, // Pass other potential fields from the JSON
+                            workflows: imageGenerationWorkflows // Use the filtered list
+                        } 
                     });
+
                 } catch (error) {
                     const errorDialog = apiErrorHandler.apiErrorToDialog(error as ResponseError);
                     setErrorAlertDialog({
