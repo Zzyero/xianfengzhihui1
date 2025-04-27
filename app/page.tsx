@@ -169,13 +169,10 @@ export default function Home() {
 
     // 处理标签切换
     const handleTabChange = (newTab: TabValue) => {
-        // 如果当前处于提示词增强页面，记录已渲染状态
-        if (currentTab === TabValue.PromptEnhance) {
-            promptEnhancementRef.current.isRendered = true;
-        }
-        
-        // 如果切换到提示词增强页面，记录第一次激活状态
+        // 如果切换到提示词增强页面，记录渲染和激活状态
         if (newTab === TabValue.PromptEnhance) {
+            promptEnhancementRef.current.isRendered = true;
+            
             console.log('切换到提示词增强页面', {
                 isFirstActivation: promptEnhancementRef.current.firstActivation,
                 isRendered: promptEnhancementRef.current.isRendered
@@ -217,15 +214,18 @@ export default function Home() {
                     />
                     {/* 主内容区域 */}
                     <main className="flex-1 overflow-x-auto overflow-y-hidden relative">
-                        {/* 视图页面 */}
+                        {/* 智能生图页面 */}
                         {currentTab === TabValue.Playground && <PlaygroundPage />}
                         
                         {/* 工作流页面 */}
                         {currentTab === TabValue.WorkflowApi && <ViewComfyPage />}
-                        {/* 智能PS页面 */}
+                        
+                        {/* 智能修图页面 */}
                         {currentTab === TabValue.SmartPS && <SmartPSPage />}
+                        
                         {/* 帮助页面 */}
                         {currentTab === TabValue.Help && <HelpPage />}
+                        
                         {/* 提示词库页面 */}
                         {currentTab === TabValue.PromptLibrary && (
                             <div className="flex flex-col h-full">
