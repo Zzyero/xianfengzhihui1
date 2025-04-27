@@ -167,31 +167,19 @@ export default function Home() {
         firstActivation: true
     });
 
-    // 智能生图和智能修图页面状态引用
-    const playgroundRef = useRef<{ isRendered: boolean }>({ isRendered: false });
-    const smartPSRef = useRef<{ isRendered: boolean }>({ isRendered: false });
-
     // 处理标签切换
     const handleTabChange = (newTab: TabValue) => {
-        // 如果切换到提示词增强页面，记录渲染和激活状态
-        if (newTab === TabValue.PromptEnhance) {
+        // 如果当前处于提示词增强页面，记录已渲染状态
+        if (currentTab === TabValue.PromptEnhance) {
             promptEnhancementRef.current.isRendered = true;
+        }
+        
+        // 如果切换到提示词增强页面，记录第一次激活状态
+        if (newTab === TabValue.PromptEnhance) {
             console.log('切换到提示词增强页面', {
                 isFirstActivation: promptEnhancementRef.current.firstActivation,
                 isRendered: promptEnhancementRef.current.isRendered
             });
-        }
-        
-        // 如果切换到智能生图页面，记录渲染状态
-        if (newTab === TabValue.Playground) {
-            playgroundRef.current.isRendered = true;
-            console.log('切换到智能生图页面', playgroundRef.current);
-        }
-        
-        // 如果切换到智能修图页面，记录渲染状态
-        if (newTab === TabValue.SmartPS) {
-            smartPSRef.current.isRendered = true;
-            console.log('切换到智能修图页面', smartPSRef.current);
         }
         
         // 设置新的标签
@@ -202,16 +190,8 @@ export default function Home() {
     // 当前是提示词增强页面或已经渲染过该页面
     const shouldRenderPromptEnhancement = currentTab === TabValue.PromptEnhance || promptEnhancementRef.current.isRendered;
     
-    // 确定是否应该渲染智能生图页面
-    const shouldRenderPlayground = currentTab === TabValue.Playground || playgroundRef.current.isRendered;
-    
-    // 确定是否应该渲染智能修图页面
-    const shouldRenderSmartPS = currentTab === TabValue.SmartPS || smartPSRef.current.isRendered;
-    
-    // 计算各页面是否处于活动状态
+    // 计算isactive属性，当前标签是提示词增强页面时为true
     const isPromptEnhanceActive = currentTab === TabValue.PromptEnhance;
-    const isPlaygroundActive = currentTab === TabValue.Playground;
-    const isSmartPSActive = currentTab === TabValue.SmartPS;
     
     // 监听提示词增强页面的激活状态变化
     useEffect(() => {
@@ -237,39 +217,16 @@ export default function Home() {
                     />
                     {/* 主内容区域 */}
                     <main className="flex-1 overflow-x-auto overflow-y-hidden relative">
-                        {/* 智能生图页面 - 在首次渲染后保持存在，通过visibility控制显示/隐藏 */}
-                        {shouldRenderPlayground && (
-                            <div 
-                                className="absolute inset-0 w-full h-full" 
-                                style={{
-                                    visibility: isPlaygroundActive ? 'visible' : 'hidden',
-                                    zIndex: isPlaygroundActive ? 10 : -1
-                                }}
-                            >
-                                <PlaygroundPage />
-                            </div>
-                        )}
+                        {/* 视图页面 */}
+                        {currentTab === TabValue.Playground && <PlaygroundPage />}
                         
-                        {/* 工作流页面 - 传统条件渲染 */}
+                        {/* 工作流页面 */}
                         {currentTab === TabValue.WorkflowApi && <ViewComfyPage />}
-                        
-                        {/* 智能修图页面 - 在首次渲染后保持存在，通过visibility控制显示/隐藏 */}
-                        {shouldRenderSmartPS && (
-                            <div 
-                                className="absolute inset-0 w-full h-full" 
-                                style={{
-                                    visibility: isSmartPSActive ? 'visible' : 'hidden',
-                                    zIndex: isSmartPSActive ? 10 : -1
-                                }}
-                            >
-                                <SmartPSPage />
-                            </div>
-                        )}
-                        
-                        {/* 帮助页面 - 传统条件渲染 */}
+                        {/* 智能PS页面 */}
+                        {currentTab === TabValue.SmartPS && <SmartPSPage />}
+                        {/* 帮助页面 */}
                         {currentTab === TabValue.Help && <HelpPage />}
-                        
-                        {/* 提示词库页面 - 传统条件渲染 */}
+                        {/* 提示词库页面 */}
                         {currentTab === TabValue.PromptLibrary && (
                             <div className="flex flex-col h-full">
                                 <div className="flex justify-between items-center p-4 border-b">
