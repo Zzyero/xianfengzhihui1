@@ -1,7 +1,6 @@
 import { useFieldArray, useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button";
 import type { IViewComfyBase, IViewComfyWorkflow } from "@/app/providers/view-comfy-provider";
-import { cn } from "@/lib/utils";
 import { ViewComfyForm } from "@/components/view-comfy/view-comfy-form";
 import "./SmartPSForm.css";
 import { useEffect } from "react";
@@ -120,22 +119,12 @@ export default function SmartPSForm(props: {
                 <div className="flex flex-row-reverse mt-8">
                     <Button
                         type="submit"
-                        className={cn(
-                            "w-full transition-opacity duration-100",
-                            loading && "opacity-50"
-                        )}
-                        disabled={loading}>
-                        {loading ? (
-                            <span className="flex items-center gap-2">
-                                <span className="loading loading-xs loading-spinner"></span>
-                                <span>{"修图中..."}</span>
-                            </span>
-                        ) : (
-                            <span className="flex items-center gap-2">
-                                <Wand className="w-4 h-4" />
-                                <span>{"开始修图"}</span>
-                            </span>
-                        )}
+                        className="w-full"
+                        >
+                        <span className="flex items-center gap-2">
+                            <Wand className="w-4 h-4" />
+                            <span>{"开始修图"}</span>
+                        </span>
                     </Button>
                 </div>
             </ViewComfyForm>
