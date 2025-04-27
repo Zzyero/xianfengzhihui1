@@ -545,9 +545,10 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
             "默克尔.safetensors",
             "萨科齐.safetensors",
             "特朗普.safetensors",
-            "曾小萌迷彩人.safetensors",
             "山姆大叔.safetensors",
-            "政治漫画画风.safetensors"
+            "曾小萌迷彩.safetensors",
+            "曾小萌体能.safetensors",
+            "曾小萌常服.safetensors",
         ];
         return (
             <FormSelectInput 
