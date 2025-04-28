@@ -67,7 +67,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                     <>
                         <SidebarButton
                             icon={<SquareTerminal className="size-5" />}
-                            label="生图"
+                            label="智能生图"
                             isActive={currentTab === TabValue.Playground}
                             onClick={() => onTabChange(TabValue.Playground)}
                             isSmallScreen={isSmallScreen}
@@ -106,7 +106,7 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                         />
                         <SidebarButton
                             icon={<SquareTerminal className="size-5" />}
-                            label="生图"
+                            label="智能生图"
                             isActive={currentTab === TabValue.Playground}
                             onClick={() => onTabChange(TabValue.Playground)}
                             isSmallScreen={isSmallScreen}

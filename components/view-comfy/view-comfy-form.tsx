@@ -133,7 +133,7 @@ export function ViewComfyForm(args: {
                                                         </FormControl>
                                                         <SelectContent>
                                                             <SelectItem value="image_generation">生图</SelectItem>
-                                                            <SelectItem value="smart_ps">智能PS</SelectItem>
+                                                            <SelectItem value="smart_ps">智能修图</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormDescription>
@@ -192,7 +192,7 @@ export function ViewComfyForm(args: {
                                         // @ts-ignore
                                         if (field.inputs.length > 0) {
                                             // 检查是否是文本编码器或上传图片组件
-                                            const isSpecialComponent = field.title === "CLIP文本编码" || field.title === "加载图像";
+                                            const isSpecialComponent = field.title === "CLIP文本编码" || field.title === "加载图像" || field.title === "CLIP文本编码器";
                                             
                                             if (isSpecialComponent) {
                                                 // 特殊组件不显示圆角方框
@@ -545,9 +545,10 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
             "默克尔.safetensors",
             "萨科齐.safetensors",
             "特朗普.safetensors",
-            "曾小萌迷彩人.safetensors",
             "山姆大叔.safetensors",
-            "政治漫画画风.safetensors"
+            "曾小萌迷彩.safetensors",
+            "曾小萌体能.safetensors",
+            "曾小萌常服.safetensors",
         ];
         return (
             <FormSelectInput 
@@ -822,24 +823,10 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                                 name: newFile.name
                             });
                             
-                            // 添加成功提示
-                            toast({
-                                title: "蒙版已保存",
-                                description: "图片已成功更新",
-                            });
-                            
-                            setShowMaskEditor(false);
+                            setShowMaskEditor(false); // 关闭对话框
                         }}
+                        onCancel={() => setShowMaskEditor(false)} // Add onCancel handler to close dialog
                     />
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => setShowMaskEditor(false)}
-                        >
-                            取消
-                        </Button>
-                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </FormItem>

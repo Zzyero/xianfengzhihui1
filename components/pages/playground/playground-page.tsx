@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import {
     Settings,
-    ChevronDown
+    ChevronDown,
+    X
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +17,7 @@ import { Header } from "@/components/header";
 import PlaygroundForm from "./playground-form";
 import { Loader } from "@/components/loader";
 import { usePostPlayground } from "@/hooks/playground/use-post-playground";
-import { ActionType, type IViewComfy, type IViewComfyWorkflow, useViewComfy } from "@/app/providers/view-comfy-provider";
+import { ActionType, type IViewComfy, type IViewComfyWorkflow, type IViewComfyJSON, useViewComfy } from "@/app/providers/view-comfy-provider";
 import { ErrorAlertDialog } from "@/components/ui/error-alert-dialog";
 import { ApiErrorHandler } from "@/lib/api-error-handler";
 import type { ResponseError } from "@/app/models/errors";
@@ -26,6 +27,7 @@ import WorkflowSwitcher from "@/components/workflow-switchter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PreviewOutputsImageGallery } from "@/components/images-preview"
 import { QueueManager } from "@/components/queue-manager";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const apiErrorHandler = new ApiErrorHandler();
 
@@ -35,6 +37,21 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     const [errorAlertDialog, setErrorAlertDialog] = useState<{ open: boolean, errorTitle: string | undefined, errorDescription: React.JSX.Element, onClose: () => void }>({ open: false, errorTitle: undefined, errorDescription: <></>, onClose: () => { } });
     
+    // 图片预览状态
+    const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+
+    // 打开图片预览
+    const openImagePreview = (imageUrl: string) => {
+        if (imageUrl) {
+            setPreviewImageUrl(imageUrl);
+        }
+    };
+
+    // 关闭图片预览
+    const closeImagePreview = () => {
+        setPreviewImageUrl(null);
+    };
+
     //获取视图配置
     useEffect(() => {
         if (viewMode) {
@@ -45,18 +62,29 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                         const error = await response.json() as ResponseError;
                         throw error;
                     }
-                    const data = await response.json() as IViewComfy;
+                    const data = await response.json() as { viewComfyJSON: IViewComfyJSON };
                     
-                    // 过滤只获取 image_generation 类型的工作流
-                    const imageGenerationWorkflows = {
-                        ...data,
-                        type: 'image_generation' as const  // 使用const断言来固定类型
-                    };
+                    // Filter workflows with type 'image_generation' from the nested structure
+                    const imageGenerationWorkflows = data.viewComfyJSON.workflows.filter(
+                        (workflow: IViewComfy) => workflow.type === 'image_generation'
+                    );
+
+                    // If no image generation workflows are found, handle appropriately (e.g., show an error or default state)
+                    if (imageGenerationWorkflows.length === 0) {
+                         console.error("No image generation workflows found.");
+                         // Optionally set an error state or return early
+                         return; 
+                    }
                     
+                    // Dispatch INIT_VIEW_COMFY to update both the list and the current workflow
                     viewComfyStateDispatcher({
-                        type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
-                        payload: imageGenerationWorkflows
+                        type: ActionType.INIT_VIEW_COMFY, 
+                        payload: { 
+                            ...data.viewComfyJSON, // Pass other potential fields from the JSON
+                            workflows: imageGenerationWorkflows // Use the filtered list
+                        } 
                     });
+
                 } catch (error) {
                     const errorDialog = apiErrorHandler.apiErrorToDialog(error as ResponseError);
                     setErrorAlertDialog({
@@ -213,7 +241,7 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
         <>
             <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center p-4 border-b">
-                    <h1 className="text-2xl font-bold">生图区</h1>
+                    <h1 className="text-2xl font-bold">智能生图</h1>
                     <QueueManager 
                         onInterrupt={handleInterrupt}
                         onClear={handleClearQueue}
@@ -308,7 +336,8 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                                                                         <img
                                                                             src={output.data}
                                                                             alt={`Generated image ${index}`}
-                                                                            className={cn("max-w-full max-h-full w-auto h-auto object-contain rounded-md transition-all hover:scale-105")}
+                                                                            className={cn("max-w-full max-h-full w-auto h-auto object-contain rounded-md transition-all hover:scale-105 cursor-pointer")}
+                                                                            onClick={() => openImagePreview(output.data)}
                                                                         />
                                                                     </BlurFade>
                                                                 )}
@@ -353,6 +382,29 @@ function PlaygroundPageContent({ loading, setLoading }: { loading: boolean, setL
                 </main>
                 <ErrorAlertDialog open={errorAlertDialog.open} errorTitle={errorAlertDialog.errorTitle} errorDescription={errorAlertDialog.errorDescription} onClose={errorAlertDialog.onClose} />
             </div>
+            
+            {/* 图片放大预览对话框 */}
+            <Dialog open={!!previewImageUrl} onOpenChange={(isOpen) => { if (!isOpen) closeImagePreview(); }}>
+                <DialogContent className="max-w-5xl p-0 bg-transparent border-none">
+                    <div className="relative">
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white"
+                            onClick={closeImagePreview}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                        {previewImageUrl && (
+                            <img
+                                src={previewImageUrl}
+                                alt="预览图片"
+                                className="w-full h-auto object-contain max-h-[90vh]"
+                            />
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
