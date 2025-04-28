@@ -205,9 +205,6 @@ const TemplateBar: React.FC<TemplateBarProps> = ({
         if (onUseTemplate) {
           // 如果提供了使用模板回调，则调用它
           onUseTemplate(template);
-          
-          // 提供用户反馈
-          toast.success(`已应用模板: ${template.name}`);
         } else {
           // 否则复制模板内容到剪贴板
           navigator.clipboard.writeText(template.content)

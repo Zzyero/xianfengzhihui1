@@ -418,7 +418,7 @@ export function HelpPage() {
         return <div className="clear-float"></div>;
       }
       
-      return <p {...props}>{children}</p>;
+      return <div {...props}>{children}</div>;
     },
     img: ({ node, src, alt, ...props }: any) => {
       // 处理图片路径，使用public目录下的图片
@@ -487,12 +487,10 @@ export function HelpPage() {
 
   return (
     <div className="help-page-container">
+    
       {/* 文档内容区域 */}
       <div className="content-container" ref={contentRef}>
-        {/* 加载动画覆盖层 */}
         <ReactMarkdown components={components}>{markdownContent}</ReactMarkdown>
-
-
       </div>
       
       {/* 侧边栏导航 */}
