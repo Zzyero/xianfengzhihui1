@@ -1,6 +1,6 @@
 import { ComfyWorkflowError } from '@/app/models/errors';
 import { ComfyUIConnRefusedError } from '@/app/constants';
-import { addLog } from '@/app/api/comfy/logs/route';
+import { addLog } from '@/app/services/logs-service';
 
 // ComfyUI WebSocket 事件类型定义
 type ComfyUIWSEventType = "status" | "executing" | "execution_cached" | "progress" | "executed" | "execution_error" | "execution_success";

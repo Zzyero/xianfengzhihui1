@@ -192,7 +192,9 @@ export function ViewComfyForm(args: {
                                         // @ts-ignore
                                         if (field.inputs.length > 0) {
                                             // 检查是否是文本编码器或上传图片组件
-                                            const isSpecialComponent = field.title === "CLIP文本编码" || field.title === "加载图像" || field.title === "CLIP文本编码器";
+                                            // 使用类型断言确保field有title属性
+                                            const fieldTitle = (field as any).title || '';
+                                            const isSpecialComponent = fieldTitle === "CLIP文本编码" || fieldTitle === "加载图像" || fieldTitle === "CLIP文本编码器";
                                             
                                             if (isSpecialComponent) {
                                                 // 特殊组件不显示圆角方框
@@ -210,7 +212,7 @@ export function ViewComfyForm(args: {
                                                         {
                                                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                                             // @ts-ignore
-                                                            field.title
+                                                            (field as any).title || '未命名组件'
                                                         }
                                                         {/* 编辑模式下显示删除按钮 */}
                                                         {editMode && (

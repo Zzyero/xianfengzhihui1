@@ -12,7 +12,7 @@ import { missingViewComfyFileError, viewComfyFileName } from "@/app/constants";
 // ComfyUI 服务类：处理工作流执行和文件处理的核心服务
 export class ComfyUIService {
     private comfyErrorHandler: ComfyErrorHandler;
-    private comfyUIAPIService: ComfyUIAPIService;
+    public comfyUIAPIService: ComfyUIAPIService;
     private clientId: string;
 
     constructor() {
