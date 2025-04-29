@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "start http://localhost:3000",
     "dev": "cross-env NODE_OPTIONS=--inspect next dev",
     "build": "next build",
     "start": "next start",

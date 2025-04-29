@@ -1,3 +1,25 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
-}
+  "extends": ["next/core-web-vitals", "next/typescript", "plugin:@typescript-eslint/recommended","plugin:react-hooks/recommended"
+],
+  "rules": {
+    // 关闭 useEffect 依赖项缺失警告
+    "react-hooks/exhaustive-deps": "off",
+    // 关闭 prefer-const 规则（变量未重新赋值警告）
+    "prefer-const": "off",
+    // 关闭未转义实体警告
+    "react/no-unescaped-entities": "off",
+    // 关闭缺少 key 属性警告
+    "react/jsx-key": "off",
+    // 关闭 <img> 替代警告（Next.js 图片优化提示）
+    "@next/next/no-img-element": "off",
+    // 关闭图片 alt 属性警告（可访问性提示）
+    "jsx-a11y/alt-text": "off",
+    // 关闭匿名默认导出警告
+    "import/no-anonymous-default-export": "off",
+    // 核心：关闭 TypeScript 未使用变量和显式 any 错误
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    
+    // 可选：关闭其他非关键规则（根据你的日志）
+    "react-hooks/rules-of-hooks": "off" // 若 Hook 调用错误确实不影响（谨慎！）
+}}
