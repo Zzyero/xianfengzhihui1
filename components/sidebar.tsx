@@ -1,4 +1,4 @@
-import { SquareTerminal, LifeBuoy, Book, Bot, BookOpen,Star } from "lucide-react"
+import { SquareTerminal, LifeBuoy, Book, Bot, BookOpen,Star, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TooltipButton } from "@/components/ui/tooltip-button"
 import Link from "next/link";
@@ -18,7 +18,8 @@ export enum TabValue {
     WorkflowApi = 'workflow_api',
     PromptLibrary = 'prompt_library',
     PromptEnhance = 'prompt_enhance',
-    SmartPS = 'smart_ps'
+    SmartPS = 'smart_ps',
+    GenerateHistory = 'generate_history'
 }
 
 //侧边栏属性接口
@@ -93,6 +94,13 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                             onClick={() => onTabChange(TabValue.PromptEnhance)}
                             isSmallScreen={isSmallScreen}
                         />
+                        <SidebarButton
+                            icon={<History className="size-5" />}
+                            label="生成历史"
+                            isActive={currentTab === TabValue.GenerateHistory}
+                            onClick={() => onTabChange(TabValue.GenerateHistory)}
+                            isSmallScreen={isSmallScreen}
+                        />
                     </>
                 ) : (
                     //编辑模式显示完整导航
@@ -130,6 +138,13 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                             label="提示词增强"
                             isActive={currentTab === TabValue.PromptEnhance}
                             onClick={() => onTabChange(TabValue.PromptEnhance)}
+                            isSmallScreen={isSmallScreen}
+                        />
+                        <SidebarButton
+                            icon={<History className="size-5" />}
+                            label="生成历史"
+                            isActive={currentTab === TabValue.GenerateHistory}
+                            onClick={() => onTabChange(TabValue.GenerateHistory)}
                             isSmallScreen={isSmallScreen}
                         />
                     </>
