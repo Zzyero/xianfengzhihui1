@@ -88,7 +88,14 @@ export function PromptForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    // 保证width/height在顶层
+    const { width, height, ...restParams } = formData.parameters || {};
+    onSubmit({
+      ...formData,
+      width: width ? Number(width) : undefined,
+      height: height ? Number(height) : undefined,
+      parameters: restParams,
+    });
   };
 
   return (
@@ -143,11 +150,11 @@ export function PromptForm({
             <div className="grid grid-cols-2 gap-2">
               {[
                 { key: 'steps', name: '步数', defaultValue: '20' },
-                { key: 'cfg', name: 'CFG', defaultValue: '7' },
                 { key: 'sampler', name: '采样器', defaultValue: 'euler' },
-                { key: 'seed', name: '种子', defaultValue: '-1' },
                 { key: 'scheduler', name: '调度器', defaultValue: 'normal' },
-                { key: 'denoise', name: '降噪强度', defaultValue: '1.0' }
+                { key: 'loraName', name: 'Lora名称', defaultValue: '' },
+                { key: 'width', name: '宽度', defaultValue: '' },
+                { key: 'height', name: '高度', defaultValue: '' }
               ].map(param => (
                 <div key={param.key} className="flex items-center gap-2">
                   <input
@@ -173,9 +180,8 @@ export function PromptForm({
                         setFormData(prev => ({ ...prev, parameters: newParams }));
                       }}
                       className="flex-1"
-                      type={param.key === 'steps' || param.key === 'seed' ? 'number' : 'text'}
-                      min={param.key === 'steps' ? '1' : undefined}
-                      step={param.key === 'denoise' ? '0.1' : '1'}
+                      type={param.key === 'steps' || param.key === 'width' || param.key === 'height' ? 'number' : 'text'}
+                      min={param.key === 'steps' || param.key === 'width' || param.key === 'height' ? '1' : undefined}
                     />
                   )}
                 </div>
@@ -188,9 +194,9 @@ export function PromptForm({
             <div className="space-y-2">
               <div>
                 <Label className="text-sm text-gray-500">中文</Label>
-                <Textarea
-                  value={formData.prompt || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, prompt: e.target.value }))}
+            <Textarea
+              value={formData.prompt || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, prompt: e.target.value }))}
                   placeholder="输入中文提示词"
                   rows={3}
                 />
@@ -202,7 +208,7 @@ export function PromptForm({
                   onChange={(e) => setFormData(prev => ({ ...prev, promptEn: e.target.value }))}
                   placeholder="输入英文提示词"
                   rows={3}
-                />
+            />
               </div>
             </div>
           </div>

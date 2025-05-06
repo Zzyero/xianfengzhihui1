@@ -6,16 +6,15 @@
       "parameters": {
         "steps": "35",
         "sampler": "dpm_adaptive",
-        "seed": "954836278540513",
         "scheduler": "karras",
-        "denoise": "1",
-        "cfg": "",
-        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 3 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+        "loraName": "Trump-000029.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493015456.png",
+      "width": 1264,
+      "height": 1024,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613561790.png",
-      "id": "1744613565278",
-      "createdAt": "2025-04-14T06:52:45.278Z"
+      "id": "1746493015474",
+      "createdAt": "2025-05-06T00:56:55.474Z"
     },
     {
       "prompt": "",
@@ -23,16 +22,15 @@
       "parameters": {
         "steps": "35",
         "sampler": "dpm_adaptive",
-        "seed": "954836278540517",
         "scheduler": "normal",
-        "denoise": "1",
-        "cfg": "",
-        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 3 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+        "loraName": "Trump-000029.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493016493.png",
+      "width": 1264,
+      "height": 1024,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613568968.png",
-      "id": "1744613569726",
-      "createdAt": "2025-04-14T06:52:49.726Z"
+      "id": "1746493016513",
+      "createdAt": "2025-05-06T00:56:56.513Z"
     },
     {
       "prompt": "",
@@ -40,16 +38,15 @@
       "parameters": {
         "steps": "35",
         "sampler": "dpm_adaptive",
-        "seed": "954836278540520",
         "scheduler": "ddim_uniform",
-        "denoise": "1",
-        "cfg": "",
-        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 3 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+        "loraName": "Trump-000029.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493017130.png",
+      "width": 1264,
+      "height": 1024,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613572800.png",
-      "id": "1744613573772",
-      "createdAt": "2025-04-14T06:52:53.772Z"
+      "id": "1746493017146",
+      "createdAt": "2025-05-06T00:56:57.146Z"
     },
     {
       "prompt": "",
@@ -57,16 +54,15 @@
       "parameters": {
         "steps": "35",
         "sampler": "heunpp2",
-        "seed": "954836278540573",
         "scheduler": "ddim_uniform",
-        "denoise": "1",
-        "cfg": "",
-        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 6 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+        "loraName": "meiguolao-000017.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493017755.png",
+      "width": 1264,
+      "height": 1024,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613576961.png",
-      "id": "1744613577708",
-      "createdAt": "2025-04-14T06:52:57.708Z"
+      "id": "1746493017770",
+      "createdAt": "2025-05-06T00:56:57.770Z"
     },
     {
       "prompt": "",
@@ -74,16 +70,15 @@
       "parameters": {
         "steps": "35",
         "sampler": "dpm_adaptive",
-        "seed": "954836278540580",
         "scheduler": "ddim_uniform",
-        "denoise": "1",
-        "cfg": "",
-        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 6 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+        "loraName": "meiguolao-000017.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493018361.png",
+      "width": 1264,
+      "height": 1024,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613580751.png",
-      "id": "1744613581533",
-      "createdAt": "2025-04-14T06:53:01.533Z"
+      "id": "1746493018375",
+      "createdAt": "2025-05-06T00:56:58.375Z"
     },
     {
       "prompt": "",
@@ -91,16 +86,15 @@
       "parameters": {
         "steps": "35",
         "sampler": "dpm_adaptive",
-        "seed": "954836278540582",
         "scheduler": "ddim_uniform",
-        "denoise": "1",
-        "cfg": "",
-        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 6 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+        "loraName": "meiguolao-000017.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493019086.png",
+      "width": 1264,
+      "height": 1024,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613584151.png",
-      "id": "1744613585123",
-      "createdAt": "2025-04-14T06:53:05.123Z"
+      "id": "1746493019103",
+      "createdAt": "2025-05-06T00:56:59.103Z"
     },
     {
       "prompt": "",
@@ -108,33 +102,31 @@
       "parameters": {
         "steps": "25",
         "sampler": "uni_pc",
-        "seed": "1037",
         "scheduler": "beta",
-        "denoise": "1",
-        "cfg": "",
-        "negative": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, ugly, blurry, Tan skin, dark skin, black skin, skin spots, skin blemishes, age spot, glans, disabled, distorted, bad anatomy, morbid, malformation, amputation, bad proportions, twins, missing body, fused body, extra head, poorly drawn face, bad eyes, deformed eye, unclear eyes, cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue, strange fingers, mutated hands,  missing hands, poorly drawn hands, extra hands, fused hands, connected hand, bad hands, wrong fingers, missing fingers, extra fingers, 4 fingers, 3 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet, wrong feet, extra feets,"
+        "loraName": "Trump-000029.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493019790.png",
+      "width": 1264,
+      "height": 1024,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613588022.png",
-      "id": "1744613588804",
-      "createdAt": "2025-04-14T06:53:08.804Z"
+      "id": "1746493019807",
+      "createdAt": "2025-05-06T00:56:59.807Z"
     },
     {
-      "prompt": "",
-      "promptEn": "meiguolao,\n\n\nThe image is a political satire cartoon featuring two caricatured figures. The figure on the left is dressed in a patriotic American theme, wearing a top hat with stars and stripes, similar to the American flag. This character also sports a bow tie and a suit with a pattern of stars, and the pants have a stripe pattern that mirrors the flag's design. The figure's behavior is aggressive, as it is depicted holding a large gun with both hands, and the gun is firing, indicated by the flames and bullets shown in the image.\n\nThe figure on the right is wearing a suit with a red tie and has a bandana covering its eyes, which is a common depiction of a burglar or someone engaging in covert activities. This character is also holding a gun and is shown in a firing stance. Notably, the figure has a speech bubble with the word \"Taiwan\" in Chinese characters, which is a focal point of the image and suggests a commentary on political issues related to Taiwan.\n\nThe background is a soft pink, which contrasts with the violent action depicted, possibly to enhance the讽刺 (satirical) nature of the cartoon. The overall tone of the image is one of political commentary, using exaggeration and symbolism to convey a message about the relationship between the figures and the concept of Taiwan. The image is likely intended to provoke thought or discussion about political dynamics or policies.",
+      "prompt": "meiguolao,\n\n\nThe image is a political satire cartoon featuring two caricatured figures. The figure on the left is dressed in a patriotic American theme, wearing a top hat with stars and stripes, similar to the American flag. This character also sports a bow tie and a suit with a pattern of stars, and the pants have a stripe pattern that mirrors the flag's design. The figure's behavior is aggressive, as it is depicted holding a large gun with both hands, and the gun is firing, indicated by the flames and bullets shown in the image.\n\nThe figure on the right is wearing a suit with a red tie and has a bandana covering its eyes, which is a common depiction of a burglar or someone engaging in covert activities. This character is also holding a gun and is shown in a firing stance. Notably, the figure has a speech bubble with the word \"Taiwan\" in Chinese characters, which is a focal point of the image and suggests a commentary on political issues related to Taiwan.\n\nThe background is a soft pink, which contrasts with the violent action depicted, possibly to enhance the讽刺 (satirical) nature of the cartoon. The overall tone of the image is one of political commentary, using exaggeration and symbolism to convey a message about the relationship between the figures and the concept of Taiwan. The image is likely intended to provoke thought or discussion about political dynamics or policies.",
+      "promptEn": "",
       "parameters": {
         "steps": "35",
         "sampler": "dpmpp_2m",
-        "seed": "1024",
         "scheduler": "beta",
-        "denoise": "1",
-        "cfg": "",
-        "negative": ""
+        "loraName": "meiguolao-000017.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493020487.png",
+      "width": 1280,
+      "height": 720,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613592072.png",
-      "id": "1744613592876",
-      "createdAt": "2025-04-14T06:53:12.876Z"
+      "id": "1746493020514",
+      "createdAt": "2025-05-06T00:57:00.514Z"
     },
     {
       "prompt": "",
@@ -142,50 +134,31 @@
       "parameters": {
         "steps": "35",
         "sampler": "euler",
-        "seed": "1024",
         "scheduler": "beta",
-        "denoise": "1",
-        "cfg": "",
-        "negative": ""
+        "loraName": "meiguolao-000017.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493021171.png",
+      "width": 1280,
+      "height": 720,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613595797.png",
-      "id": "1744613596713",
-      "createdAt": "2025-04-14T06:53:16.713Z"
+      "id": "1746493021189",
+      "createdAt": "2025-05-06T00:57:01.189Z"
     },
     {
       "prompt": "",
-      "promptEn": "meiguolao,\nThe image is a political satire cartoon depicting a character dressed in an American patriotic theme. The character is wearing a top hat with stars and stripes, reflecting the design of the American flag. The attire includes a blue suit with white stars on the lapels, which further emphasizes the patriotic motif.\n\nThe character's behavior is chaotic and destructive; it is holding a bomb with a lit fuse in one hand and a box labeled \"DEMOCRACY\" in the other. The bomb has Chinese characters on it, which translate to \"chaos\" or \"turmoil,\" suggesting a commentary on the state of democracy or the impact of the character's actions on democratic principles.\n\nThe character's expression is one of wild abandon or recklessness, with a wide-open mouth and eyes that appear to be in a state of frenzy or excitement. The background is a simple blue, which contrasts with the character's dynamic pose and the explosive elements in the scene.\n\nThe overall tone of the image is critical and satirical, using exaggeration to convey a message about the character's actions and their perceived effect on democracy. The cartoon likely intends to provoke thought or discussion about political stability, the state of democracy, or the influence of certain actions on democratic processes.\n\n",
+      "promptEn": "meiguolao,\nThe image is a political satire cartoon depicting a character dressed in an American patriotic theme. The character is wearing a top hat with stars and stripes, reflecting the design of the American flag. The attire includes a blue suit with white stars on the lapels, which further emphasizes the patriotic motif.\n\nThe character's behavior is chaotic and destructive; it is holding a bomb with a lit fuse in one hand and a box labeled \"DEMOCRACY\" in the other. The bomb has Chinese characters on it, which translate to \"chaos\" or \"turmoil,\" suggesting a commentary on the state of democracy or the impact of the character's actions on democratic principles.\n\nThe character's expression is one of wild abandon or recklessness, with a wide-open mouth and eyes that appear to be in a state of frenzy or excitement. The background is a simple blue, which contrasts with the character's dynamic pose and the explosive elements in the scene.\n\nThe overall tone of the image is critical and satirical, using exaggeration to convey a message about the character's actions and their perceived effect on democracy. The cartoon likely intends to provoke thought or discussion about political stability, the state of democracy, or the influence of certain actions on democratic processes.",
       "parameters": {
         "steps": "35",
         "sampler": "euler_ancestral",
-        "seed": "1030",
         "scheduler": "beta",
-        "denoise": "1",
-        "cfg": "",
-        "negative": ""
+        "loraName": "meiguolao-000017.safetensors"
       },
+      "imageUrl": "/images/prompts/1746493021784.png",
+      "width": 1280,
+      "height": 720,
       "tags": [],
-      "imageUrl": "/images/prompts/1744613599300.png",
-      "id": "1744613601184",
-      "createdAt": "2025-04-14T06:53:21.184Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "A political cartoon:\nA political satire cartoon with a simple background, featuring ugly characters with enlarged heads,1man,1laiqingde is dressed in a suit, holding a book in front with one hand and a wad of cash behind with the other, his eyes looking up and a sly smile on his face.",
-      "parameters": {
-        "steps": "23",
-        "sampler": "dpmpp_2m",
-        "seed": "403638930550798",
-        "scheduler": "ddim_uniform",
-        "denoise": "1",
-        "cfg": "",
-        "negative": ""
-      },
-      "tags": [],
-      "imageUrl": "/images/prompts/1744613604760.png",
-      "id": "1744613605601",
-      "createdAt": "2025-04-14T06:53:25.601Z"
+      "id": "1746493021798",
+      "createdAt": "2025-05-06T00:57:01.798Z"
     }
   ]
 }

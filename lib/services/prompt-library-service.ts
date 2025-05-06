@@ -12,7 +12,7 @@ export class PromptLibraryService {
   static async getPrompts(): Promise<PromptItem[]> {
     try {
       // 尝试从本地存储获取数据
-      const data = localStorage.getItem(STORAGE_KEY);
+    const data = localStorage.getItem(STORAGE_KEY);
       if (data) {
         const parsedData = JSON.parse(data);
         // 如果数据是数组，直接返回
@@ -23,8 +23,8 @@ export class PromptLibraryService {
         if (parsedData && Array.isArray(parsedData.prompts)) {
           return parsedData.prompts;
         }
-      }
-      
+  }
+
       // 如果本地存储没有数据或数据格式不正确，使用默认数据
       const defaultData = defaultPrompts.prompts;
       // 将默认数据保存到本地存储
@@ -75,7 +75,7 @@ export class PromptLibraryService {
   static async savePrompts(prompts: PromptItem[]): Promise<void> {
     try {
       // 保存提示词数据到本地存储
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
       
       // 同时保存到服务器
       try {
