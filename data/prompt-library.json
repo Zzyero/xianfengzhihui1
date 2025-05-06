@@ -159,6 +159,216 @@
       "tags": [],
       "id": "1746493021798",
       "createdAt": "2025-05-06T00:57:01.798Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "Prompt: Draw a colorful political satire cartoon in an exaggerated cartoon style. The main figure is Uncle Sam wearing a tall star-spangled top hat, blue suit, red tie, and headset with a microphone. He is sitting at a desk with an open scroll, holding strings attached to a globe on the desk like a puppet master. The globe shows parts of Europe and Africa with many puppet strings controlling various locations. Uncle Sam smirks confidently, symbolizing control and manipulation of global affairs.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495234012.png",
+      "width": 1264,
+      "height": 1024,
+      "tags": [],
+      "id": "1746493928967",
+      "createdAt": "2025-05-06T01:12:08.967Z",
+      "updatedAt": "2025-05-06T01:34:02.673Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Illustrate a political satire cartoon in a colorful, exaggerated cartoon style. The central figure is a wealthy, obese man sitting at a round table with a white tablecloth, labeled with a sign meaning \"Rich.\" He has a satisfied, smug expression, wearing a tuxedo and bow tie, holding a fork and knife, about to eat a large steak on a platter with sides. Behind him, a green Statue of Liberty figure stands cooking meat on a grill, wearing an apron and using a grilling fork. Outside a window behind them, impoverished, desperate people with sad faces press against the glass, labeled \"Poor.\" The scene highlights stark social inequality and critique of exploitation.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495190111.png",
+      "tags": [],
+      "id": "1746493932110",
+      "createdAt": "2025-05-06T01:12:12.110Z",
+      "updatedAt": "2025-05-06T01:33:37.678Z",
+      "width": 1152,
+      "height": 900
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Create a political satire cartoon in a vivid, exaggerated cartoon style. The central figure is a heavily armed U.S. soldier dressed in a camouflage uniform, wearing a helmet and tactical gear. He has a smug, condescending expression and stands over a small, thin, terrified child who is sitting on the ground, crying with dirt-streaked skin and torn clothing. The child looks vulnerable and helpless, with wide eyes filled with fear. \n\n    The background shows a war-torn landscape, with ruined buildings, scattered debris, and abandoned vehicles, all under a smoky, orange sky that indicates destruction. The soldier is saying, \"Why are you crying? Although you've lost everything, you now have freedom and democracy!\" This dialogue highlights the irony and critique of military actions in conflict zones.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746493932664.png",
+      "width": 1264,
+      "height": 1024,
+      "tags": [],
+      "id": "1746493933261",
+      "createdAt": "2025-05-06T01:12:13.261Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Create a political satire cartoon in a detailed, colorful cartoon style. The scene shows a large hand wearing a blue sleeve with white cuff and red stars, resembling Uncle Sam’s iconic outfit, holding a large dog bone as bait. Below, a woman with short black hair, glasses, and a blue blazer is kneeling and struggling while carrying a heavy box overflowing with stacks of money marked with dollar signs. The woman looks forced and anxious, reaching toward the dangling bone with an expression blending hope and strain. The imagery symbolizes manipulation and unequal exchange in a political or financial context.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": "蔡英文.safetensors"
+      },
+      "imageUrl": "/images/prompts/1746495166437.png",
+      "width": 1264,
+      "height": 1024,
+      "tags": [],
+      "id": "1746493934207",
+      "createdAt": "2025-05-06T01:12:14.207Z",
+      "updatedAt": "2025-05-06T01:32:55.869Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Create a political satire cartoon in a vivid, exaggerated cartoon style. The central figure is a heavily armed U.S. soldier dressed in a camouflage uniform, wearing a helmet and tactical gear. He has a smug, condescending expression and stands over a small, thin, terrified child who is sitting on the ground, crying with dirt-streaked skin and torn clothing. The child looks vulnerable and helpless, with wide eyes filled with fear. \n\n    The background shows a war-torn landscape, with ruined buildings, scattered debris, and abandoned vehicles, all under a smoky, orange sky that indicates destruction. The soldier is saying, \"Why are you crying? Although you've lost everything, you now have freedom and democracy!\" This dialogue highlights the irony and critique of military actions in conflict zones.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495135326.png",
+      "width": 1024,
+      "height": 720,
+      "tags": [],
+      "id": "1746493935159",
+      "createdAt": "2025-05-06T01:12:15.159Z",
+      "updatedAt": "2025-05-06T01:32:31.967Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Illustrate a political satire cartoon in a colorful, expressive cartoon style. The main scene shows a panda standing in front of a large whiteboard labeled \"Chinese Technology Enterprises\" in Chinese characters, focused on analyzing or developing a small glowing microchip held in one paw. To the right, an eagle wearing a Uncle Sam hat aggressively tries to snatch a large bag labeled with Chinese characters meaning \"Key Technology\" from a smaller, frightened eagle on the ground. The background is a simple dark room, suggesting tension and competition in the technology sector between China (panda) and the United States (eagles).",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495124164.png",
+      "tags": [],
+      "id": "1746493936046",
+      "createdAt": "2025-05-06T01:12:16.046Z",
+      "updatedAt": "2025-05-06T01:32:06.017Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "Prompt: Create a political satire comic in a clean, bold cartoon style showing two identical Uncle Sam characters standing back to back. Both wear the classic red, white, and blue costume with a tall hat decorated with stars and stripes, blue jacket with stars, red bow tie, and red-striped pants. The Uncle Sam on the left looks stern and serious, holding a pair of handcuffs in his left hand. Behind him is a window or frame depicting the U.S. Capitol dome with a crowd and raised fists under the text \"US Capitol Riot\" in Chinese characters. The Uncle Sam on the right appears smug and sly, holding a shiny bronze medal by its red ribbon. Behind him is a window or frame showing a chaotic scene of violent protests in a cityscape under the text \"Hong Kong Riot\" in Chinese characters. The contrast between the two Uncle Sams highlights ironic double standards and political hypocrisy.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495101894.png",
+      "width": 1024,
+      "height": 720,
+      "tags": [],
+      "id": "1746493936989",
+      "createdAt": "2025-05-06T01:12:16.989Z",
+      "updatedAt": "2025-05-06T01:31:51.429Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Draw a political satire cartoon in a detailed, caricature style. The central figure is Uncle Sam with a large star-spangled top hat and a smug, sly facial expression. On his right shoulder stands a small angel with a halo, wings, and clasped hands, wearing traditional robes and a gentle, hopeful expression. On his left shoulder, a mischievous devil character dressed as a pirate with a skull hat, bat wings, a red outfit, and a devil’s tail whispers into Uncle Sam’s ear. The background is plain to emphasize this internal moral conflict portrayed humorously.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495067672.png",
+      "tags": [],
+      "id": "1746493937928",
+      "createdAt": "2025-05-06T01:12:17.928Z",
+      "updatedAt": "2025-05-06T01:31:25.139Z",
+      "width": 1024,
+      "height": 720
+    },
+    {
+      "prompt": "",
+      "promptEn": "Prompt: Draw a political satire cartoon in a clean, expressive cartoon style. The central figure is the Statue of Liberty, portrayed as struggling and being sawed in half by a large handsaw labeled \"MIDTERM ELECTIONS.\" On the left side, a donkey character dressed in a blue suit, symbolizing the Democratic Party, pulls the saw handle with effort, showing determination. On the right side, an elephant character in a brown suit, symbolizing the Republican Party, pulls the other side of the saw with focused intensity. The Statue of Liberty has an agonized, distressed facial expression and body posture indicating pain. The scene conveys the destructive nature of political conflict during midterm elections.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746494935833.png",
+      "tags": [],
+      "id": "1746493938805",
+      "createdAt": "2025-05-06T01:12:18.805Z",
+      "updatedAt": "2025-05-06T01:28:56.763Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Draw a two-panel political satire cartoon in a clear, simple cartoon style. Both panels show Uncle Sam standing on a stage in front of an audience. He wears his classic star-spangled top hat, blue jacket, and striped pants. In the first panel, Uncle Sam faces the audience, angrily holding up a sign with Chinese characters meaning \"Democracy,\" and angrily shouting. In the second panel, Uncle Sam has turned his back to the audience, revealing a different sign with Chinese characters meaning \"Hegemony\" attached to a spiked club he holds behind his back, showing a hidden, threatening side. The cartoon contrasts outward appearance versus hidden reality.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495056807.png",
+      "tags": [],
+      "id": "1746493940701",
+      "createdAt": "2025-05-06T01:12:20.701Z",
+      "updatedAt": "2025-05-06T01:30:57.651Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Illustrate a political satire cartoon in a detailed, bold cartoon style. The main figure is a man dressed in a dark suit, white shirt, and red tie, wearing an Uncle Sam top hat decorated with stars and stripes. He is shouting passionately at a podium with multiple microphones while holding a small flag with Chinese characters meaning \"Democracy.\" Behind him is a red curtain with visible tears and holes. The curtain is pulled aside slightly to reveal a large pile of money bags marked with dollar signs, spilling out from behind. The scene highlights the contrast between the rhetoric of democracy and underlying financial interests or corruption.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495046359.png",
+      "tags": [],
+      "id": "1746493942004",
+      "createdAt": "2025-05-06T01:12:22.004Z",
+      "updatedAt": "2025-05-06T01:30:47.957Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Draw a detailed political satire cartoon in a colorful, exaggerated comic style. The scene features two main characters: on the left, a traditionally dressed Asian man with a chubby face, tied-back hair, wearing a yellow and brown striped robe, presenting a large plate with a red lobster marked with a nuclear hazard symbol. On the right, an angry Uncle Sam character with a tall star-spangled hat, black suit, red bow tie, and long facial hair is sitting in a chair and violently pushing away the lobster dish with one hand while giving a thumbs-up toward a large screen. The screen shows nuclear waste barrels and Chinese text meaning \"Japan releases nuclear wastewater.\" The contrast highlights hypocrisy and political tension surrounding nuclear contamination.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495036830.png",
+      "tags": [],
+      "id": "1746493943045",
+      "createdAt": "2025-05-06T01:12:23.045Z",
+      "updatedAt": "2025-05-06T01:30:38.442Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "**Prompt:** Create a political satire cartoon in a dark, somber cartoon style. The main image is a large wooden coffin with Chinese characters on the side that translate to \"Taiwan separatist forces.\" Two human arms emerge from inside the coffin: one is holding a hammer, aggressively trying to nail more nails on the coffin lid, while the other points or steadies a nail. The background is plain and dark, emphasizing a tense and ominous atmosphere. The cartoon symbolizes self-destructive behavior of separatist movements.",
+      "parameters": {
+        "steps": "20",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "loraName": ""
+      },
+      "imageUrl": "/images/prompts/1746495012803.png",
+      "width": 1024,
+      "height": 720,
+      "tags": [],
+      "id": "1746493944052",
+      "createdAt": "2025-05-06T01:12:24.052Z",
+      "updatedAt": "2025-05-06T01:30:26.907Z"
     }
   ]
 }
