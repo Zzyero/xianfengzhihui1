@@ -1,84 +1,178 @@
 "use client"
-import { useState, useEffect } from 'react';
-import { Trash2 } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Trash2, ArrowUpDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/loader';
 import './GenerateHistoryPage.css';
 import { useRouter } from 'next/navigation';
-import fs from 'fs';
 import path from 'path';
 
 // 图片类型接口
 interface ImageItem {
   src: string;
   name: string;
-  fullPath?: string;
+  timestamp: number;
+  tempFile?: string;
 }
+
+// 排序类型
+type SortType = 'time' | 'name';
+type SortOrder = 'asc' | 'desc';
+
+// 自动刷新间隔 (毫秒)
+const AUTO_REFRESH_INTERVAL = 5000; // 5秒自动刷新
+// 预览图片刷新间隔
+const PREVIEW_REFRESH_INTERVAL = 30000; // 30秒刷新一次预览图片
 
 // 生成历史页面组件
 export default function GenerateHistoryPage() {
-  // 图片列表状态
   const [images, setImages] = useState<ImageItem[]>([]);
-  // 加载状态
   const [isLoading, setIsLoading] = useState(true);
-  // 错误状态
   const [error, setError] = useState<string | null>(null);
-  // 图片查看状态
   const [viewImage, setViewImage] = useState<ImageItem | null>(null);
+  const [sortType, setSortType] = useState<SortType>('time');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
+  const [refreshCount, setRefreshCount] = useState(0);
+  const [previewTimestamp, setPreviewTimestamp] = useState<number>(Date.now());
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [newFileName, setNewFileName] = useState('');
+  const [renameError, setRenameError] = useState<string | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const renameInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-
-  // 加载图片列表
-  useEffect(() => {
-    // 在客户端获取公共文件夹中的所有图片
-    async function fetchImages() {
-      try {
+  
+  // 获取图片列表 - 使用useCallback避免effect中的依赖问题
+  const fetchImages = useCallback(async (showLoader = true) => {
+    try {
+      if (showLoader) {
         setIsLoading(true);
-        
-        // 使用fetch获取图片文件列表
-        // 在实际应用中，这可能需要一个简单的API或静态生成的数据
-        // 这里我们直接列出public/images/prompts目录中的文件
-        
-        // 模拟读取目录内容
-        // 注意：浏览器端代码不能直接读取文件系统
-        // 这里直接扫描public/images/prompts文件夹下的文件
-        
-        // 获取public/images/prompts目录下的所有图片文件
-        const imageFiles = await getPublicImages();
-        setImages(imageFiles);
-      } catch (err) {
-        console.error('加载图片错误:', err);
-        setError('加载图片失败，请刷新页面重试');
-      } finally {
+      }
+      
+      // 添加时间戳避免缓存
+      const cacheBreaker = new Date().getTime();
+      console.log('正在请求图片数据...');
+      
+      // 通过API获取JSON文件内容，这样可以读取项目目录中的文件
+      const response = await fetch(`/api/get-image-list?t=${cacheBreaker}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('获取图片列表错误:', response.status, errorText);
+        throw new Error(`获取图片列表错误: ${response.status}`);
+      }
+      
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error('解析图片数据失败:', parseError);
+        throw new Error('无法解析图片数据，可能是格式不正确');
+      }
+      
+      // 验证数据格式
+      if (!data || !Array.isArray(data.images)) {
+        console.error('图片数据格式不正确:', data);
+        throw new Error('图片数据格式不正确');
+      }
+      
+      console.log('成功获取图片数据:', data.images.length, '张图片');
+      
+      // 更新状态
+      setImages(data.images);
+      setLastUpdateTime(new Date(data.lastUpdate));
+      setRefreshCount(prev => prev + 1);
+    } catch (err) {
+      console.error('加载图片错误:', err);
+      if (showLoader) {
+        setError(`加载图片失败: ${err instanceof Error ? err.message : '未知错误'}`);
+      }
+    } finally {
+      if (showLoader) {
         setIsLoading(false);
       }
     }
+  }, []);
+  
+  // 初始加载图片列表
+  useEffect(() => {
+    fetchImages(true); // 初始加载
+  }, [fetchImages]);
 
-    fetchImages();
+  // 自动刷新逻辑
+  useEffect(() => {
+    console.log('启动自动刷新, 间隔:', AUTO_REFRESH_INTERVAL);
+    const intervalId = setInterval(() => {
+      console.log('执行自动刷新...');
+      fetchImages(false); // 静默刷新，不显示加载状态
+    }, AUTO_REFRESH_INTERVAL);
+    
+    return () => {
+      console.log('停止自动刷新');
+      clearInterval(intervalId);
+    };
+  }, [fetchImages]);
+
+  // 预览图片自动刷新
+  useEffect(() => {
+    if (!viewImage) return;
+    
+    console.log('启动预览图片自动刷新');
+    const intervalId = setInterval(() => {
+      console.log('刷新预览图片...');
+      setPreviewTimestamp(Date.now());
+    }, PREVIEW_REFRESH_INTERVAL);
+    
+    return () => {
+      console.log('停止预览图片自动刷新');
+      clearInterval(intervalId);
+    };
+  }, [viewImage]);
+
+  // 监听滚动事件
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      // 当滚动超过一定距离时显示返回顶部按钮
+      const scrollPosition = scrollContainer.scrollTop;
+      setShowScrollTop(scrollPosition > 300);
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll);
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
-  // 模拟获取public文件夹中的图片
-  // 这个函数在实际应用中需要替换为服务器端代码
-  async function getPublicImages(): Promise<ImageItem[]> {
-    // 在生产环境中，这些图片应该通过静态生成或API获取
-    // 这里我们假设public/images/prompts目录下有一些图片
-    
-    // 扫描public/images/prompts目录(模拟)
-    // 用一些示例图片替代
-    return [
-      {
-        src: '/images/prompts/sample1.jpg',
-        name: 'sample1.jpg'
-      },
-      {
-        src: '/images/prompts/sample2.jpg',
-        name: 'sample2.jpg'
-      },
-      // 添加更多示例图片...
-    ];
-    
-    // 注意：在真实实现中，这部分应该由服务器端或静态生成提供
-    // 例如，可以创建一个getStaticProps函数来获取图片列表
-  }
+  // 处理排序
+  const handleSort = (type: SortType) => {
+    if (sortType === type) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortType(type);
+      setSortOrder('desc');
+    }
+  };
+
+  // 获取排序后的图片列表
+  const getSortedImages = () => {
+    return [...images].sort((a, b) => {
+      if (sortType === 'time') {
+        return sortOrder === 'asc' 
+          ? a.timestamp - b.timestamp 
+          : b.timestamp - a.timestamp;
+      } else {
+        return sortOrder === 'asc'
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      }
+    });
+  };
 
   // 删除图片
   const handleDeleteImage = async (image: ImageItem) => {
@@ -87,30 +181,41 @@ export default function GenerateHistoryPage() {
     }
 
     try {
-      // 在实际应用中，这里需要调用服务器API或使用适当的方法删除文件
-      // 这里我们只从状态中移除图片以进行演示
-      setImages(images.filter(img => img.src !== image.src));
+      // 使用标准API路径格式
+      const response = await fetch(`/api/local-images?filename=${encodeURIComponent(image.name)}`, {
+        method: 'DELETE',
+      });
       
-      // 如果当前正在查看该图片，关闭查看器
-      if (viewImage && viewImage.src === image.src) {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('删除图片错误:', response.status, errorText);
+        throw new Error(`删除失败: ${response.status} ${errorText}`);
+      }
+      
+      // 解析响应获取最新图片列表
+      const data = await response.json();
+      if (data && Array.isArray(data.images)) {
+        setImages(data.images);
+        setLastUpdateTime(new Date(data.lastUpdate));
+      } else {
+        // 如果没有返回新列表，则移除当前图片
+        setImages(images.filter(img => img.name !== image.name));
+      }
+      
+      if (viewImage && viewImage.name === image.name) {
         setViewImage(null);
       }
       
-      // 显示删除成功消息
       alert('图片已删除');
-      
-      // 重新加载页面以刷新图片列表
-      setTimeout(() => {
-        router.refresh();
-      }, 500);
     } catch (err) {
       console.error('删除图片错误:', err);
-      alert('删除图片时发生错误');
+      alert(`删除图片时发生错误: ${err instanceof Error ? err.message : '未知错误'}`);
     }
   };
 
   // 打开图片查看器
   const openImageViewer = (image: ImageItem) => {
+    setPreviewTimestamp(Date.now());
     setViewImage(image);
   };
 
@@ -119,10 +224,154 @@ export default function GenerateHistoryPage() {
     setViewImage(null);
   };
 
+  // 刷新预览图片
+  const refreshPreviewImage = () => {
+    setIsPreviewLoading(true);
+    setPreviewTimestamp(Date.now());
+  };
+
+  // 图片加载完成
+  const handleImageLoad = () => {
+    setIsPreviewLoading(false);
+  };
+
+  // 图片加载错误
+  const handleImageError = () => {
+    setIsPreviewLoading(false);
+    console.error('图片加载失败，尝试刷新');
+    // 自动尝试再次加载
+    setTimeout(() => {
+      setPreviewTimestamp(Date.now());
+    }, 1000);
+  };
+
+  // 滚动到顶部
+  const scrollToTop = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // 处理重命名图片
+  const handleRenameStart = () => {
+    if (!viewImage) return;
+    setNewFileName(viewImage.name);
+    setIsRenaming(true);
+    setRenameError(null);
+    // 在下一个事件循环中聚焦输入框
+    setTimeout(() => {
+      if (renameInputRef.current) {
+        renameInputRef.current.focus();
+        renameInputRef.current.select();
+      }
+    }, 50);
+  };
+
+  const handleRenameCancel = () => {
+    setIsRenaming(false);
+    setRenameError(null);
+  };
+
+  const handleRenameSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    
+    if (!viewImage || !newFileName.trim()) {
+      setRenameError('文件名不能为空');
+      return;
+    }
+
+    // 检查文件扩展名是否改变
+    const originalExt = path.extname(viewImage.name);
+    const newExt = path.extname(newFileName);
+    
+    // 如果修改了扩展名或文件名无效，显示错误
+    if (originalExt !== newExt) {
+      setRenameError('不能修改文件扩展名');
+      return;
+    }
+
+    if (newFileName.includes('/') || newFileName.includes('\\') || newFileName.includes(':')) {
+      setRenameError('文件名包含非法字符');
+      return;
+    }
+
+    try {
+      // 发送重命名请求
+      const response = await fetch('/api/local-images', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          oldName: viewImage.name,
+          newName: newFileName.trim()
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '重命名失败');
+      }
+
+      const data = await response.json();
+      
+      // 更新图片列表和当前查看的图片
+      if (data && Array.isArray(data.images)) {
+        setImages(data.images);
+        setLastUpdateTime(new Date(data.lastUpdate));
+        
+        // 更新当前查看的图片为重命名后的图片
+        const renamedImage = data.images.find((img: ImageItem) => img.name === newFileName.trim());
+        if (renamedImage) {
+          setViewImage(renamedImage);
+        } else {
+          setViewImage(null);
+        }
+      }
+
+      setIsRenaming(false);
+      setRenameError(null);
+    } catch (err) {
+      console.error('重命名图片错误:', err);
+      setRenameError(`重命名失败: ${err instanceof Error ? err.message : '未知错误'}`);
+    }
+  };
+
   return (
     <div className="generate-history-container">
       <div className="generate-history-header">
         <h1>生成历史</h1>
+        <div className="header-actions">
+          <div className="sort-buttons">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSort('time')}
+              className={sortType === 'time' ? 'active' : ''}
+            >
+              <ArrowUpDown className="h-4 w-4 mr-1" />
+              按时间排序 {sortType === 'time' && (sortOrder === 'asc' ? '↑' : '↓')}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSort('name')}
+              className={sortType === 'name' ? 'active' : ''}
+            >
+              <ArrowUpDown className="h-4 w-4 mr-1" />
+              按名称排序 {sortType === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+            </Button>
+          </div>
+          
+          {lastUpdateTime && (
+            <div className="last-update-time">
+              上次更新: {lastUpdateTime.toLocaleTimeString()}
+            </div>
+          )}
+        </div>
       </div>
 
       {isLoading ? (
@@ -140,27 +389,32 @@ export default function GenerateHistoryPage() {
           <p>暂无生成历史图片</p>
         </div>
       ) : (
-        <div className="generate-history-grid">
-          {images.map((image, index) => (
-            <div key={index} className="image-card">
-              <div className="image-container" onClick={() => openImageViewer(image)}>
-                <img src={image.src} alt={image.name} loading="lazy" />
+        <div className="generate-history-scroll-container" ref={scrollContainerRef}>
+          <div className="generate-history-grid">
+            {getSortedImages().map((image, index) => (
+              <div key={`${image.name}-${image.timestamp}`} className="image-card">
+                <div className="image-container" onClick={() => openImageViewer(image)}>
+                  {/* 添加key参数防止图片缓存 */}
+                  <img src={`${image.src}?t=${refreshCount}`} alt={image.name} loading="lazy" />
+                </div>
+                <div className="image-name" title={image.name}>
+                  {image.name}
+                </div>
+                <div className="image-actions">
+                  <span className="text-xs text-gray-500">
+                    {new Date(image.timestamp).toLocaleString()}
+                  </span>
+                </div>
               </div>
-              <div className="image-actions">
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteImage(image);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  删除
-                </Button>
-              </div>
+            ))}
+          </div>
+          
+          {/* 滚动指示器 */}
+          {showScrollTop && (
+            <div className={`scroll-indicator visible`} onClick={scrollToTop}>
+              <ChevronUp className="h-6 w-6" />
             </div>
-          ))}
+          )}
         </div>
       )}
 
@@ -168,9 +422,45 @@ export default function GenerateHistoryPage() {
       {viewImage && (
         <div className="image-viewer-overlay" onClick={closeImageViewer}>
           <div className="image-viewer-content" onClick={(e) => e.stopPropagation()}>
-            <img src={viewImage.src} alt={viewImage.name} />
+            <div className="image-viewer-img-container">
+              {isPreviewLoading && (
+                <div className="preview-loader">
+                  <Loader />
+                </div>
+              )}
+              <img 
+                ref={imageRef}
+                src={`${viewImage.src}?t=${previewTimestamp}`} 
+                alt={viewImage.name}
+                onLoad={handleImageLoad} 
+                onError={handleImageError}
+                style={{ display: isPreviewLoading ? 'none' : 'block' }}
+              />
+            </div>
             <div className="image-viewer-info">
-              <p>{viewImage.name}</p>
+              {isRenaming ? (
+                <form onSubmit={handleRenameSubmit} className="rename-form">
+                  <input
+                    ref={renameInputRef}
+                    type="text"
+                    value={newFileName}
+                    onChange={(e) => setNewFileName(e.target.value)}
+                    className="rename-input"
+                  />
+                  {renameError && <p className="text-sm text-red-500">{renameError}</p>}
+                  <div className="rename-actions">
+                    <Button type="submit" variant="default">确认</Button>
+                    <Button type="button" variant="outline" onClick={handleRenameCancel}>取消</Button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <p>{viewImage.name}</p>
+                  <p className="text-sm text-gray-999">
+                    {new Date(viewImage.timestamp).toLocaleString()}
+                  </p>
+                </>
+              )}
               <div className="image-viewer-actions">
                 <Button 
                   variant="destructive" 
@@ -178,6 +468,12 @@ export default function GenerateHistoryPage() {
                 >
                   <Trash2 className="h-4 w-4 mr-1" />
                   删除图片
+                </Button>
+                <Button 
+                  variant="default"
+                  onClick={handleRenameStart}
+                >
+                  重命名
                 </Button>
                 <Button 
                   variant="secondary"

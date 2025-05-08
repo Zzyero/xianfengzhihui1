@@ -44,3 +44,10 @@ powershell_venv
 *.tsbuildinfo
 next-env.d.ts
 *.Identifier
+
+# 忽略所有临时文件
+public/temp-images
+
+# 忽略所有照片
+components/pages/GenerateHistory/photos/
+
