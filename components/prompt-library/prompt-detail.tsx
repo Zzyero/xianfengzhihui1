@@ -17,6 +17,16 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  // 兼容处理，保证tags为数组
+  const safeTags = Array.isArray(prompt.tags) ? prompt.tags : [];
+
+  // 合并顶层width/height到parameters
+  const paramEntries = {
+    ...prompt.parameters,
+    ...(prompt.width ? { width: prompt.width } : {}),
+    ...(prompt.height ? { height: prompt.height } : {}),
+  };
+
   // 处理返回按钮点击
   const handleBack = () => {
     router.push('/?from=prompt');
@@ -99,7 +109,7 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
           <div>
             <h2 className="text-lg font-semibold mb-2">标签</h2>
             <div className="flex flex-wrap gap-2">
-              {prompt.tags.map((tag) => (
+              {safeTags.map((tag) => (
                 <Badge
                   key={tag.id}
                   variant="secondary"
@@ -124,10 +134,10 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
           <div>
             <h2 className="text-lg font-semibold mb-2">参数设置</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(prompt.parameters).map(([key, value]) => (
-                <div key={key} className="flex justify-between p-2 bg-gray-50 dark:bg-muted dark:text-foreground rounded">
-                  <span className="text-gray-600 dark:text-muted-foreground font-medium">{key}:</span>
-                  <span className="text-gray-800 dark:text-foreground">{value}</span>
+              {Object.entries(paramEntries).map(([key, value]) => (
+                <div key={key} className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600 font-medium">{key}:</span>
+                  <span className="text-gray-800">{value}</span>
                 </div>
               ))}
             </div>

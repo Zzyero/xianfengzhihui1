@@ -7,11 +7,8 @@ export interface PromptTag {
 export interface PromptParameters {
   steps: string;
   sampler: string;
-  seed: string;
   scheduler: string;
-  denoise: string;
-  cfg?: string;
-  negative?: string;
+  loraName: string;
   [key: string]: string | undefined;
 }
 
@@ -24,10 +21,14 @@ export interface PromptItem {
   tags: PromptTag[];
   createdAt: string;
   updatedAt?: string;
+  width?: number;
+  height?: number;
 }
 
 export type PartialPromptParameters = Partial<PromptParameters>;
 
 export type PartialPromptItem = Partial<Omit<PromptItem, 'parameters'>> & {
   parameters?: PartialPromptParameters;
+  width?: number;
+  height?: number;
 }; 
