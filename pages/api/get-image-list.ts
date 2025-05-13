@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { promises as fsPromises } from 'fs';
+import path from 'path';
 
-// 直接指定JSON文件的绝对路径
-const IMAGE_LIST_JSON = "D:\\gitvscode\\smart-painting-pioneer\\components\\pages\\GenerateHistory\\image-list.json";
+// 使用相对路径
+const IMAGE_LIST_JSON = path.join(process.cwd(), "components", "pages", "GenerateHistory", "image-list.json");
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // 允许缓存控制

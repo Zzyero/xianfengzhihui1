@@ -6,11 +6,11 @@ import { promises as fsPromises } from 'fs';
 // 支持的图片格式
 const SUPPORTED_FORMATS = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
 
-// 直接在代码中指定本地图片目录
-const LOCAL_IMAGE_DIRECTORY = "D:\\gitvscode\\smart-painting-pioneer\\components\\pages\\GenerateHistory\\photos";
+// 使用相对路径
+const LOCAL_IMAGE_DIRECTORY = path.join(process.cwd(), "components", "pages", "GenerateHistory", "photos");
 
-// 图片列表JSON文件路径 - 使用绝对路径
-const IMAGE_LIST_JSON = "D:\\gitvscode\\smart-painting-pioneer\\components\\pages\\GenerateHistory\\image-list.json";
+// 图片列表JSON文件路径 - 使用相对路径
+const IMAGE_LIST_JSON = path.join(process.cwd(), "components", "pages", "GenerateHistory", "image-list.json");
 
 // 全局文件列表缓存及最后更新时间
 const fileCache = {
@@ -140,6 +140,7 @@ async function refreshFileCache(saveToJson = false) {
         const filePath = path.join(LOCAL_IMAGE_DIRECTORY, file);
         try {
           const stats = await fsPromises.stat(filePath);
+          // 使用相对路径格式
           return {
             src: `/api/images/${encodeURIComponent(file)}`,
             name: file,

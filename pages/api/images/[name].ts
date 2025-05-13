@@ -13,8 +13,8 @@ const SUPPORTED_FORMATS = {
   '.webp': 'image/webp'
 };
 
-// 图片所在目录
-const LOCAL_IMAGE_DIRECTORY = "D:\\gitvscode\\smart-painting-pioneer\\components\\pages\\GenerateHistory\\photos";
+// 图片所在目录 - 使用相对路径
+const LOCAL_IMAGE_DIRECTORY = path.join(process.cwd(), "components", "pages", "GenerateHistory", "photos");
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { name } = req.query;
