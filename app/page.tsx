@@ -96,6 +96,7 @@ function HomeContent() {
                 ...prompt,
                 parameters: prompt.parameters ? {
                     steps: prompt.parameters.steps || '',
+                    loraName: prompt.parameters.loraName || '',
                     sampler: prompt.parameters.sampler || '',
                     seed: prompt.parameters.seed || '',
                     scheduler: prompt.parameters.scheduler || '',
@@ -130,6 +131,7 @@ function HomeContent() {
                     seed: prompt.parameters.seed || '',
                     scheduler: prompt.parameters.scheduler || '',
                     denoise: prompt.parameters.denoise || '',
+                    loraName: prompt.parameters.loraName || '',
                     cfg: prompt.parameters.cfg,
                     negative: prompt.parameters.negative,
                 } : undefined
