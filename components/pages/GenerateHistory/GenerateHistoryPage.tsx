@@ -201,11 +201,17 @@ export default function GenerateHistoryPage() {
   const openImageViewer = (image: ImageItem) => {
     setPreviewTimestamp(Date.now());
     setViewImage(image);
+    // 重置重命名状态，确保切换图片时不会保留重命名模式
+    setIsRenaming(false);
+    setRenameError(null);
   };
 
   // 关闭图片查看器
   const closeImageViewer = () => {
     setViewImage(null);
+    // 重置重命名状态，确保关闭图片查看器时不会保留重命名模式
+    setIsRenaming(false);
+    setRenameError(null);
   };
 
   // 刷新预览图片
