@@ -2,15 +2,16 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
 import { promises as fsPromises } from 'fs';
+import { getImageDirectory, getImageListJsonPath } from '../../components/pages/GenerateHistory/paths';
 
 // 支持的图片格式
 const SUPPORTED_FORMATS = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
 
-// 使用相对路径
-const LOCAL_IMAGE_DIRECTORY = path.join(process.cwd(), "components", "pages", "GenerateHistory", "photos");
+// 使用配置中的图片目录路径
+const LOCAL_IMAGE_DIRECTORY = getImageDirectory();
 
-// 图片列表JSON文件路径 - 使用相对路径
-const IMAGE_LIST_JSON = path.join(process.cwd(), "components", "pages", "GenerateHistory", "image-list.json");
+// 图片列表JSON文件路径 - 使用配置
+const IMAGE_LIST_JSON = getImageListJsonPath();
 
 // 全局文件列表缓存及最后更新时间
 const fileCache = {
