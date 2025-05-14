@@ -3,8 +3,10 @@ import fs from 'fs';
 import path from 'path';
 import { promises as fsPromises } from 'fs';
 
-// 本地图片目录
-const LOCAL_IMAGE_DIRECTORY = "D:\\gitvscode\\smart-painting-pioneer\\components\\pages\\GenerateHistory\\photos";
+// 在代码中使用
+const uploadsDir = process.env.UPLOADS_DIR || '/uploads';
+const LOCAL_IMAGE_DIRECTORY = path.join(process.cwd(), "public", uploadsDir, "photos");
+const IMAGE_LIST_JSON = path.join(process.cwd(), "public", "uploads", "image-list.json");
 
 // 支持的图片类型与对应的Content-Type
 const CONTENT_TYPES: Record<string, string> = {
