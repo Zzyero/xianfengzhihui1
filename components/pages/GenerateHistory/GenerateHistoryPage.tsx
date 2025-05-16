@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import path from 'path';
 import { FixedSizeGrid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import LazyImage from './LazyImage';
 
 // 图片类型接口
 interface ImageItem {
@@ -398,10 +399,10 @@ export default function GenerateHistoryPage() {
       <div style={style} className="image-cell">
         <div className="image-card">
           <div className="image-container" onClick={() => openImageViewer(image)}>
-            <img 
+            <LazyImage 
               src={`${image.src}?t=${refreshCount}`} 
-              alt={image.name} 
-              loading="lazy" 
+              alt={image.name}
+              initialInView={true} // 设置为立即可见，因为虚拟滚动已经确保只渲染可见区域
             />
           </div>
           <div className="image-name" title={image.name}>
@@ -521,6 +522,7 @@ export default function GenerateHistoryPage() {
                 ref={imageRef}
                 src={`${viewImage.src}?t=${previewTimestamp}`} 
                 alt={viewImage.name}
+                className="viewer-image"
                 onLoad={handleImageLoad} 
                 onError={handleImageError}
                 style={{ display: isPreviewLoading ? 'none' : 'block' }}
