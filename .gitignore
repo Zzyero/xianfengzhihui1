@@ -52,4 +52,4 @@ public/temp-images
 components/pages/GenerateHistory/photos/
 
 # 忽略所有图片列表
-components/pages/GenerateHistory/image-list.json
+components/pages/GenerateHistory/image-list.json/
