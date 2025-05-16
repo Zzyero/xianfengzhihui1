@@ -395,6 +395,10 @@ export default function GenerateHistoryPage() {
       return <div style={style} />;
     }
     
+    // 格式化文件名，移除扩展名进行显示
+    const displayName = image.name.replace(/\.[^/.]+$/, ""); // 移除扩展名
+    const fileExt = path.extname(image.name); // 获取扩展名
+    
     return (
       <div style={style} className="image-cell">
         <div className="image-card">
@@ -406,7 +410,8 @@ export default function GenerateHistoryPage() {
             />
           </div>
           <div className="image-name" title={image.name}>
-            {image.name}
+            {displayName}
+            <span className="file-ext">{fileExt}</span>
           </div>
           <div className="image-actions">
             <span className="text-xs text-gray-500">
@@ -486,7 +491,7 @@ export default function GenerateHistoryPage() {
                   columnWidth={width / columnCount}
                   height={height}
                   rowCount={getRowCount(getSortedImages().length)}
-                  rowHeight={260} // 调整行高以适合图片卡片
+                  rowHeight={300} // 增加行高以适应更多的文字
                   width={width}
                   onScroll={({ scrollTop }: { scrollTop: number }) => {
                     // 当滚动超过一定距离时显示返回顶部按钮
