@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import fs from 'fs';
 import { promises as fsPromises } from 'fs';
+import { getImageDirectory } from '../../../components/pages/GenerateHistory/paths';
 
 // 支持的图片格式
 const SUPPORTED_FORMATS = {
@@ -13,8 +14,8 @@ const SUPPORTED_FORMATS = {
   '.webp': 'image/webp'
 };
 
-// 图片所在目录 - 使用相对路径
-const LOCAL_IMAGE_DIRECTORY = path.join(process.cwd(), "components", "pages", "GenerateHistory", "photos");
+// 图片所在目录 - 使用配置
+const LOCAL_IMAGE_DIRECTORY = getImageDirectory();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { name } = req.query;

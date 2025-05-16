@@ -19,8 +19,6 @@ interface ImageItem {
 type SortType = 'time' | 'name';
 type SortOrder = 'asc' | 'desc';
 
-// 自动刷新间隔 (毫秒)
-const AUTO_REFRESH_INTERVAL = 5000; // 5秒自动刷新
 // 预览图片刷新间隔
 const PREVIEW_REFRESH_INTERVAL = 30000; // 30秒刷新一次预览图片
 
@@ -57,7 +55,7 @@ export default function GenerateHistoryPage() {
       console.log('正在请求图片数据...');
       
       // 通过API获取JSON文件内容，这样可以读取项目目录中的文件
-      const response = await fetch(`/api/get-image-list?t=${cacheBreaker}`);
+      const response = await fetch(`/api/local-images?t=${cacheBreaker}`);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -100,20 +98,6 @@ export default function GenerateHistoryPage() {
   // 初始加载图片列表
   useEffect(() => {
     fetchImages(true); // 初始加载
-  }, [fetchImages]);
-
-  // 自动刷新逻辑
-  useEffect(() => {
-    console.log('启动自动刷新, 间隔:', AUTO_REFRESH_INTERVAL);
-    const intervalId = setInterval(() => {
-      console.log('执行自动刷新...');
-      fetchImages(false); // 静默刷新，不显示加载状态
-    }, AUTO_REFRESH_INTERVAL);
-    
-    return () => {
-      console.log('停止自动刷新');
-      clearInterval(intervalId);
-    };
   }, [fetchImages]);
 
   // 预览图片自动刷新
@@ -217,11 +201,17 @@ export default function GenerateHistoryPage() {
   const openImageViewer = (image: ImageItem) => {
     setPreviewTimestamp(Date.now());
     setViewImage(image);
+    // 重置重命名状态，确保切换图片时不会保留重命名模式
+    setIsRenaming(false);
+    setRenameError(null);
   };
 
   // 关闭图片查看器
   const closeImageViewer = () => {
     setViewImage(null);
+    // 重置重命名状态，确保关闭图片查看器时不会保留重命名模式
+    setIsRenaming(false);
+    setRenameError(null);
   };
 
   // 刷新预览图片
@@ -340,11 +330,26 @@ export default function GenerateHistoryPage() {
     }
   };
 
+  // 手动刷新图片列表
+  const handleManualRefresh = () => {
+    console.log('手动刷新图片列表');
+    fetchImages(true);
+  };
+
   return (
     <div className="generate-history-container">
       <div className="generate-history-header">
         <h1>生成历史</h1>
         <div className="header-actions">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleManualRefresh}
+            className="refresh-button"
+          >
+            <RefreshCw className="h-4 w-4 mr-1" />
+            刷新
+          </Button>
           <div className="sort-buttons">
             <Button
               variant="outline"

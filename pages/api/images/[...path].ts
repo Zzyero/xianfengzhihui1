@@ -2,10 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
 import { promises as fsPromises } from 'fs';
+import { getImageDirectory } from '../../../components/pages/GenerateHistory/paths';
 
-// 在代码中使用
-const uploadsDir = process.env.UPLOADS_DIR || '/uploads';
-const LOCAL_IMAGE_DIRECTORY = path.join(process.cwd(), "public", uploadsDir, "photos");
+// 使用统一的配置
+const LOCAL_IMAGE_DIRECTORY = getImageDirectory();
 const IMAGE_LIST_JSON = path.join(process.cwd(), "public", "uploads", "image-list.json");
 
 // 支持的图片类型与对应的Content-Type
@@ -17,6 +17,7 @@ const CONTENT_TYPES: Record<string, string> = {
   '.bmp': 'image/bmp',
   '.webp': 'image/webp'
 };
+
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // 只允许GET请求
