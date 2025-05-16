@@ -407,6 +407,7 @@ export default function GenerateHistoryPage() {
               src={`${image.src}?t=${refreshCount}`} 
               alt={image.name}
               initialInView={true} // 设置为立即可见，因为虚拟滚动已经确保只渲染可见区域
+              unloadWhenNotVisible={true} // 启用图片卸载策略，移出视口时卸载图片
             />
           </div>
           <div className="image-name" title={image.name}>
