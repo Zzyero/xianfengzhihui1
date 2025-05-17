@@ -6,6 +6,9 @@ import { Loader } from '@/components/loader';
 import './GenerateHistoryPage.css';
 import { useRouter } from 'next/navigation';
 import path from 'path';
+import { FixedSizeGrid } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import LazyImage from './LazyImage';
 
 // 图片类型接口
 interface ImageItem {
@@ -42,6 +45,8 @@ export default function GenerateHistoryPage() {
   const imageRef = useRef<HTMLImageElement>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const [columnCount, setColumnCount] = useState(4); // 默认列数
+  const gridRef = useRef<FixedSizeGrid>(null);
   
   // 获取图片列表 - 使用useCallback避免effect中的依赖问题
   const fetchImages = useCallback(async (showLoader = true) => {
@@ -237,10 +242,10 @@ export default function GenerateHistoryPage() {
 
   // 滚动到顶部
   const scrollToTop = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+    if (gridRef.current) {
+      gridRef.current.scrollTo({
+        scrollTop: 0,
+        scrollLeft: 0
       });
     }
   };
@@ -336,6 +341,103 @@ export default function GenerateHistoryPage() {
     fetchImages(true);
   };
 
+  // 在窗口大小变化时调整列数
+  useEffect(() => {
+    const handleResize = () => {
+      // 根据窗口宽度决定列数
+      const width = window.innerWidth;
+      if (width < 640) {
+        setColumnCount(2);
+      } else if (width < 1024) {
+        setColumnCount(3);
+      } else if (width < 1280) {
+        setColumnCount(4);
+      } else {
+        setColumnCount(5);
+      }
+      // 通知grid布局已更改
+      if (gridRef.current) {
+        // FixedSizeGrid不直接支持resetAfterIndices，但我们可以使用其他方法强制更新
+        gridRef.current.forceUpdate();
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 刷新Grid布局
+  useEffect(() => {
+    if (gridRef.current && images.length > 0) {
+      // 强制更新Grid
+      gridRef.current.forceUpdate();
+    }
+  }, [images, sortType, sortOrder]);
+
+  // 计算行数
+  const getRowCount = (itemCount: number) => {
+    return Math.ceil(itemCount / columnCount);
+  };
+
+  // 获取指定位置的图片
+  const getImageAtIndex = (index: number) => {
+    const sortedImages = getSortedImages();
+    return sortedImages[index] || null;
+  };
+
+  // 渲染单元格
+  const Cell = ({ columnIndex, rowIndex, style }: { columnIndex: number; rowIndex: number; style: React.CSSProperties }) => {
+    const index = rowIndex * columnCount + columnIndex;
+    const image = getImageAtIndex(index);
+    
+    if (!image) {
+      return <div style={style} />;
+    }
+    
+    // 格式化文件名，移除扩展名进行显示
+    const displayName = image.name.replace(/\.[^/.]+$/, ""); // 移除扩展名
+    const fileExt = path.extname(image.name); // 获取扩展名
+    
+    // 格式化时间为更简短的格式
+    const formatDate = (timestamp: number) => {
+      const date = new Date(timestamp);
+      const today = new Date();
+      
+      // 如果是今天的文件
+      if (date.toDateString() === today.toDateString()) {
+        return `今天 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      }
+      
+      // 非今天的文件使用月-日 时:分格式
+      return `${date.getMonth() + 1}-${date.getDate()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    };
+    
+    return (
+      <div style={style} className="image-cell">
+        <div className="image-card">
+          <div className="image-container" onClick={() => openImageViewer(image)}>
+            <LazyImage 
+              src={`${image.src}?t=${refreshCount}`} 
+              alt={image.name}
+              initialInView={true} // 设置为立即可见，因为虚拟滚动已经确保只渲染可见区域
+              unloadWhenNotVisible={true} // 启用图片卸载策略，移出视口时卸载图片
+            />
+          </div>
+          <div className="image-name" title={image.name}>
+            {displayName}
+            <span className="file-ext">{fileExt}</span>
+          </div>
+          <div className="image-actions">
+            <span className="text-xs text-gray-500" title={new Date(image.timestamp).toLocaleString()}>
+              {formatDate(image.timestamp)}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="generate-history-container">
       <div className="generate-history-header">
@@ -396,22 +498,25 @@ export default function GenerateHistoryPage() {
       ) : (
         <div className="generate-history-scroll-container" ref={scrollContainerRef}>
           <div className="generate-history-grid">
-            {getSortedImages().map((image, index) => (
-              <div key={`${image.name}-${image.timestamp}`} className="image-card">
-                <div className="image-container" onClick={() => openImageViewer(image)}>
-                  {/* 添加key参数防止图片缓存 */}
-                  <img src={`${image.src}?t=${refreshCount}`} alt={image.name} loading="lazy" />
-                </div>
-                <div className="image-name" title={image.name}>
-                  {image.name}
-                </div>
-                <div className="image-actions">
-                  <span className="text-xs text-gray-500">
-                    {new Date(image.timestamp).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            ))}
+            <AutoSizer>
+              {({ height, width }: { height: number; width: number }) => (
+                <FixedSizeGrid
+                  ref={gridRef}
+                  columnCount={columnCount}
+                  columnWidth={width / columnCount}
+                  height={height}
+                  rowCount={getRowCount(getSortedImages().length)}
+                  rowHeight={320} // 增加行高以适应更多的文字和时间戳
+                  width={width}
+                  onScroll={({ scrollTop }: { scrollTop: number }) => {
+                    // 当滚动超过一定距离时显示返回顶部按钮
+                    setShowScrollTop(scrollTop > 300);
+                  }}
+                >
+                  {Cell}
+                </FixedSizeGrid>
+              )}
+            </AutoSizer>
           </div>
           
           {/* 滚动指示器 */}
@@ -437,6 +542,7 @@ export default function GenerateHistoryPage() {
                 ref={imageRef}
                 src={`${viewImage.src}?t=${previewTimestamp}`} 
                 alt={viewImage.name}
+                className="viewer-image"
                 onLoad={handleImageLoad} 
                 onError={handleImageError}
                 style={{ display: isPreviewLoading ? 'none' : 'block' }}

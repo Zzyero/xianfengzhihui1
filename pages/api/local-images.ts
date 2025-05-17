@@ -74,6 +74,15 @@ async function writeImageListToJson() {
   try {
     await ensureDataDirectory();
     
+    // 先读取现有的JSON文件
+    let currentData = { images: [], lastUpdate: 0 };
+    try {
+      const data = await fsPromises.readFile(IMAGE_LIST_JSON, 'utf8');
+      currentData = JSON.parse(data);
+    } catch (error) {
+      console.log('JSON文件不存在或格式不正确，将创建新文件');
+    }
+    
     // 准备要写入的JSON数据
     const jsonData = JSON.stringify({
       images: fileCache.images,
@@ -100,39 +109,86 @@ async function refreshFileCache(saveToJson = false) {
   }
 
   try {
+    // 先从JSON文件读取当前的图片列表
+    let currentImages: Array<{name: string, src: string, timestamp: number}> = [];
+    let currentImageMap = new Map<string, {name: string, src: string, timestamp: number}>();
+    
+    try {
+      const data = await readImageListFromJson();
+      currentImages = data.images || [];
+      // 创建一个以文件名为键的映射表，方便查找
+      currentImageMap = new Map(currentImages.map(img => [img.name, img]));
+    } catch (error) {
+      console.error('读取现有图片列表失败:', error);
+    }
+    
     isRefreshing = true;
     const files = await fsPromises.readdir(LOCAL_IMAGE_DIRECTORY);
     
-    // 图片文件列表
-    const imagePromises = files
-      .filter(file => {
-        const ext = path.extname(file).toLowerCase();
-        return SUPPORTED_FORMATS.includes(ext);
-      })
-      .map(async (file) => {
-        const filePath = path.join(LOCAL_IMAGE_DIRECTORY, file);
-        try {
-          const stats = await fsPromises.stat(filePath);
-          // 使用相对路径格式
-          return {
+    // 当前文件系统中的文件集合
+    const fileSet = new Set(files.filter(file => {
+      const ext = path.extname(file).toLowerCase();
+      return SUPPORTED_FORMATS.includes(ext);
+    }));
+    
+    // 找出已不存在但仍在JSON中的文件（需要删除）
+    const existingFileNames = new Set(currentImages.map(img => img.name));
+    const filesToRemove: string[] = [];
+    
+    // 使用forEach避免Set的迭代器问题
+    existingFileNames.forEach(fileName => {
+      if (!fileSet.has(fileName)) {
+        filesToRemove.push(fileName);
+      }
+    });
+    
+    // 从当前图片列表中移除已删除的文件
+    if (filesToRemove.length > 0) {
+      console.log(`从图片列表中移除 ${filesToRemove.length} 个已删除的文件`);
+      for (const name of filesToRemove) {
+        currentImageMap.delete(name);
+      }
+    }
+    
+    // 处理新增或更新的文件
+    const updatedPromises: Promise<{src: string, name: string, timestamp: number}>[] = [];
+    
+    // 使用Array.from将Set转换为数组
+    for (const file of Array.from(fileSet)) {
+      const filePath = path.join(LOCAL_IMAGE_DIRECTORY, file);
+      
+      try {
+        const stats = await fsPromises.stat(filePath);
+        const fileModTime = stats.mtimeMs;
+        
+        // 检查文件是否已经在列表中，且修改时间是否有变化
+        const existingImage = currentImageMap.get(file);
+        
+        if (!existingImage || fileModTime !== existingImage.timestamp) {
+          // 如果是新文件或文件已更新，则添加/更新记录
+          updatedPromises.push(Promise.resolve({
             src: `/api/images/${encodeURIComponent(file)}`,
             name: file,
-            timestamp: stats.mtimeMs
-          };
-        } catch (error) {
-          console.error(`获取文件信息失败: ${file}`, error);
-          return null;
+            timestamp: fileModTime
+          }));
+          console.log(`${existingImage ? '更新' : '新增'}图片记录: ${file}`);
+        } else {
+          // 如果文件没有变化，保留现有记录
+          updatedPromises.push(Promise.resolve(existingImage));
         }
-      });
-
-    const images = (await Promise.all(imagePromises)).filter(Boolean);
+      } catch (error) {
+        console.error(`获取文件信息失败: ${file}`, error);
+      }
+    }
+    
+    const updatedImages = await Promise.all(updatedPromises);
     
     // 更新缓存
-    fileCache.images = images;
+    fileCache.images = updatedImages;
     fileCache.lastUpdate = Date.now();
     
     // 减少日志输出频率，仅在首次或图片数量变化时输出
-    const logMessage = `文件缓存已更新，共 ${images.length} 个图片`;
+    const logMessage = `文件缓存已更新，共 ${updatedImages.length} 个图片`;
     if (!saveToJson) {
       console.log(logMessage);
     }
