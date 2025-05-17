@@ -20,12 +20,19 @@ const fileCache = {
   isWatching: false
 };
 
+// 添加节流控制变量
+let isRefreshing = false;
+let refreshTimeout: NodeJS.Timeout | null = null;
+const THROTTLE_DELAY = 2000; // 设置2秒的节流延迟
+
+// 全局初始化状态标志
+let isInitialized = false;
+
 // 确保data目录存在 - 这里不需要创建目录，因为使用的是已存在的项目目录
 async function ensureDataDirectory() {
   const dataDir = path.dirname(IMAGE_LIST_JSON);
   try {
     await fsPromises.access(dataDir);
-    console.log(`项目数据目录已存在: ${dataDir}`);
   } catch (error) {
     console.error(`访问项目数据目录失败: ${dataDir}`, error);
     // 不尝试创建目录，因为它应该已经存在
@@ -79,56 +86,21 @@ async function writeImageListToJson() {
       jsonData,
       'utf8'
     );
-    
-    console.log(`已将 ${fileCache.images.length} 个图片记录保存到JSON文件`);
   } catch (error) {
     console.error('写入JSON文件失败:', error);
   }
 }
 
-// 设置文件监视
-async function setupFileWatcher() {
-  if (fileCache.isWatching) return;
-
-  try {
-    // 确保目录存在
-    if (!fs.existsSync(LOCAL_IMAGE_DIRECTORY)) {
-      fs.mkdirSync(LOCAL_IMAGE_DIRECTORY, { recursive: true });
-      console.log(`已创建图片目录: ${LOCAL_IMAGE_DIRECTORY}`);
-    }
-    
-    // 从JSON文件中加载初始数据
-    const savedData = await readImageListFromJson();
-    fileCache.images = savedData.images;
-    fileCache.lastUpdate = savedData.lastUpdate;
-
-    // 设置文件夹监视
-    const watcher = fs.watch(LOCAL_IMAGE_DIRECTORY, { persistent: true }, async (eventType, filename) => {
-      console.log(`检测到文件变化: ${eventType} - ${filename}`);
-      
-      // 刷新文件缓存并保存到JSON
-      await refreshFileCache(true);
-    });
-
-    // 设置错误处理
-    watcher.on('error', (error) => {
-      console.error('文件监视错误:', error);
-      fileCache.isWatching = false;
-    });
-
-    fileCache.isWatching = true;
-    console.log(`开始监视文件夹: ${LOCAL_IMAGE_DIRECTORY}`);
-
-    // 初始化缓存
-    await refreshFileCache(true);
-  } catch (error) {
-    console.error('设置文件监视失败:', error);
-  }
-}
-
 // 刷新文件缓存
 async function refreshFileCache(saveToJson = false) {
+  // 如果已经在刷新，则跳过
+  if (isRefreshing) {
+    console.log('已有刷新操作正在进行中，跳过本次刷新');
+    return;
+  }
+
   try {
+    isRefreshing = true;
     const files = await fsPromises.readdir(LOCAL_IMAGE_DIRECTORY);
     
     // 图片文件列表
@@ -159,7 +131,11 @@ async function refreshFileCache(saveToJson = false) {
     fileCache.images = images;
     fileCache.lastUpdate = Date.now();
     
-    console.log(`文件缓存已更新，共 ${images.length} 个图片`);
+    // 减少日志输出频率，仅在首次或图片数量变化时输出
+    const logMessage = `文件缓存已更新，共 ${images.length} 个图片`;
+    if (!saveToJson) {
+      console.log(logMessage);
+    }
     
     // 如果需要，保存到JSON文件
     if (saveToJson) {
@@ -167,11 +143,74 @@ async function refreshFileCache(saveToJson = false) {
     }
   } catch (error) {
     console.error('刷新文件缓存失败:', error);
+  } finally {
+    isRefreshing = false;
   }
 }
 
-// 初始化文件监视
-setupFileWatcher();
+// 节流处理的刷新函数
+function throttledRefreshCache(saveToJson = false) {
+  // 如果已有定时器在运行，清除它
+  if (refreshTimeout) {
+    clearTimeout(refreshTimeout);
+  }
+  
+  // 设置新的定时器
+  refreshTimeout = setTimeout(async () => {
+    await refreshFileCache(saveToJson);
+    refreshTimeout = null;
+  }, THROTTLE_DELAY);
+}
+
+// 设置文件监视
+async function setupFileWatcher() {
+  // 确保只初始化一次
+  if (fileCache.isWatching || isInitialized) {
+    console.log('文件监视已初始化，跳过重复初始化');
+    return;
+  }
+  
+  // 标记为已初始化
+  isInitialized = true;
+
+  try {
+    // 确保目录存在
+    if (!fs.existsSync(LOCAL_IMAGE_DIRECTORY)) {
+      fs.mkdirSync(LOCAL_IMAGE_DIRECTORY, { recursive: true });
+      console.log(`已创建图片目录: ${LOCAL_IMAGE_DIRECTORY}`);
+    }
+    
+    // 从JSON文件中加载初始数据
+    const savedData = await readImageListFromJson();
+    fileCache.images = savedData.images;
+    fileCache.lastUpdate = savedData.lastUpdate;
+
+    // 设置文件夹监视
+    const watcher = fs.watch(LOCAL_IMAGE_DIRECTORY, { persistent: true }, async (eventType, filename) => {
+      console.log(`检测到文件变化: ${eventType} - ${filename}`);
+      
+      // 使用节流函数刷新文件缓存并保存到JSON
+      throttledRefreshCache(true);
+    });
+
+    // 设置错误处理
+    watcher.on('error', (error) => {
+      console.error('文件监视错误:', error);
+      fileCache.isWatching = false;
+      // 错误发生时不重置isInitialized，防止重复初始化失败
+    });
+
+    fileCache.isWatching = true;
+    console.log(`开始监视文件夹: ${LOCAL_IMAGE_DIRECTORY}`);
+
+    // 初始化缓存
+    await refreshFileCache(true);
+  } catch (error) {
+    console.error('设置文件监视失败:', error);
+    // 初始化失败时重置标志，允许下次尝试
+    isInitialized = false;
+  }
+}
 
 // 导出API处理函数
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -179,21 +218,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { method, query } = req;
 
   try {
+    // 确保文件监视已初始化
+    if (!isInitialized) {
+      console.log('首次API请求，初始化文件监视');
+      await setupFileWatcher();
+    }
+    
     switch (method) {
       case 'GET':
         console.log('处理图片列表请求');
-
-        // 检查是否启动了文件监视
-        if (!fileCache.isWatching) {
-          await setupFileWatcher();
-        }
         
         // 如果缓存过期或强制刷新，则更新缓存
         const forceRefresh = query.refresh === 'true';
         const cacheAge = Date.now() - fileCache.lastUpdate;
         
         if (forceRefresh || cacheAge > 5000 || fileCache.images.length === 0) {
-          await refreshFileCache();
+          // 使用节流函数代替直接调用
+          if (forceRefresh) {
+            // 强制刷新时直接调用，不使用节流
+            await refreshFileCache();
+          } else if (!refreshTimeout) {
+            // 没有正在进行的刷新时才触发
+            throttledRefreshCache(false);
+          }
         }
 
         return res.status(200).json({
@@ -220,7 +267,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await fsPromises.unlink(filePath);
         console.log(`已删除文件: ${filePath}`);
         
-        // 更新缓存并保存到JSON
+        // 更新缓存并保存到JSON - 删除操作需要立即生效
         await refreshFileCache(true);
         
         return res.status(200).json({ 
@@ -280,7 +327,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(500).json({ error: '重命名文件失败' });
         }
 
-        // 更新缓存并保存到JSON
+        // 更新缓存并保存到JSON - 重命名操作需要立即生效
         await refreshFileCache(true);
 
         return res.status(200).json({ 

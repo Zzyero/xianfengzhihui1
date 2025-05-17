@@ -1,6 +1,8 @@
 /**
  * 图片存储路径配置
  */
+import path from 'path';
+
 // 图片存储的绝对路径
 export const IMAGE_BASE_PATH = "E:\\ZhiHui\\ComfyUI_windows_portable\\ComfyUI\\output";
 
@@ -14,10 +16,10 @@ export function getImageDirectory() {
     return IMAGE_BASE_PATH;
   }
   // 否则视为相对路径，与项目根目录拼接
-  return require('path').join(process.cwd(), IMAGE_BASE_PATH);
+  return path.join(process.cwd(), IMAGE_BASE_PATH);
 }
 
 // 获取完整的图片列表JSON文件路径
 export function getImageListJsonPath() {
-  return require('path').join(process.cwd(), IMAGE_LIST_JSON_PATH);
+  return path.join(process.cwd(), IMAGE_LIST_JSON_PATH);
 } 
