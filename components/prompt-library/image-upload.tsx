@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -11,6 +11,8 @@ interface ImageUploadProps {
 export function ImageUpload({ value, onChange }: ImageUploadProps) {
   const [preview, setPreview] = useState(value);
   const [uploading, setUploading] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,6 +20,8 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
     if (file) {
       try {
         setUploading(true);
+        setImageError(false);
+        setImageLoaded(false);
         const formData = new FormData();
         formData.append('file', file);
 
@@ -37,6 +41,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       } catch (error) {
         console.error('上传图片失败:', error);
         alert('上传图片失败，请重试');
+        setImageError(true);
       } finally {
         setUploading(false);
       }
@@ -46,16 +51,38 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value;
     setPreview(url);
+    setImageError(false);
+    setImageLoaded(false);
     onChange(url);
   };
 
   const handleClear = () => {
     setPreview('');
+    setImageError(false);
+    setImageLoaded(false);
     onChange('');
     if (inputRef.current) {
       inputRef.current.value = '';
     }
   };
+
+  const handleImageError = () => {
+    console.error('图片加载失败:', preview);
+    setImageError(true);
+    setImageLoaded(true);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setImageError(false);
+  };
+
+  // 占位图组件
+  const PlaceholderImage = () => (
+    <div className="flex items-center justify-center w-full h-full bg-gray-100 rounded-lg">
+      <ImageIcon className="w-12 h-12 text-gray-400" />
+    </div>
+  );
 
   return (
     <div className="space-y-4">
@@ -94,11 +121,22 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       </div>
       {preview && (
         <div className="relative aspect-video">
-          <img
-            src={preview}
-            alt="Preview"
-            className="rounded-lg object-cover w-full h-full"
-          />
+          {!imageLoaded && !imageError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400 text-xs">
+              加载中...
+            </div>
+          )}
+          {imageError ? (
+            <PlaceholderImage />
+          ) : (
+            <img
+              src={preview}
+              alt="预览图片"
+              className="rounded-lg object-cover w-full h-full"
+              onError={handleImageError}
+              onLoad={handleImageLoad}
+            />
+          )}
         </div>
       )}
     </div>

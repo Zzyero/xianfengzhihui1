@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Edit, Trash, X, Image, ArrowLeft } from "lucide-react";
+import { Edit, Trash, X, Image as ImageIcon, ArrowLeft } from "lucide-react";
 import type { PromptItem } from './types';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
@@ -16,6 +16,9 @@ interface PromptDetailProps {
 export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [previewImageError, setPreviewImageError] = useState(false);
 
   // 兼容处理，保证tags为数组
   const safeTags = Array.isArray(prompt.tags) ? prompt.tags : [];
@@ -35,12 +38,39 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
   // 处理图片双击事件
   const handleImageDoubleClick = (imageUrl: string) => {
     setSelectedImage(imageUrl);
+    setPreviewImageError(false);
   };
 
   // 关闭图片预览
   const closeImagePreview = () => {
     setSelectedImage(null);
   };
+
+  // 处理图片加载错误
+  const handleImageError = () => {
+    console.error('图片加载失败:', prompt.imageUrl);
+    setImageError(true);
+    setImageLoaded(true);
+  };
+
+  // 处理图片加载完成
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setImageError(false);
+  };
+
+  // 处理预览图片加载错误
+  const handlePreviewImageError = () => {
+    console.error('预览图片加载失败:', selectedImage);
+    setPreviewImageError(true);
+  };
+
+  // 占位图组件
+  const PlaceholderImage = () => (
+    <div className="flex items-center justify-center w-full h-full bg-gray-100 rounded-lg" style={{minHeight: "300px"}}>
+      <ImageIcon className="w-16 h-16 text-gray-400" />
+    </div>
+  );
 
   // 处理删除操作
   const handleDeleteClick = async () => {
@@ -93,16 +123,31 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
       <Card className="p-6">
         <div 
           className="relative mb-6 overflow-hidden bg-white dark:bg-background rounded-lg p-2 cursor-pointer"
-          onClick={() => handleImageDoubleClick(prompt.imageUrl)}
+          onClick={() => !imageError && handleImageDoubleClick(prompt.imageUrl)}
         >
-          <img
-            src={prompt.imageUrl}
-            alt={prompt.prompt}
-            className="w-full h-auto object-contain max-h-[600px]"
-          />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/10 text-white text-sm opacity-0 hover:opacity-100 transition-opacity">
-            双击查看大图
-          </div>
+          {!imageLoaded && !imageError && (
+            <div className="flex items-center justify-center w-full h-[300px] bg-gray-100 text-gray-500">
+              加载中...
+            </div>
+          )}
+          
+          {imageError ? (
+            <PlaceholderImage />
+          ) : (
+            <img
+              src={prompt.imageUrl}
+              alt={prompt.prompt}
+              className="w-full h-auto object-contain max-h-[600px]"
+              onError={handleImageError}
+              onLoad={handleImageLoad}
+            />
+          )}
+          
+          {!imageError && imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/10 text-white text-sm opacity-0 hover:opacity-100 transition-opacity">
+              双击查看大图
+            </div>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -156,12 +201,22 @@ export function PromptDetail({ prompt, onEdit, onDelete }: PromptDetailProps) {
             >
               <X className="h-4 w-4" />
             </Button>
+            
             {selectedImage && (
-              <img
-                src={selectedImage}
-                alt="预览图片"
-                className="w-full h-auto object-contain max-h-[90vh]"
-              />
+              <>
+                {previewImageError ? (
+                  <div className="flex items-center justify-center w-full h-[50vh] bg-gray-100">
+                    <ImageIcon className="w-20 h-20 text-gray-400" />
+                  </div>
+                ) : (
+                  <img
+                    src={selectedImage}
+                    alt="预览图片"
+                    className="w-full h-auto object-contain max-h-[90vh]"
+                    onError={handlePreviewImageError}
+                  />
+                )}
+              </>
             )}
           </div>
         </DialogContent>
