@@ -495,15 +495,16 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
         const samplerOptions = [
             "euler",
             "heun",
-            "dpm2",
-            "dpmpp_2s_a",
-            "dpmpp_2m",
-            "dpmpp_sde",
-            "dpmpp_2m_sde",
+            "heunpp2",
+            "dpm_2",
             "dpm_adaptive",
-            "lms",
+            "dpmpp_2m",
+            "lcm",
+            "ipndm",
+            "deis",
+            "ddim",
             "uni_pc",
-            "ddim"
+            "uni_pc_bh2",
         ];
         return (
             <FormSelectInput 
@@ -524,7 +525,8 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
             "exponential",
             "sgm_uniform",
             "simple",
-            "ddim_uniform"
+            "ddim_uniform",
+            "beta"
         ];
         return (
             <FormSelectInput 
