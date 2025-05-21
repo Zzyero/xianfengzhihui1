@@ -62,14 +62,12 @@ export interface AppSettings {
   lastUsedTemplateId?: string;// 最后使用的提示词模板ID
   lastUsedSessionId?: string; // 最后使用的会话ID
   lastUsedHelpDoc?: string; // 最后使用的帮助文档类型
-  notFirstUse?:string;// 没有第一次用
   timestamp: Date;          // 最后更新时间
   [key: string]: any;       // 其他设置项
 }
 
 // 帮助文档类型
 export type HelpDocType = 'introducer' | 'manual' | 'parameters';
-import importData from "./prompt-enhancement-data.json"
 
 /**
  * 获取数据库连接
@@ -633,90 +631,25 @@ const db = {
   },
 
   /**
-   * 获取不是第一次使用
-   * @returns 第一次返回undefined，之后返回true
+   * 初始化默认模型
+   * 如果数据库中没有模型，则添加默认的API模型配置
    */
-  getnotFirstUse:async ():Promise<string | undefined> => {
-    return executeOperation<string | undefined>(STORES.SETTINGS, 'readonly', store => {
-      return new Promise((resolve, reject) => {
-        const request = store.get('app-settings');
-        request.onsuccess = () => resolve(request.result?.notFirstUse);
-        request.onerror = () => reject(request.error);
-      });
-    });
-  },
-
-  /**
-   * 保存不是第一次使用
-   * @param notFirstUse true
-   */
-  savenotFirstUse: async (notFirstUse: string): Promise<IDBValidKey> => {
-    return executeOperation<IDBValidKey>(STORES.SETTINGS, 'readwrite', async store => {
-      const settings = await new Promise<AppSettings | undefined>((resolve, reject) => {
-        const request = store.get('app-settings');
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-      
-      const updatedSettings: AppSettings = {
-        ...(settings || { id: 'app-settings' }),
-        notFirstUse: notFirstUse, 
-        timestamp: new Date()
-      };
-      
-      return new Promise((resolve, reject) => {
-        const request = store.put(updatedSettings);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    });
-  },
-  /**
-   * 初始化
-  */
-  inputData: async () => {
-  // 导入模型
-  if (importData.models) {
-    for (const model of importData.models) {
-        try {
-            // 将 timestamp 字符串转换为 Date 对象
-            const modelWithDate = {
-                ...model,
-                timestamp: new Date(model.timestamp)
-            };
-            await db.saveModel(modelWithDate);
-        } catch (error) {
-            console.error('导入模型失败:', error);
-        }
-    }
-  }
-
-  // 导入模板
-  if (importData.templates) {
-      for (const template of importData.templates) {
-          try {
-              const templateWithDate = {
-                  ...template,
-                  timestamp: new Date(template.timestamp)
-              };
-              await db.saveTemplate(templateWithDate);
-          } catch (error) {
-              console.error('导入模板失败:', error);
-          }
-      }
-  }
-  },
-
-
-  /**
-   * 初始化
-   */
-  async init(): Promise<void> {
+  async initDefaultModels(): Promise<void> {
     try {
-      const isfirstUse = await this.getnotFirstUse();
-      if(isfirstUse !== "true"){
-        this.inputData();
-        this.savenotFirstUse("true");
+      const models = await this.getAllModels();
+      if (models.length === 0) {
+        // 添加默认模型，注意parameters是一个格式良好的JSON字符串
+        const defaultModel: Model = {
+          id: `${Date.now()}`,
+          name: 'Set Your Model Name',
+          url: 'Set Your Model Url',
+          apiKey: '',
+          apiId: 'Set Your Model Id',
+          parameters: '{"temperature":0.7,"max_tokens":2000,"stream":true,"top_p":1}', // 正确的JSON格式字符串
+          timestamp: new Date(),
+          type: 'api'
+        };
+        await this.saveModel(defaultModel);
       }
     } catch (error) {
       console.error('初始化默认模型失败:', error);
