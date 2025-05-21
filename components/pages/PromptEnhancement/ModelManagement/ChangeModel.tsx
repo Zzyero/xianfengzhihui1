@@ -41,7 +41,7 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ selectedModel, setSelectedMod
   const loadModels = async () => {
     try {
       // 初始化默认模型（如果数据库为空）
-      await db.initDefaultModels();
+      await db.init();
 
       // 加载所有模型
       const ModelsData = await db.getAllModels();
