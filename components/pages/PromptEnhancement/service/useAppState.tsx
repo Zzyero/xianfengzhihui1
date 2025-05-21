@@ -524,7 +524,7 @@ export const AppStateProvider: React.FC<{children: React.ReactNode}> = ({ childr
       setIsLoading(true);
       try {
         // 确保数据库初始化
-        await db.initDefaultModels();
+        await db.init();
         
         // 尝试获取最后使用的模型ID
         const lastUsedModelId = await db.getLastUsedModelId();
