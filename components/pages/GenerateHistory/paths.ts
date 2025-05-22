@@ -4,7 +4,7 @@
 import path from 'path';
 
 // 图片存储的绝对路径
-export const IMAGE_BASE_PATH = "E:\\ZhiHui\\ComfyUI_windows_portable\\ComfyUI\\output";
+export const IMAGE_BASE_PATH = "../ComfyUI_windows_portable/ComfyUI/output";
 
 // 图片列表JSON文件路径（相对于项目根目录）
 export const IMAGE_LIST_JSON_PATH = "components/pages/GenerateHistory/image-list.json";
