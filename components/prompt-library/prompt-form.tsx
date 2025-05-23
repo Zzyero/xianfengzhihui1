@@ -12,6 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import type { PartialPromptItem, PromptTag } from './types';
 import { ImageUpload } from './image-upload';
+import './prompt-form.css';
 
 interface PromptFormProps {
   open: boolean;
@@ -34,11 +35,10 @@ export function PromptForm({
     parameters: {
       steps: '',
       sampler: '',
-      seed: '',
       scheduler: '',
-      denoise: '',
-      cfg: '',
-      negative: '',
+      loraName: '',
+      width: '512',
+      height: '512',
     },
     tags: [],
     imageUrl: '',
@@ -50,7 +50,18 @@ export function PromptForm({
 
   useEffect(() => {
     if (open && initialData) {
-      setFormData(initialData);
+      setFormData({
+        ...initialData,
+        parameters: {
+          steps: initialData.parameters?.steps || '',
+          sampler: initialData.parameters?.sampler || '',
+          scheduler: initialData.parameters?.scheduler || '',
+          loraName: initialData.parameters?.loraName || '',
+          width: (initialData.width?.toString() || initialData.parameters?.width || '512'),
+          height: (initialData.height?.toString() || initialData.parameters?.height || '512'),
+        },
+        tags: initialData.tags || [],
+      });
     }
     setNewTag('');
     setNewParamKey('');
@@ -127,12 +138,12 @@ export function PromptForm({
               {formData.tags?.map(tag => (
                 <div
                   key={tag.id}
-                  className="px-2 py-1 rounded-md text-sm"
-                  style={{ backgroundColor: tag.color }}
+                  className="prompt-form-tag"
+                  style={{ backgroundColor: tag.color || undefined }}
                 >
                   {tag.name}
                   <button
-                    className="ml-2 text-xs"
+                    className="prompt-form-tag-close"
                     onClick={() => setFormData(prev => ({
                       ...prev,
                       tags: prev.tags?.filter(t => t.id !== tag.id)
@@ -169,8 +180,10 @@ export function PromptForm({
                       }
                       setFormData(prev => ({ ...prev, parameters: newParams }));
                     }}
+                    title={`启用${param.name}`}
+                    id={`param-checkbox-${param.key}`}
                   />
-                  <Label>{param.name}</Label>
+                  <Label htmlFor={`param-checkbox-${param.key}`}>{param.name}</Label>
                   {formData.parameters?.[param.key] !== undefined && (
                     <Input
                       value={formData.parameters[param.key]}
@@ -182,6 +195,7 @@ export function PromptForm({
                       className="flex-1"
                       type={param.key === 'steps' || param.key === 'width' || param.key === 'height' ? 'number' : 'text'}
                       min={param.key === 'steps' || param.key === 'width' || param.key === 'height' ? '1' : undefined}
+                      placeholder={`请输入${param.name}`}
                     />
                   )}
                 </div>

@@ -1,374 +1,1289 @@
 {
   "prompts": [
     {
-      "prompt": "",
-      "promptEn": "Trump\nThis is a comic book style picture, there is an old man, yellow hair, blue suit, red tie, Beijing is the universe, he is located behind the earth, the right hand is a boat on the surface of the earth, the other hand is holding the plane on the earth, the ship and the plane have the logo of the American flag.",
+      "prompt": "特朗普站在一个写着“贸易战”的集装箱上，手持喇叭宣布加征关税，集装箱下方是破碎的地球仪模型飘在海上，特朗普的表情得意而丑陋，背景是乌云密布的天空，整体氛围压抑。远处印有中国标志的货轮驶来",
+      "promptEn": "Prompt: Trump stood on a container with the words \"trade war\" written on it, holding a horn to announce the imposition of tariffs. Below the container was a broken globe model floating on the sea, and Trump's expression was both proud and ugly. The background was a sky covered in dark clouds, and the overall atmosphere was oppressive. A cargo ship with Chinese logo printed in the distance is approaching.",
       "parameters": {
-        "steps": "35",
-        "sampler": "dpm_adaptive",
-        "scheduler": "karras",
-        "loraName": "Trump-000029.safetensors"
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "特朗普.safetensors"
       },
-      "imageUrl": "/images/prompts/1746493015456.png",
+      "tags": [
+        {
+          "id": "1747907154105",
+          "name": "特朗普",
+          "color": "#4ee866"
+        },
+        {
+          "id": "1747908520268",
+          "name": "贸易战",
+          "color": "#cd680b"
+        },
+        {
+          "id": "1747969350157",
+          "name": "美国",
+          "color": "#b1aafa"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747559815133.png",
+      "id": "1747559844799",
+      "createdAt": "2025-05-18T09:17:24.799Z",
       "width": 1264,
       "height": 1024,
-      "tags": [],
-      "id": "1746493015474",
-      "createdAt": "2025-05-06T00:56:55.474Z"
+      "updatedAt": "2025-05-23T03:02:31.218Z"
     },
     {
-      "prompt": "",
-      "promptEn": "Trump\n\nIt is a comic-book style image of a character in a blue suit and red tie standing on a cracked step, using a broom to sweep a glass display case that reads \"Human Rights\" on a higher step. The steps he was standing on were cracked, and there were many white bones under them. The meaning of this painting may be to criticize the hypocrisy of certain countries in pursuing and safeguarding human rights, or to accuse them of ignoring human rights issues or even creating human rights crises.",
+      "prompt": "特朗普嘴中吐出关税脓液，右臂拿着关税注射器，左臂拿着关税喷雾，喊着\"America First\"弹幕，右侧骷髅头皮裸露金属颅骨刻\"MAGA 2025\"",
+      "promptEn": "Prompt：Trump vomited tariff pus, with a tariff syringe in his right arm and a tariff spray in his left arm, shouting the \"America First\" bullet screen, and the skull skull on the right was engraved with \"MAGA 2025\".",
       "parameters": {
-        "steps": "35",
-        "sampler": "dpm_adaptive",
-        "scheduler": "normal",
-        "loraName": "Trump-000029.safetensors"
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "特朗普。safetensor"
       },
-      "imageUrl": "/images/prompts/1746493016493.png",
+      "tags": [
+        {
+          "id": "1747907275965",
+          "name": "特朗普",
+          "color": "#4a9a10"
+        },
+        {
+          "id": "1747969104342",
+          "name": "贸易战",
+          "color": "#396ae3"
+        },
+        {
+          "id": "1747969356700",
+          "name": "美国",
+          "color": "#caa1ac"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747559850643.png",
+      "id": "1747559870575",
+      "createdAt": "2025-05-18T09:17:50.575Z",
       "width": 1264,
       "height": 1024,
-      "tags": [],
-      "id": "1746493016513",
-      "createdAt": "2025-05-06T00:56:56.513Z"
+      "updatedAt": "2025-05-23T11:49:01.388Z"
     },
     {
-      "prompt": "",
-      "promptEn": "Trump\n\nIt is a comic-book style image of a character in a blue suit and red tie standing on a cracked step, using a broom to sweep a glass display case that reads \"Human Rights\" on a higher step. The steps he was standing on were cracked, and there were many white bones under them. The meaning of this painting may be to criticize the hypocrisy of certain countries in pursuing and safeguarding human rights, or to accuse them of ignoring human rights issues or even creating human rights crises.",
+      "prompt": "特朗普嘴角歪斜露出贪婪笑容。他右手挥舞标有“870M 台湾军援”的破烂武器箱，左手紧抓“台积电$100B”的芯片晶圆，晶圆上缠绕铁链锁住亚利桑那州地图。背景中，解放军战机穿过，特朗普的尾巴化作蛇形绞索勒住台湾岛轮廓，脚下踩着“国际芯片供应链”的残片。",
+      "promptEn": "Prompt：Trump's mouth tilted, revealing a greedy smile. He waved a tattered weapon box labeled \"870M Taiwan Military Aid\" in his right hand, and tightly grasped the chip wafer of \"TSMC $100B\" in his left hand, with iron chains wrapped around the wafer to lock the map of Arizona. In the background, PLA fighter jets pass through , and Trump's tail turns into a snake like noose to strangle the outline of Taiwan Island, stepping on fragments of the \"international chip supply chain\" under his feet.",
       "parameters": {
-        "steps": "35",
-        "sampler": "dpm_adaptive",
-        "scheduler": "ddim_uniform",
-        "loraName": "Trump-000029.safetensors"
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "特朗普.safetensors"
       },
-      "imageUrl": "/images/prompts/1746493017130.png",
+      "tags": [
+        {
+          "id": "1747907330119",
+          "name": "特朗普",
+          "color": "#c54e00"
+        },
+        {
+          "id": "1747969113159",
+          "name": "台独",
+          "color": "#4d6054"
+        },
+        {
+          "id": "1747969365381",
+          "name": "美国",
+          "color": "#71d64f"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747559875343.png",
+      "id": "1747559895304",
+      "createdAt": "2025-05-18T09:18:15.304Z",
       "width": 1264,
       "height": 1024,
-      "tags": [],
-      "id": "1746493017146",
-      "createdAt": "2025-05-06T00:56:57.146Z"
+      "updatedAt": "2025-05-23T03:02:46.450Z"
     },
     {
-      "prompt": "",
-      "promptEn": "laiqingde2, dressed in a black suit, is in the top half of the frame, inside the plane, leaning out of the window with the trophy in his hand, and the ground below is covered with trash and white skulls.",
+      "prompt": "特朗普面部扭曲（左眼眯成缝，右眼瞪如铜铃），背着着《联合国海洋法公约》残页，双手操控提线木偶——菲律宾小船模型和日本自卫队徽章。双脚踩踏《南海行为准则》草案，背景是标有“中国专属经济区”的破碎海图，其领带化作导弹轨迹穿透南海珊瑚礁群",
+      "promptEn": "Prompt：Trump’s grotesque face (uneven eyes and twisted mouth) clenches shredded UNCLOS pages. Puppet strings control a Philippine boat model and Japanese military insignia. His feet stomp on a South China Sea code draft, while a tie-shaped missile path obliterates coral reefs. The \"Exclusive Economic Zone\" map lies torn behind him, exposing legal hypocrisy.",
       "parameters": {
-        "steps": "35",
-        "sampler": "heunpp2",
-        "scheduler": "ddim_uniform",
-        "loraName": "meiguolao-000017.safetensors"
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "特朗普.safetensors"
       },
-      "imageUrl": "/images/prompts/1746493017755.png",
+      "tags": [
+        {
+          "id": "1747907354983",
+          "name": "特朗普",
+          "color": "#307275"
+        },
+        {
+          "id": "1747969125038",
+          "name": "南海",
+          "color": "#81aea7"
+        },
+        {
+          "id": "1747969372621",
+          "name": "美国",
+          "color": "#dbb5b5"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747559900321.png",
+      "id": "1747559922834",
+      "createdAt": "2025-05-18T09:18:42.834Z",
       "width": 1264,
       "height": 1024,
-      "tags": [],
-      "id": "1746493017770",
-      "createdAt": "2025-05-06T00:56:57.770Z"
+      "updatedAt": "2025-05-23T03:02:53.242Z"
     },
     {
-      "prompt": "",
-      "promptEn": "laiqingde2, The overall picture of the comic is the interior of the plane, laiqingde wearing a black suit sitting on the plane seat, holding a book in his hand and reading",
+      "prompt": "这是一幅漫画风格的图片，有一位老人，黄色的头发，蓝色的西装，红色的领带，背景是宇宙，他位于地球的后面，右手是地球表面上的一艘船，另一只手拿着地球上的飞机，船和飞机上都有美国国旗的标志。",
+      "promptEn": "Prompt：Trump This is a comic book style picture, there is an old man, yellow hair, blue suit, red tie, Beijing is the universe, he is located behind the earth, the right hand is a boat on the surface of the earth, the other hand is holding the plane on the earth, the ship and the plane have the logo of the American flag",
       "parameters": {
-        "steps": "35",
-        "sampler": "dpm_adaptive",
-        "scheduler": "ddim_uniform",
-        "loraName": "meiguolao-000017.safetensors"
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "特朗普.safetensors"
       },
-      "imageUrl": "/images/prompts/1746493018361.png",
+      "tags": [
+        {
+          "id": "1747907395567",
+          "name": "特朗普",
+          "color": "#b19ccb"
+        },
+        {
+          "id": "1747969140279",
+          "name": "霸权",
+          "color": "#9092be"
+        },
+        {
+          "id": "1747969379749",
+          "name": "美国",
+          "color": "#ed06db"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560118256.png",
+      "id": "1747559965259",
+      "createdAt": "2025-05-18T09:19:25.259Z",
+      "updatedAt": "2025-05-23T03:03:11.298Z",
       "width": 1264,
-      "height": 1024,
-      "tags": [],
-      "id": "1746493018375",
-      "createdAt": "2025-05-06T00:56:58.375Z"
+      "height": 1024
     },
     {
-      "prompt": "",
-      "promptEn": "laiqingde2, The comic as a whole is divided into two parts, the top half is a flying plane, laiqingde out of the window of the plane, holding the trophy in his hands, the bottom half is an island on the shore, the island and the sea are filled with garbage and skulls",
+      "prompt": "这幅漫画辛辣地讽刺了一位身穿蓝色西装、系着红色领带的特朗普的右脚。他的面部表情是极度痛苦的。他的右手握着一把枪，枪口朝下，说明是自己造成的伤口，正在渗出红色的血。一个令人不寒而栗的细节是他鞋子上的“伊朗”字样，连同地板上的一滩血迹，为现场增添了一层政治讽刺意味。",
+      "promptEn": "Prompt：Trump The cartoon offers a poignant satire of an elderly man dressed in a blue suit and a red tie shooting his right feet. His facial expression is one of acute distress. Clutched in his right hand is a gun, with the muzzle pointed downwards, indicating a self-inflicted wound that is seeping red blood. A chilling detail is the inscription \"IRAN\" on his shoes, which, along with the pool of blood on the floor, adds a layer of political commentary to the scene.",
       "parameters": {
-        "steps": "35",
-        "sampler": "dpm_adaptive",
-        "scheduler": "ddim_uniform",
-        "loraName": "meiguolao-000017.safetensors"
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "特朗普.safetensors"
       },
-      "imageUrl": "/images/prompts/1746493019086.png",
+      "tags": [
+        {
+          "id": "1747907459665",
+          "name": "特朗普",
+          "color": "#f36b89"
+        },
+        {
+          "id": "1747969156415",
+          "name": "霸权",
+          "color": "#ba547c"
+        },
+        {
+          "id": "1747969399942",
+          "name": "美国",
+          "color": "#2afcd8"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747559990916.png",
+      "id": "1747559981320",
+      "createdAt": "2025-05-18T09:19:41.320Z",
+      "updatedAt": "2025-05-23T03:03:20.836Z",
       "width": 1264,
-      "height": 1024,
-      "tags": [],
-      "id": "1746493019103",
-      "createdAt": "2025-05-06T00:56:59.103Z"
+      "height": 1024
     },
     {
-      "prompt": "",
-      "promptEn": "Trump\nThe cartoon offers a poignant satire of an elderly man dressed in a blue suit and a red tie shooting his right feet. His facial expression is one of acute distress. Clutched in his right hand is a gun, with the muzzle pointed downwards, indicating a self-inflicted wound that is seeping red blood. A chilling detail is the inscription \"IRAN\" on his shoes, which, along with the pool of blood on the floor, adds a layer of political commentary to the scene.",
+      "prompt": "特朗普站在燃烧的\"中美贸易地图\"前，挥舞沾满墨水的关税令，文件标题为\"60%新关税\"。他张大嘴巴露出参差不齐的牙齿，金发被火焰热浪吹成鸡冠状，领带印满美元符号。背景左侧中国工厂和右侧美国超市都被烈焰吞噬",
+      "promptEn": "Prompt: Trump stood in front of the burning \"China US trade map\", waving an ink stained tariff order titled \"60% New Tariffs\". He opened his mouth wide to reveal his uneven teeth, his golden hair was blown into a chicken crown by the flames and heat, and his tie was printed with dollar signs. On the left side of the background, Chinese factories and on the right side, American supermarkets were engulfed in flames.",
       "parameters": {
-        "steps": "25",
-        "sampler": "uni_pc",
-        "scheduler": "beta",
-        "loraName": "Trump-000029.safetensors"
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "特朗普.safetensors"
       },
-      "imageUrl": "/images/prompts/1746493019790.png",
+      "tags": [
+        {
+          "id": "1747907467233",
+          "name": "特朗普",
+          "color": "#8a4d6d"
+        },
+        {
+          "id": "1747969178728",
+          "name": "贸易战",
+          "color": "#423c36"
+        },
+        {
+          "id": "1747969408558",
+          "name": "美国",
+          "color": "#fbc829"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560015997.png",
+      "id": "1747560030780",
+      "createdAt": "2025-05-18T09:20:30.780Z",
+      "updatedAt": "2025-05-23T03:03:29.531Z",
       "width": 1264,
-      "height": 1024,
-      "tags": [],
-      "id": "1746493019807",
-      "createdAt": "2025-05-06T00:56:59.807Z"
+      "height": 1024
     },
     {
-      "prompt": "meiguolao,\n\n\nThe image is a political satire cartoon featuring two caricatured figures. The figure on the left is dressed in a patriotic American theme, wearing a top hat with stars and stripes, similar to the American flag. This character also sports a bow tie and a suit with a pattern of stars, and the pants have a stripe pattern that mirrors the flag's design. The figure's behavior is aggressive, as it is depicted holding a large gun with both hands, and the gun is firing, indicated by the flames and bullets shown in the image.\n\nThe figure on the right is wearing a suit with a red tie and has a bandana covering its eyes, which is a common depiction of a burglar or someone engaging in covert activities. This character is also holding a gun and is shown in a firing stance. Notably, the figure has a speech bubble with the word \"Taiwan\" in Chinese characters, which is a focal point of the image and suggests a commentary on political issues related to Taiwan.\n\nThe background is a soft pink, which contrasts with the violent action depicted, possibly to enhance the讽刺 (satirical) nature of the cartoon. The overall tone of the image is one of political commentary, using exaggeration and symbolism to convey a message about the relationship between the figures and the concept of Taiwan. The image is likely intended to provoke thought or discussion about political dynamics or policies.",
-      "promptEn": "",
+      "prompt": "特朗普站在白宫椭圆形办公室的落地窗前，左手签署印有\"America First\"的备忘录，右手在签署关税文件。旁边是散落的美元，桌子上的地球仪被“保护主义”黏住，窗外阴影笼罩的中国城市天际线被铁链封锁",
+      "promptEn": "Prompt：Trump stood in front of the french window of the Oval Office of the White House, with his left hand signing the memorandum printed with \"America First\", and his right hand signing tariff documents. Next to it are scattered US dollars, the globe on the table is stuck by \"protectionism\", and the Chinese city skyline shrouded in shadows outside the window is blocked by iron chains,",
       "parameters": {
-        "steps": "35",
-        "sampler": "dpmpp_2m",
-        "scheduler": "beta",
-        "loraName": "meiguolao-000017.safetensors"
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "特朗普.safetensors"
       },
-      "imageUrl": "/images/prompts/1746493020487.png",
-      "width": 1280,
-      "height": 720,
-      "tags": [],
-      "id": "1746493020514",
-      "createdAt": "2025-05-06T00:57:00.514Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "meiguolao,\n\nThe image depicts a caricature of a figure dressed in an American patriotic theme.1 man is wearing a top hat adorned with stars and stripes, reminiscent of the American flag. The outfit is completed with a suit that carries the same patriotic color scheme, and the pants have a striped pattern that echoes the flag's design.\n\nThe figure's behavior is aggressive and combative; it is holding a large, green military-style weapon with both hands, and the weapon is actively firing, as indicated by the flames and smoke emanating from the barrel. The character's facial expression is one of fierce determination or possibly fanaticism, which, combined with the attire, suggests a critique or satire of American foreign policy or military actions.\n\nThe setting is chaotic, with a dark, possibly war-torn background that includes explosions and debris, which further emphasizes the violent nature of the scene. The overall tone of the image is one of political satire, using exaggeration and symbolism to convey a message or commentary.",
-      "parameters": {
-        "steps": "35",
-        "sampler": "euler",
-        "scheduler": "beta",
-        "loraName": "meiguolao-000017.safetensors"
-      },
-      "imageUrl": "/images/prompts/1746493021171.png",
-      "width": 1280,
-      "height": 720,
-      "tags": [],
-      "id": "1746493021189",
-      "createdAt": "2025-05-06T00:57:01.189Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "meiguolao,\nThe image is a political satire cartoon depicting a character dressed in an American patriotic theme. The character is wearing a top hat with stars and stripes, reflecting the design of the American flag. The attire includes a blue suit with white stars on the lapels, which further emphasizes the patriotic motif.\n\nThe character's behavior is chaotic and destructive; it is holding a bomb with a lit fuse in one hand and a box labeled \"DEMOCRACY\" in the other. The bomb has Chinese characters on it, which translate to \"chaos\" or \"turmoil,\" suggesting a commentary on the state of democracy or the impact of the character's actions on democratic principles.\n\nThe character's expression is one of wild abandon or recklessness, with a wide-open mouth and eyes that appear to be in a state of frenzy or excitement. The background is a simple blue, which contrasts with the character's dynamic pose and the explosive elements in the scene.\n\nThe overall tone of the image is critical and satirical, using exaggeration to convey a message about the character's actions and their perceived effect on democracy. The cartoon likely intends to provoke thought or discussion about political stability, the state of democracy, or the influence of certain actions on democratic processes.",
-      "parameters": {
-        "steps": "35",
-        "sampler": "euler_ancestral",
-        "scheduler": "beta",
-        "loraName": "meiguolao-000017.safetensors"
-      },
-      "imageUrl": "/images/prompts/1746493021784.png",
-      "width": 1280,
-      "height": 720,
-      "tags": [],
-      "id": "1746493021798",
-      "createdAt": "2025-05-06T00:57:01.798Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "Prompt: Draw a colorful political satire cartoon in an exaggerated cartoon style. The main figure is Uncle Sam wearing a tall star-spangled top hat, blue suit, red tie, and headset with a microphone. He is sitting at a desk with an open scroll, holding strings attached to a globe on the desk like a puppet master. The globe shows parts of Europe and Africa with many puppet strings controlling various locations. Uncle Sam smirks confidently, symbolizing control and manipulation of global affairs.",
-      "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
-      },
-      "imageUrl": "/images/prompts/1746495234012.png",
+      "tags": [
+        {
+          "id": "1747907496817",
+          "name": "特朗普",
+          "color": "#4bddbe"
+        },
+        {
+          "id": "1747969201153",
+          "name": "贸易战",
+          "color": "#5420d5"
+        },
+        {
+          "id": "1747969416478",
+          "name": "美国",
+          "color": "#9a4c01"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560036588.png",
+      "id": "1747560053933",
+      "createdAt": "2025-05-18T09:20:53.933Z",
+      "updatedAt": "2025-05-23T03:03:37.020Z",
       "width": 1264,
-      "height": 1024,
-      "tags": [],
-      "id": "1746493928967",
-      "createdAt": "2025-05-06T01:12:08.967Z",
-      "updatedAt": "2025-05-06T01:34:02.673Z"
+      "height": 1024
     },
     {
-      "prompt": "",
-      "promptEn": "**Prompt:** Illustrate a political satire cartoon in a colorful, exaggerated cartoon style. The central figure is a wealthy, obese man sitting at a round table with a white tablecloth, labeled with a sign meaning \"Rich.\" He has a satisfied, smug expression, wearing a tuxedo and bow tie, holding a fork and knife, about to eat a large steak on a platter with sides. Behind him, a green Statue of Liberty figure stands cooking meat on a grill, wearing an apron and using a grilling fork. Outside a window behind them, impoverished, desperate people with sad faces press against the glass, labeled \"Poor.\" The scene highlights stark social inequality and critique of exploitation.",
+      "prompt": "这是一幅政治讽刺漫画，采用色彩鲜明的漫画风格，画面中两人物握手。一个是打扮成山姆大叔的男子，带白胡须，穿蓝色星星外套、红白条纹裤子和有星条旗图案的礼帽，表情愉快。另一个是留短黑发、带眼镜、穿黑色商务西装白衬衫的女性，也带笑意握手。山姆大叔脑袋上有思绪泡泡，画他和一大叠百元钞票握手，表情欣喜且渴望。女性脑袋上思绪泡泡是她与穿蓝色披红斗篷带“S”标志的超人形象握手，超人自信温暖微笑。背景渐变由黑到白，突出思想对比。漫画表达了双方握手背后不同的政治期待与心态。",
+      "promptEn": "Prompt：A political satire cartoon in a colorful comic style featuring two characters shaking hands. One character is a man dressed as Uncle Sam with a white beard, wearing a blue jacket with white stars, red and white striped pants, and a top hat with stars and stripes. The other character is a woman with short black hair, glasses, wearing a black business suit with a white shirt. Both characters smile pleasantly while shaking hands. Above Uncle Sam, a thought bubble shows him shaking hands with a large stack of hundred-dollar bills with a happy and eager expression. Above the woman, a thought bubble depicts her shaking hands with a man dressed as Superman, wearing a blue suit with a red cape and the iconic red and yellow \"S\" symbol, smiling confidently and warmly. The background is gradient from black at the top to white at the bottom, emphasizing the contrast in thoughts. The cartoon conveys a political message about different perspectives and hopes behind a friendly handshake.",
       "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
-      },
-      "imageUrl": "/images/prompts/1746495190111.png",
-      "tags": [],
-      "id": "1746493932110",
-      "createdAt": "2025-05-06T01:12:12.110Z",
-      "updatedAt": "2025-05-06T01:33:37.678Z",
-      "width": 1152,
-      "height": 900
-    },
-    {
-      "prompt": "",
-      "promptEn": "**Prompt:** Create a political satire cartoon in a vivid, exaggerated cartoon style. The central figure is a heavily armed U.S. soldier dressed in a camouflage uniform, wearing a helmet and tactical gear. He has a smug, condescending expression and stands over a small, thin, terrified child who is sitting on the ground, crying with dirt-streaked skin and torn clothing. The child looks vulnerable and helpless, with wide eyes filled with fear. \n\n    The background shows a war-torn landscape, with ruined buildings, scattered debris, and abandoned vehicles, all under a smoky, orange sky that indicates destruction. The soldier is saying, \"Why are you crying? Although you've lost everything, you now have freedom and democracy!\" This dialogue highlights the irony and critique of military actions in conflict zones.",
-      "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
-      },
-      "imageUrl": "/images/prompts/1746493932664.png",
-      "width": 1264,
-      "height": 1024,
-      "tags": [],
-      "id": "1746493933261",
-      "createdAt": "2025-05-06T01:12:13.261Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "**Prompt:** Create a political satire cartoon in a detailed, colorful cartoon style. The scene shows a large hand wearing a blue sleeve with white cuff and red stars, resembling Uncle Sam’s iconic outfit, holding a large dog bone as bait. Below, a woman with short black hair, glasses, and a blue blazer is kneeling and struggling while carrying a heavy box overflowing with stacks of money marked with dollar signs. The woman looks forced and anxious, reaching toward the dangling bone with an expression blending hope and strain. The imagery symbolizes manipulation and unequal exchange in a political or financial context.",
-      "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
         "loraName": "蔡英文.safetensors"
       },
-      "imageUrl": "/images/prompts/1746495166437.png",
+      "tags": [
+        {
+          "id": "1747907511746",
+          "name": "蔡英文",
+          "color": "#f84d5f"
+        },
+        {
+          "id": "1747969224586",
+          "name": "台独",
+          "color": "#d3754"
+        },
+        {
+          "id": "1747969423278",
+          "name": "美国",
+          "color": "#a93f8e"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560086242.png",
+      "id": "1747560107837",
+      "createdAt": "2025-05-18T09:21:47.837Z",
+      "updatedAt": "2025-05-23T03:03:44.166Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "一幅政治讽刺漫画，头像夸张风格，背景白色，一个大红苹果，上面写着“一个中国原则”几个中文字。一个绿色毛虫正在啃食苹果，但毛虫的头是一个女子的头部。毛虫是从旁边一个类似“山姆大叔”的男子手中的笼子里放出来的。男子戴着带星条的高帽，穿蓝色外套和红领带，表情严肃，象征通过伪装手段进行的外国干涉，破坏中国原则。",
+      "promptEn": "Prompt：political cartoon, caricature style, white background, large red apple labeled with Chinese characters \"一个中国原则,\" a large green caterpillar with a woman's head eating into the apple, the caterpillar extending out from a cage held by a man resembling Uncle Sam, who wears a tall hat with stars and stripes, blue coat, red tie, serious expression, symbolizing foreign interference using disguised means to undermine Chinese principles",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "蔡英文.safetensors"
+      },
+      "tags": [
+        {
+          "id": "1747907539171",
+          "name": "蔡英文",
+          "color": "#39ede4"
+        },
+        {
+          "id": "1747969290299",
+          "name": "台独",
+          "color": "#d58e0"
+        },
+        {
+          "id": "1747969429982",
+          "name": "美国",
+          "color": "#f4f7ce"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560128726.png",
+      "id": "1747560153903",
+      "createdAt": "2025-05-18T09:22:33.903Z",
+      "updatedAt": "2025-05-23T03:03:50.669Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一幅色彩鲜明的政治讽刺漫画，共三格。第一格描绘一个短黑发、戴眼镜、穿米色上衣黑裤的严厉女性，手持擀面杖，生气地指着一个神情紧张、穿白衬衫、蓝领带和灰裤子的“台湾人民”标签男子。第二格显示女性用擀面杖将惊恐的男子按倒在地，旁边有一只打开的宝箱，钱财飞出。第三格画面中女性举起一个闪亮的宝箱，箱上有美元符号，面对站在红地毯上的山姆大叔，山姆大叔穿传统蓝夹克、白星背心、红白条纹裤和高礼帽，手握写有“保护”、“和平谈判”、“自由”气球的形象，背景有带海盗骷髅旗的飞机。漫画揭示了台湾、金钱与美方以保护和自由名义干涉之间紧张且带交易意味的关系。",
+      "promptEn": "Prompt：political cartoon, caricature style, simple white background, two characters facing each other, one is a woman with short black hair, glasses, gray blazer, blue shirt, yellow pants, black shoes, smiling gently with open hands, the other is a man resembling Uncle Sam wearing a tall hat with red and white stripes, blue band with white stars, blue tailcoat, red tie, striped pants, holding a dynamite stick with a clock labeled \"ARMS SALES\" in both hands, intense expression, tense interaction symbolizing arms trade tension",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "蔡英文.safetensors"
+      },
+      "tags": [
+        {
+          "id": "1747907628198",
+          "name": "蔡英文",
+          "color": "#b1eb86"
+        },
+        {
+          "id": "1747969331436",
+          "name": "美国",
+          "color": "#e23372"
+        },
+        {
+          "id": "1747969336668",
+          "name": "虚伪",
+          "color": "#98a438"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560159053.png",
+      "id": "1747560176457",
+      "createdAt": "2025-05-18T09:22:56.457Z",
+      "updatedAt": "2025-05-23T03:02:17.666Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一个政治漫画风格的作品，描绘了一位留着短黑发的女性政治家，穿着蓝色西装和黑色长裤，手里拿着一个标有“台湾”的红色燃料罐。她坐在木栅栏上，带着调皮的笑容。背景中，一座写有“台湾”的小房子正在燃烧，象征着冲突或紧张局势。场景戏剧性，充满黑烟和愤怒的火焰，传达出紧迫感和政治不稳定。",
+      "promptEn": "Prompt：Political cartoon style featuring a female politician with short dark hair, wearing a blue blazer and black pants, holding a red fuel can labeled \"Taiwan.\" She is sitting on a wooden fence, smiling with a mischievous look. In the background, a small house with \"Taiwan\" written on it is on fire, representing conflict or tension. The scene is dramatic, filled with dark smoke and angry flames, conveying a sense of urgency and political instability.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "蔡英文.safetensors"
+      },
+      "tags": [
+        {
+          "id": "1747907643455",
+          "name": "蔡英文",
+          "color": "#bdb09f"
+        },
+        {
+          "id": "1747969438311",
+          "name": "台独",
+          "color": "#68182a"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560183515.png",
+      "id": "1747560198297",
+      "createdAt": "2025-05-18T09:23:18.297Z",
+      "updatedAt": "2025-05-23T03:04:22.718Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "一个男人在桌前阅读一本书，身后是美元钞票",
+      "promptEn": "Prompt：A man is reading a book at the table, with dollar bills behind him",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "赖清德.safetensors"
+      },
+      "tags": [
+        {
+          "id": "1747907749272",
+          "name": "赖清德",
+          "color": "#fe384b"
+        },
+        {
+          "id": "1747969452640",
+          "name": "台独",
+          "color": "#a7913"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560204874.png",
+      "id": "1747560224995",
+      "createdAt": "2025-05-18T09:23:44.995Z",
+      "updatedAt": "2025-05-23T03:04:13.300Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "第一幅图中，赖清德拿着放大镜在地球仪上寻找南太平洋岛国，暗示他对这些国家的了解非常有限，访问的目的并不明确，只是为了形式而形式，岛国只是他的棋子。自欺欺人：第二幅图中，赖清德在飞机上阅读《国际政治》，临时抱佛脚，暗示他对这次访问的准备非常仓促，缺乏真正的诚意和计划。虚伪的外交：第三幅图中，赖清德与岛国领导人握手，但地上却插着美国国旗，暗示这次访问实际上是在美国的影响和操控下进行的。虚伪的和平宣言：第四幅图赖清德自称“和平使者”，却对下方的惨状视而不见，这种反差突出了其言行不一的虚伪性，他所宣称的和平与他实际的行为或影响形成了鲜明对比。",
+      "promptEn": "In the first picture, Lai Ching te is looking for South Pacific island countries on a globe with a magnifying glass, implying that his understanding of these countries is very limited and the purpose of the visit is not clear. It is only for the sake of form, and the island countries are just his chess pieces. Self deception: In the second picture, Lai Qingde reads \"International Politics\" on the plane, cramming and implying that his preparation for this visit was very hasty, lacking true sincerity and planning.   The hypocritical peace declaration: The fourth picture depicts Turaiqing De claiming to be a \"peace envoy\" but turning a blind eye to the tragic situation below. This contrast highlights the hypocrisy of his words and actions, as his claimed peace contrasts sharply with his actual actions or influence.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": "赖清德.safetensors"
+      },
+      "tags": [
+        {
+          "id": "1747907760408",
+          "name": "赖清德",
+          "color": "#2b3f7d"
+        },
+        {
+          "id": "1747969470351",
+          "name": "台独",
+          "color": "#fc494a"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560256659.png",
+      "id": "1747560319788",
+      "createdAt": "2025-05-18T09:25:19.788Z",
+      "updatedAt": "2025-05-23T03:04:36.142Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一幅政治讽刺漫画，漫画中左边一个戴着美国国旗图案高帽的人，手持扩音器，对着右边两个分别代表乌克兰和俄罗斯的人喊话。",
+      "promptEn": "Prompt：This is a political satire cartoon. In the cartoon, a person on the left wearing a tall hat with the pattern of the American flag is holding a megaphone and shouting at two people on the right who respectively represent Ukraine and Russia.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747908479938",
+          "name": "俄乌冲突",
+          "color": "#d448f1"
+        },
+        {
+          "id": "1747908482594",
+          "name": "美国",
+          "color": "#badfe"
+        },
+        {
+          "id": "1747969491000",
+          "name": "虚伪",
+          "color": "#e7453b"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560327546.png",
+      "id": "1747560363918",
+      "createdAt": "2025-05-18T09:26:03.918Z",
       "width": 1264,
       "height": 1024,
-      "tags": [],
-      "id": "1746493934207",
-      "createdAt": "2025-05-06T01:12:14.207Z",
-      "updatedAt": "2025-05-06T01:32:55.869Z"
+      "updatedAt": "2025-05-23T03:04:51.709Z"
     },
     {
-      "prompt": "",
-      "promptEn": "**Prompt:** Create a political satire cartoon in a vivid, exaggerated cartoon style. The central figure is a heavily armed U.S. soldier dressed in a camouflage uniform, wearing a helmet and tactical gear. He has a smug, condescending expression and stands over a small, thin, terrified child who is sitting on the ground, crying with dirt-streaked skin and torn clothing. The child looks vulnerable and helpless, with wide eyes filled with fear. \n\n    The background shows a war-torn landscape, with ruined buildings, scattered debris, and abandoned vehicles, all under a smoky, orange sky that indicates destruction. The soldier is saying, \"Why are you crying? Although you've lost everything, you now have freedom and democracy!\" This dialogue highlights the irony and critique of military actions in conflict zones.",
+      "prompt": "这绘制一幅两格分镜的政治讽刺漫画，风格清晰、极简。第一格中，一位政治家正在发表关于环境保护的演讲，背景是美丽的绿色风景。第二格中，同一位政治家正拿着电锯砍伐森林，背景中有一家工厂，黑烟污染着空气。这幅漫画展示了政治家在环境问题上的虚伪。",
+      "promptEn": "Prompt： Draw a two - panel political satire cartoon in a clean, minimalist style. In the first panel, a politician is giving a speech about environmental protection, with a beautiful green landscape as a backdrop. In the second panel, the same politician is cutting down a forest with a chainsaw, and there is a factory in the background with black smoke polluting the air. The cartoon shows the hypocrisy of politicians on environmental issues.",
       "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
         "loraName": ""
       },
-      "imageUrl": "/images/prompts/1746495135326.png",
+      "tags": [
+        {
+          "id": "1747907818234",
+          "name": "美国",
+          "color": "#ef00b2"
+        },
+        {
+          "id": "1747907821146",
+          "name": "虚伪",
+          "color": "#32f858"
+        },
+        {
+          "id": "1747969765759",
+          "name": "政客",
+          "color": "#6b3d7"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747560370243.png",
+      "id": "1747560393559",
+      "createdAt": "2025-05-18T09:26:33.559Z",
+      "updatedAt": "2025-05-23T03:09:26.487Z",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "prompt": "绘制一幅细致且色彩丰富的政治讽刺漫画。一只代表强大企业的大手伸进投票箱。手中拿着一些标有 “收买的选票” 的小纸条。在投票箱旁边，几个诚实的选民震惊地看着。背景是选举日的场景，有一个投票站。这个场景揭露了政治中的买票行为。",
+      "promptEn": "绘制一幅细致且色彩丰富的政治讽刺漫画。一只代表强大企业的大手伸进投票箱。手中拿着一些标有 “收买的选票” 的小纸条。在投票箱旁边，几个诚实的选民震惊地看着。背景是选举日的场景，有一个投票站。这个场景揭露了政治中的买票行为。",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747907847675",
+          "name": "美国",
+          "color": "#2a868d"
+        },
+        {
+          "id": "1747907859395",
+          "name": "虚伪",
+          "color": "#701118"
+        },
+        {
+          "id": "1747969582131",
+          "name": "美国大选",
+          "color": "#b5a775"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747562739241.png",
+      "id": "1747562988710",
+      "createdAt": "2025-05-18T10:09:48.710Z",
+      "updatedAt": "2025-05-23T03:06:27.736Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一幅政治讽刺漫画。画面中是一个头戴美国国旗图案高帽、留着黑色长发、眼神锐利的人物形象，他一只手掌握地球，手指细长，分别写有军事（Military）、经济（Economic）、意识形态（Ideology）、文化（Cultural）等字样。",
+      "promptEn": "Prompt：This is a political satire cartoon. In the picture is a figure wearing a tall hat with the pattern of the American flag, with long black hair and sharp eyes. He holds the Earth with one hand, and his fingers are long and slender, with words such as Military, Economic, Ideology and Cultural written respectively.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747907716919",
+          "name": "美国",
+          "color": "#1a41b2"
+        },
+        {
+          "id": "1747969508209",
+          "name": "霸权",
+          "color": "#8d74e8"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747566459640.png",
+      "id": "1747566445867",
+      "createdAt": "2025-05-18T11:07:25.867Z",
+      "updatedAt": "2025-05-23T03:05:13.526Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一幅政治讽刺漫画，画面中有一个穿着黑色西装、打着蝴蝶结领带的胖男人坐在餐厅里，面前摆着一大盘牛排，手里拿着刀叉，旁边还有一个烤架上放着另一块牛排。他身后站着自由女神像，自由女神手中拿着一把叉子。窗外有一群人，他们举着刀叉，表情愤怒地望着餐厅内的场景",
+      "promptEn": "Prompt：This is a political satire cartoon. In the picture, there is a fat man wearing a black suit and a bow tie sitting in a restaurant. In front of him is a large plate of steaks, holding a knife and fork in his hand. Next to it, there is another steak on a grill. Behind him stood the Statue of Liberty, who was holding a fork in her hand. Outside the window, there is a group of people. They are holding knives and forks, looking angrily at the scene inside the restaurant.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747907776993",
+          "name": "美国",
+          "color": "#5523e0"
+        },
+        {
+          "id": "1747969524705",
+          "name": "贫富差距",
+          "color": "#187b3c"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747566486777.png",
+      "id": "1747566502704",
+      "createdAt": "2025-05-18T11:08:22.704Z",
+      "updatedAt": "2025-05-23T03:05:30.710Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "一幅卡通风格的图像。画面中有一个戴着带有美国国旗图案礼帽、打着领结、穿着条纹裤子的男人，他牵着一只白色狗的牵引绳，走在红地毯上。在红地毯的另一侧，一个戴着眼镜、穿着蓝色上衣和灰色裤子的女人正趴在地上，用手推着地毯。背景左侧有黑色线条，营造出一种动感和紧张的氛围。",
+      "promptEn": "Prompt：A cartoon - style image. There is a man wearing a top hat with American flag patterns, a bow tie, and striped pants, holding the leash of a white dog, walking on a red carpet. On the other side of the carpet, a woman with glasses, wearing a blue top and gray pants, is crawling on the ground, pushing the carpet with her hands. The background has black lines on the left side, creating a sense of movement and tension.\n",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747907784489",
+          "name": "台独",
+          "color": "#c46874"
+        },
+        {
+          "id": "1747969541483",
+          "name": "美国",
+          "color": "#6760a5"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747566673058.png",
+      "id": "1747566700886",
+      "createdAt": "2025-05-18T11:11:40.886Z",
+      "updatedAt": "2025-05-23T03:05:47.380Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "画一幅风格简洁而富有表现力的政治讽刺漫画。一个普通工人正在给一辆破旧的小车加油，油枪上写着“美国资金”，而“山姆大叔”则在给一辆装饰着彩球、写有“中期选举”的大卡车加油。漫画通过对比普通工人和“山姆大叔”的加油场景，讽刺了美国在中期选举中花费巨额资金，而普通民众却面临着能源短缺等问题，揭示了美国政治中的资源分配不均和对选举的过度投入。",
+      "promptEn": "Prompt：Draw a political satire cartoon with a simple style and strong expressiveness. An ordinary worker is refueling an old and shabby car with \"American Funds\" written on the fuel nozzle, while \"Uncle Sam\" is refueling a large truck decorated with colorful balls and marked with \"Midterm Elections\". The cartoon satirizes the huge amount of money spent in the midterm elections in the United States by comparing the cheering scenes of ordinary workers and \"Uncle Sam\", while ordinary people are facing problems such as energy shortages, revealing the uneven distribution of resources and excessive investment in elections in American politics.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747907791593",
+          "name": "美国",
+          "color": "#9639c5"
+        },
+        {
+          "id": "1747969558545",
+          "name": "贫富差距",
+          "color": "#dd47f0"
+        },
+        {
+          "id": "1747969570242",
+          "name": "美国大选",
+          "color": "#44803b"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747566719397.png",
+      "id": "1747566726567",
+      "createdAt": "2025-05-18T11:12:06.567Z",
+      "updatedAt": "2025-05-23T03:06:11.016Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "创作一幅生动夸张的政治讽刺漫画。画面左侧，一个被白布裹住全身、只露出两个眼孔的幽灵形象，代表美国霸权主义。它戴着面具、披着长袍，右手紧握一把冒着烟的手枪，左手拿着一本写有“霸权主义”的红书，左脚抬起，正狠狠地踹向自由女神像。右侧的自由女神像被击倒在地，面容扭曲、神情惊恐，象征着自由、平等和正义在霸权主义面前的脆弱无力。背景是灰蓝色的天空，增添了整个画面的压抑和沉重氛围，暗示着美国在国际事务中常以霸权主义的方式行事，肆意践踏他国主权和国际法。",
+      "promptEn": "Prompt：Create a vivid and exaggerated political satire cartoon. On the left side of the picture, there is a ghost figure wrapped all over in white cloth, with only two eye holes exposed, representing American hegemonism. It wore a mask and a long robe, held a smoking pistol tightly in its right hand, a red book written \"hegemonism\" in its left hand, raised its left foot and was kicking the Statue of Liberty hard. The Statue of Liberty on the right was knocked down to the ground, with a distorted face and a frightened expression, symbolizing the fragility and powerlessness of freedom, equality and justice in the face of hegemonism. The background is a grayish-blue sky, which adds a depressing and heavy atmosphere to the entire picture, suggesting that the United States often acts in a hegemonic way in international affairs, wantonly trampling on the sovereignty of other countries and international law.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747907835051",
+          "name": "美国",
+          "color": "#4555f0"
+        },
+        {
+          "id": "1747907839907",
+          "name": "霸权",
+          "color": "#c899d0"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747566732463.png",
+      "id": "1747566747863",
+      "createdAt": "2025-05-18T11:12:27.863Z",
+      "updatedAt": "2025-05-23T03:06:46.635Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "绘制一幅细致而夸张的政治讽刺漫画。这幅讽刺漫画中美国国会大厦被描绘成一座裂痕斑斑的建筑，顶部的自由雕像被民主党和共和党分别代表的驴和象紧紧抓住，两者互相撕扯，驴喊着“你松开！”，象喊着“你放手！”，整个建筑摇摇欲坠，显示出美国政治的分裂和内斗。",
+      "promptEn": "Prompt：Draw a detailed and exaggerated political satire cartoon. In this satirical cartoon, the United States Capitol is depicted as a cracked building. The statue of Freedom at the top is tightly grasped by a donkey represented by the Democratic Party and an elephant represented by the Republican Party respectively. The two are tearing at each other, and the donkey shouts, \"Let go!\" The elephant shouted, \"Let go!\" The entire building is tottering, revealing the political division and internal strife in the United States.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747907866564",
+          "name": "美国",
+          "color": "#1e604a"
+        },
+        {
+          "id": "1747907875291",
+          "name": "党争",
+          "color": "#60d8e"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747566759938.png",
+      "id": "1747566794785",
+      "createdAt": "2025-05-18T11:13:14.785Z",
+      "updatedAt": "2025-05-23T03:06:56.914Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一幅政治讽刺漫画，画面中有一个木制棺材，上面用汉字写着“台独分裂势力”。棺材里伸出一只手，正用锤子将带有钉子的手指钉进棺材盖中。",
+      "promptEn": "Prompt： A hand emerged from the coffin and was using a hammer to drive the fingers with nails into the coffin lid.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747907883916",
+          "name": "台独",
+          "color": "#f7397a"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747566808370.png",
+      "id": "1747566825937",
+      "createdAt": "2025-05-18T11:13:45.937Z",
+      "updatedAt": "2025-05-23T03:07:10.801Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一幅政治讽刺漫画，画面中是一个头戴美国国旗图案高帽、身穿美国国旗配色服装的人物形象。他跪在地上，正拉开一张弓，弓上插着三支箭，箭上分别用汉字写着“反恐”“贸易战”“民主”射向自己。背景中太阳正在升起",
+      "promptEn": "Prompt：This is a political satire cartoon. In the picture, there is a figure wearing a high hat with the pattern of the American flag and dressed in clothing in the colors of the American flag. He knelt on the ground and was drawing a bow, with three arrows inserted into it. The arrows, written in Chinese characters \"counter-terrorism\", \"Trade war\" and \"Democracy\" respectively, were shot at him. The sun is rising in the background.",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747907892020",
+          "name": "美国",
+          "color": "#5a4910"
+        },
+        {
+          "id": "1747907898532",
+          "name": "贸易战",
+          "color": "#d74c38"
+        },
+        {
+          "id": "1747907911476",
+          "name": "虚伪",
+          "color": "#228535"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747566834453.png",
+      "id": "1747566850658",
+      "createdAt": "2025-05-18T11:14:10.658Z",
+      "updatedAt": "2025-05-23T03:07:21.377Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一部极具讽刺意味的政治漫画。背景是520，赖庆德拿着一个写着“主权独立”“和平共荣”的公文包，他的领带变成了一条毒蛇吐出的字母，他的瞳孔异常地睁大。",
+      "promptEn": "This is a highly satirical political cartoon. The background is 520. Lai Qingde is holding a briefcase with the words \"Sovereignty and Independence\" and \"Peace and Common Prosperity\" written on it. His tie has turned into a letter spat out by a venomous snake, and his pupils are abnormally wide open.",
+      "parameters": {
+        "steps": "27",
+        "sampler": "dpm_adaptive",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747904643020.png",
+      "tags": [
+        {
+          "id": "1747907927492",
+          "name": "赖清德",
+          "color": "#a3e29e"
+        },
+        {
+          "id": "1747907930965",
+          "name": "台独",
+          "color": "#42851"
+        },
+        {
+          "id": "1747969651356",
+          "name": "虚伪",
+          "color": "#439b1f"
+        }
+      ],
+      "id": "1747904400064",
+      "createdAt": "2025-05-22T09:00:00.064Z",
+      "updatedAt": "2025-05-23T03:07:31.921Z",
       "width": 1024,
-      "height": 720,
-      "tags": [],
-      "id": "1746493935159",
-      "createdAt": "2025-05-06T01:12:15.159Z",
-      "updatedAt": "2025-05-06T01:32:31.967Z"
+      "height": 1548
     },
     {
-      "prompt": "",
-      "promptEn": "**Prompt:** Illustrate a political satire cartoon in a colorful, expressive cartoon style. The main scene shows a panda standing in front of a large whiteboard labeled \"Chinese Technology Enterprises\" in Chinese characters, focused on analyzing or developing a small glowing microchip held in one paw. To the right, an eagle wearing a Uncle Sam hat aggressively tries to snatch a large bag labeled with Chinese characters meaning \"Key Technology\" from a smaller, frightened eagle on the ground. The background is a simple dark room, suggesting tension and competition in the technology sector between China (panda) and the United States (eagles).",
+      "prompt": "这是一幅政治讽刺漫画，餐桌上摆满的不是食物，而是美国军事合同和武器模型。中央悬挂着“热烈庆祝美国台湾联合军演顺利完成”的大横幅。赖清德和一名妇女举起酒杯庆祝他们的选举胜利，脸上挂着假笑。桌子上有“10亿美元军需订单",
+      "promptEn": "This is a political satire cartoon. Instead of food, the dining table is filled with American military contracts and weapon models. A large banner reading \"Warmly celebrate the successful completion of the joint military exercise between the United States and Taiwan\" is hung in the center. Lai Ching-te and a woman raised their glasses to celebrate their election victory, with fake smiles on their faces. There is a \"$1 billion military supply order\" on the table.",
       "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
+        "steps": "27",
+        "sampler": "dpm_adaptive",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
       },
-      "imageUrl": "/images/prompts/1746495124164.png",
-      "tags": [],
-      "id": "1746493936046",
-      "createdAt": "2025-05-06T01:12:16.046Z",
-      "updatedAt": "2025-05-06T01:32:06.017Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "Prompt: Create a political satire comic in a clean, bold cartoon style showing two identical Uncle Sam characters standing back to back. Both wear the classic red, white, and blue costume with a tall hat decorated with stars and stripes, blue jacket with stars, red bow tie, and red-striped pants. The Uncle Sam on the left looks stern and serious, holding a pair of handcuffs in his left hand. Behind him is a window or frame depicting the U.S. Capitol dome with a crowd and raised fists under the text \"US Capitol Riot\" in Chinese characters. The Uncle Sam on the right appears smug and sly, holding a shiny bronze medal by its red ribbon. Behind him is a window or frame showing a chaotic scene of violent protests in a cityscape under the text \"Hong Kong Riot\" in Chinese characters. The contrast between the two Uncle Sams highlights ironic double standards and political hypocrisy.",
-      "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
-      },
-      "imageUrl": "/images/prompts/1746495101894.png",
+      "imageUrl": "/images/prompts/1747904696954.png",
       "width": 1024,
-      "height": 720,
-      "tags": [],
-      "id": "1746493936989",
-      "createdAt": "2025-05-06T01:12:16.989Z",
-      "updatedAt": "2025-05-06T01:31:51.429Z"
+      "height": 1548,
+      "tags": [
+        {
+          "id": "1747907965510",
+          "name": "赖清德",
+          "color": "#34f15"
+        },
+        {
+          "id": "1747907969454",
+          "name": "台独",
+          "color": "#3afea"
+        },
+        {
+          "id": "1747969659933",
+          "name": "美国",
+          "color": "#45e5a7"
+        }
+      ],
+      "id": "1747904401003",
+      "createdAt": "2025-05-22T09:00:01.003Z",
+      "updatedAt": "2025-05-23T03:07:40.486Z"
     },
     {
-      "prompt": "",
-      "promptEn": "**Prompt:** Draw a political satire cartoon in a detailed, caricature style. The central figure is Uncle Sam with a large star-spangled top hat and a smug, sly facial expression. On his right shoulder stands a small angel with a halo, wings, and clasped hands, wearing traditional robes and a gentle, hopeful expression. On his left shoulder, a mischievous devil character dressed as a pirate with a skull hat, bat wings, a red outfit, and a devil’s tail whispers into Uncle Sam’s ear. The background is plain to emphasize this internal moral conflict portrayed humorously.",
+      "prompt": "一幅。来清德凸起的v型标志被射灯投影在后墙上。影子伸展变形，融化成一面飘扬的白旗——投降的象征——而下面，欢呼凝固成令人不安的沉默。",
+      "promptEn": " A political cartoon. The raised V-shaped logo of Lai Qingde was projected onto the back wall by spotlights. The shadow stretched and deformed, melting into a fluttering white flag - a symbol of surrender - and below, the cheers solidified into an unsettling silence.",
       "parameters": {
-        "steps": "20",
+        "steps": "27",
         "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
+        "scheduler": "simple",
+        "loraName": "赖清德safetensors"
       },
-      "imageUrl": "/images/prompts/1746495067672.png",
-      "tags": [],
-      "id": "1746493937928",
-      "createdAt": "2025-05-06T01:12:17.928Z",
-      "updatedAt": "2025-05-06T01:31:25.139Z",
+      "imageUrl": "/images/prompts/1747904816247.png",
       "width": 1024,
-      "height": 720
+      "height": 1548,
+      "tags": [
+        {
+          "id": "1747907989952",
+          "name": "赖清德",
+          "color": "#e910a7"
+        },
+        {
+          "id": "1747907994599",
+          "name": "台独",
+          "color": "#d3f1d1"
+        },
+        {
+          "id": "1747969668525",
+          "name": "虚伪",
+          "color": "#eefa9a"
+        }
+      ],
+      "id": "1747904428457",
+      "createdAt": "2025-05-22T09:00:28.457Z",
+      "updatedAt": "2025-05-23T03:07:49.178Z"
     },
     {
-      "prompt": "",
-      "promptEn": "Prompt: Draw a political satire cartoon in a clean, expressive cartoon style. The central figure is the Statue of Liberty, portrayed as struggling and being sawed in half by a large handsaw labeled \"MIDTERM ELECTIONS.\" On the left side, a donkey character dressed in a blue suit, symbolizing the Democratic Party, pulls the saw handle with effort, showing determination. On the right side, an elephant character in a brown suit, symbolizing the Republican Party, pulls the other side of the saw with focused intensity. The Statue of Liberty has an agonized, distressed facial expression and body posture indicating pain. The scene conveys the destructive nature of political conflict during midterm elections.",
+      "prompt": "一幅政治漫画，赖清德自信地站在巨大的新闻大炮前。大炮喷出厚厚的、旋转的绿色有毒雾，标签为“大陆威胁论”，威胁地散布在景观上。大炮后面写着“520”赖清德得意地笑着。一根耳机线从他的耳朵里蜿蜒而出。他的左胸上有美元的标志，右胸上印着美国国旗，喊着“钱到位。民众利益？与我何干”",
+      "promptEn": "In a political cartoon, Lai Ching-te stands confidently in front of a huge news cannon. The cannons spewed thick, swirling green and toxic mist, labeled as \"Continental Threat Theory\", which was threateningly scattered across the landscape. Behind the cannon was written \"520\", and Lai Qingde smiled smugly. A headphone cable wound out of his ear. There was a sign of the US dollar on his left chest and the American flag printed on his right chest, Shouting \"The money is in place.\" The interests of the people? What does it have to do with me?",
       "parameters": {
-        "steps": "20",
+        "steps": "27",
         "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
       },
-      "imageUrl": "/images/prompts/1746494935833.png",
-      "tags": [],
-      "id": "1746493938805",
-      "createdAt": "2025-05-06T01:12:18.805Z",
-      "updatedAt": "2025-05-06T01:28:56.763Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "**Prompt:** Draw a two-panel political satire cartoon in a clear, simple cartoon style. Both panels show Uncle Sam standing on a stage in front of an audience. He wears his classic star-spangled top hat, blue jacket, and striped pants. In the first panel, Uncle Sam faces the audience, angrily holding up a sign with Chinese characters meaning \"Democracy,\" and angrily shouting. In the second panel, Uncle Sam has turned his back to the audience, revealing a different sign with Chinese characters meaning \"Hegemony\" attached to a spiked club he holds behind his back, showing a hidden, threatening side. The cartoon contrasts outward appearance versus hidden reality.",
-      "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
-      },
-      "imageUrl": "/images/prompts/1746495056807.png",
-      "tags": [],
-      "id": "1746493940701",
-      "createdAt": "2025-05-06T01:12:20.701Z",
-      "updatedAt": "2025-05-06T01:30:57.651Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "**Prompt:** Illustrate a political satire cartoon in a detailed, bold cartoon style. The main figure is a man dressed in a dark suit, white shirt, and red tie, wearing an Uncle Sam top hat decorated with stars and stripes. He is shouting passionately at a podium with multiple microphones while holding a small flag with Chinese characters meaning \"Democracy.\" Behind him is a red curtain with visible tears and holes. The curtain is pulled aside slightly to reveal a large pile of money bags marked with dollar signs, spilling out from behind. The scene highlights the contrast between the rhetoric of democracy and underlying financial interests or corruption.",
-      "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
-      },
-      "imageUrl": "/images/prompts/1746495046359.png",
-      "tags": [],
-      "id": "1746493942004",
-      "createdAt": "2025-05-06T01:12:22.004Z",
-      "updatedAt": "2025-05-06T01:30:47.957Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "**Prompt:** Draw a detailed political satire cartoon in a colorful, exaggerated comic style. The scene features two main characters: on the left, a traditionally dressed Asian man with a chubby face, tied-back hair, wearing a yellow and brown striped robe, presenting a large plate with a red lobster marked with a nuclear hazard symbol. On the right, an angry Uncle Sam character with a tall star-spangled hat, black suit, red bow tie, and long facial hair is sitting in a chair and violently pushing away the lobster dish with one hand while giving a thumbs-up toward a large screen. The screen shows nuclear waste barrels and Chinese text meaning \"Japan releases nuclear wastewater.\" The contrast highlights hypocrisy and political tension surrounding nuclear contamination.",
-      "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
-      },
-      "imageUrl": "/images/prompts/1746495036830.png",
-      "tags": [],
-      "id": "1746493943045",
-      "createdAt": "2025-05-06T01:12:23.045Z",
-      "updatedAt": "2025-05-06T01:30:38.442Z"
-    },
-    {
-      "prompt": "",
-      "promptEn": "**Prompt:** Create a political satire cartoon in a dark, somber cartoon style. The main image is a large wooden coffin with Chinese characters on the side that translate to \"Taiwan separatist forces.\" Two human arms emerge from inside the coffin: one is holding a hammer, aggressively trying to nail more nails on the coffin lid, while the other points or steadies a nail. The background is plain and dark, emphasizing a tense and ominous atmosphere. The cartoon symbolizes self-destructive behavior of separatist movements.",
-      "parameters": {
-        "steps": "20",
-        "sampler": "euler",
-        "scheduler": "normal",
-        "loraName": ""
-      },
-      "imageUrl": "/images/prompts/1746495012803.png",
+      "imageUrl": "/images/prompts/1747904867845.png",
       "width": 1024,
-      "height": 720,
-      "tags": [],
-      "id": "1746493944052",
-      "createdAt": "2025-05-06T01:12:24.052Z",
-      "updatedAt": "2025-05-06T01:30:26.907Z"
+      "height": 1548,
+      "tags": [
+        {
+          "id": "1747908037559",
+          "name": "赖清德",
+          "color": "#384f3f"
+        },
+        {
+          "id": "1747908044657",
+          "name": "台独",
+          "color": "#22de83"
+        },
+        {
+          "id": "1747969679909",
+          "name": "虚伪",
+          "color": "#15f7af"
+        }
+      ],
+      "id": "1747904456505",
+      "createdAt": "2025-05-22T09:00:56.505Z",
+      "updatedAt": "2025-05-23T03:08:00.581Z"
+    },
+    {
+      "prompt": "地上的账簿封面印“民进党毒品&枪械”，机器人犬叼着账本，赖清德俯身露出尖牙贪笑，旁边写“国民党罪证”的空盒被随意丢弃。",
+      "promptEn": "comic panel, high contrast lighting, pile of ledgers on the floor stamped with bright green label “DPP drugs & guns”. A robot dog’s jaw clamps a ledger while Lai bends low beside it, long nose and crooked teeth exposed in greedy smirk. Behind, discarded empty evidence boxes labeled “KMT crime” lie untouched.",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747905084607.png",
+      "width": 1024,
+      "height": 1548,
+      "tags": [
+        {
+          "id": "1747908059448",
+          "name": "赖清德",
+          "color": "#c69066"
+        },
+        {
+          "id": "1747908063353",
+          "name": "台独",
+          "color": "#65779a"
+        },
+        {
+          "id": "1747969690062",
+          "name": "虚伪",
+          "color": "#3a0591"
+        }
+      ],
+      "id": "1747904456676",
+      "createdAt": "2025-05-22T09:00:56.676Z",
+      "updatedAt": "2025-05-23T03:08:10.764Z"
+    },
+    {
+      "prompt": "法官席突变，木质表面长出黏腻绿触手，缠住判决卷轴，用滴落荧光绿墨重新涂写。触手末端贴小民进党徽章。法官身影藏于暗处，只剩懒散冷笑。",
+      "promptEn": "comic panel, high judge’s bench mutates grotesquely. Slimy green tentacles sprout from the wood, stretching over parchments, grabbing the judgment scroll and repainting sentences with dripping neon-green ink. Each tentacle bears a tiny DPP emblem. The judge’s silhouette hides in shadow, only a lazy grin visible.",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747905156595.png",
+      "width": 1264,
+      "height": 1024,
+      "tags": [
+        {
+          "id": "1747908086113",
+          "name": "赖清德",
+          "color": "#8c35ad"
+        },
+        {
+          "id": "1747908088321",
+          "name": "台独",
+          "color": "#4b68d"
+        }
+      ],
+      "id": "1747904456828",
+      "createdAt": "2025-05-22T09:00:56.828Z",
+      "updatedAt": "2025-05-22T10:01:38.676Z"
+    },
+    {
+      "prompt": "讽刺漫画，聚光灯下，赖清德举着写有 “INTEGRITY” 的大横幅，西装过亮且用别针别住领口，双眼上翻、嘴角歪笑，脚踩木箱装高，地面彩纸散落。内心确另有想法。",
+      "promptEn": "political satire comic, thick ink outlines, strong stage spotlight, Lai Ching-te raises a huge paper banner printed “INTEGRITY” above his head, wears an oversized shiny suit, safety pin holds the collar, eyes roll upward, crooked grin, sweat beads on forehead, stands on wooden crate to look taller, floor covered with confetti",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747905199875.png",
+      "tags": [
+        {
+          "id": "1747908133099",
+          "name": "赖清德",
+          "color": "#7e1235"
+        },
+        {
+          "id": "1747908135842",
+          "name": "台独",
+          "color": "#b64bdd"
+        }
+      ],
+      "id": "1747904456996",
+      "createdAt": "2025-05-22T09:00:56.996Z",
+      "updatedAt": "2025-05-22T10:02:16.787Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "油污灯暗的工坊内，西装裂开的赖清德蹲在嗡鸣的工业级 3D 打印机前，机器正喷出带“京华市清白证明”字样的发光塑料板。赖清德嘴咬螺丝刀，慌张改线，蓝色火花四射，地上堆满半成品假证与印章碎屑。",
+      "promptEn": "satirical comic style, bold rough lines, dim workshop, Kewenzhe in cracked business suit crouches before a buzzing industrial 3D-printer. Printer extrudes glowing plastic sheet stamped “Jinghua City INNOCENCE Certificate.” Kewenzhe’s eyes dart nervously, screw-driver in his mouth, fingers frantically tweak printer wires. Blue sparks, scattered fake seals, stacks of half-finished certificates litter the greasy floor.",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747905241243.png",
+      "width": 1264,
+      "height": 1024,
+      "tags": [
+        {
+          "id": "1747908142338",
+          "name": "赖清德",
+          "color": "#1df05"
+        },
+        {
+          "id": "1747969711094",
+          "name": "虚伪",
+          "color": "#d07a87"
+        }
+      ],
+      "id": "1747905190499",
+      "createdAt": "2025-05-22T09:13:10.499Z",
+      "updatedAt": "2025-05-23T03:08:42.571Z"
+    },
+    {
+      "prompt": "赖清德变身丑陋绿色章鱼，身穿西装，脸带猥琐笑容，八只触手伸向会场各处。触手缠绕窜改痕迹明显的计票机。赖清德自鸣得意，眼神警觉四处扫视。",
+      "promptEn": "Laiqingde transformed into a grotesque green octopus in a suit, sly face, all eight tentacles stretch across the voting hall. Tentacles grip different machines and voter piles. Laiqingde’s face shows smug satisfaction and his eyes dart in every direction.",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747905310833.png",
+      "tags": [
+        {
+          "id": "1747908174124",
+          "name": "虚伪",
+          "color": "#d51eed"
+        },
+        {
+          "id": "1747969729758",
+          "name": "赖清德",
+          "color": "#d60d97"
+        }
+      ],
+      "id": "1747905190639",
+      "createdAt": "2025-05-22T09:13:10.639Z",
+      "updatedAt": "2025-05-23T03:08:50.596Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "赖清德在聚光灯下高举\"清廉\"标语，背后阴影中民进党黑手操纵提线木偶。国民党代表被铐在铁笼里，脚下散落着\"无罪证据\"文件。背景电子屏显示暴涨的犯罪率曲线，但赖清德的麦克风被改造成消音器形状。",
+      "promptEn": "Laiqingde held up the slogan \"Integrity\" under the spotlight, while in the shadows behind him, the Democratic Progressive Party was manipulating the puppet with its black hands. The representatives of the Kuomintang were handcuffed in iron cages, with \"evidence of innocence\" documents scattered beneath their feet. The background electronic screen shows the soaring crime rate curve, but Laiqingde’s microphone has been modified into the shape of a muffler.",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747905364008.png",
+      "tags": [
+        {
+          "id": "1747908209821",
+          "name": "赖清德",
+          "color": "#6eb2fb"
+        },
+        {
+          "id": "1747908212572",
+          "name": "虚伪",
+          "color": "#f5eb1b"
+        }
+      ],
+      "id": "1747905190799",
+      "createdAt": "2025-05-22T09:13:10.799Z",
+      "updatedAt": "2025-05-23T03:09:03.172Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "法庭场景中，民进党罪犯席堆满带血账本和美金，法官却将法槌换成高尔夫杆。国民党被告席空荡干净，但铁栅自动闭合。赖清德在旁听席用毛笔修改宪法条文，墨水呈浑浊的深绿色。",
+      "promptEn": "In the courtroom scene, the criminal seats of the Democratic Progressive Party were piled high with bloody account books and US dollars, but the judge replaced the gavel with a golf club. The dock of the Kuomintang was empty and clean, but the iron fence closed automatically. Laiqingde revised the constitutional provisions with a brush pen in the public gallery, and the ink was a murky dark green.",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747905406775.png",
+      "tags": [
+        {
+          "id": "1747908234189",
+          "name": "赖清德",
+          "color": "#1d4078"
+        },
+        {
+          "id": "1747908238100",
+          "name": "虚伪",
+          "color": "#1f64e9"
+        }
+      ],
+      "id": "1747905190951",
+      "createdAt": "2025-05-22T09:13:10.951Z",
+      "updatedAt": "2025-05-22T10:04:03.559Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一张极具讽刺效果的政治漫画。赖清德四肢缠绕彩色傀儡线，线头分别连接赖清德背后墙上画着的“华盛顿国会山”。他读着写着\"两岸互惠\"稿件，但嘴巴吐出绿色\"台独\"毒雾。他脚下踩着印有\"台独520\"的破碎石板，地上满是枪支弹药，而他周围密密麻麻的民众举着牌子。",
+      "promptEn": "A cartoon-style politician stands on a small wooden boat piled high with explosives, exaggeratingly covering his ears with both hands, smiling on his face, and the saliva spurting from his mouth turns into sparks, igniting the fuse of the explosives. Around the small boat is a dense area of water mines, and in the distance, there are huge water splashes and thick smoke from the explosion of water mines. The background is a gloomy sky and a rough sea surface",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747905441673.png",
+      "tags": [
+        {
+          "id": "1747908257029",
+          "name": "赖清德",
+          "color": "#c765a"
+        },
+        {
+          "id": "1747908259837",
+          "name": "台独",
+          "color": "#428d1c"
+        }
+      ],
+      "id": "1747905191087",
+      "createdAt": "2025-05-22T09:13:11.087Z",
+      "updatedAt": "2025-05-22T10:04:21.191Z",
+      "width": 1264,
+      "height": 1024
+    },
+    {
+      "prompt": "这是一幅具有强烈讽刺意味的政治漫画。画面中有一个巨大的绿色蜘蛛，蜘蛛的身体部分是一个人物的头部，人物表情夸张，张大嘴巴，露出狡黠的笑容。蜘蛛的八条腿修长且强壮，支撑着整个身体，显得非常突兀和恐怖。\n",
+      "promptEn": "This is a political cartoon with a strong satirical flavor. There is a huge green spider in the picture. The body part of the spider is the head of a character. The character's expression is exaggerated, with a wide mouth and a sly smile. The eight legs of a spider are long and strong, supporting the entire body, looking very conspicuous and terrifying.",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747906399621.png",
+      "width": 1264,
+      "height": 1024,
+      "tags": [
+        {
+          "id": "1747908271197",
+          "name": "赖清德",
+          "color": "#a4cc5b"
+        },
+        {
+          "id": "1747908275029",
+          "name": "台独",
+          "color": "#d528bb"
+        }
+      ],
+      "id": "1747905530476",
+      "createdAt": "2025-05-22T09:18:50.476Z",
+      "updatedAt": "2025-05-22T10:05:19.944Z"
+    },
+    {
+      "prompt": "阴森炼金台前，披绿袍尖帽的民进党巫师狞笑，挥魔杖悬于金光闪闪的“贿赂金条”上。伴随噼啪特效，金条变成烫金“政治献金证明”卷轴。蓝烟缭绕，架子上整排被转换的金条散出幽绿光",
+      "promptEn": "In front of the gloomy alchemy platform, a Democratic Progressive Party wizard in a green robe and pointed hat grinned maliciously, waving his magic wand over the glittering \"bribery gold bar\". With the crackling effect, the gold bar turns into a gilded \"Political Donation Certificate\" scroll. Blue smoke swirled around, and the entire row of transformed gold bars on the shelf emitted a faint green light",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "赖清德.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747905713110.png",
+      "width": 1264,
+      "height": 1024,
+      "tags": [
+        {
+          "id": "1747908362584",
+          "name": "台湾",
+          "color": "#b13da6"
+        },
+        {
+          "id": "1747908366732",
+          "name": "民进党",
+          "color": "#bd9e9c"
+        },
+        {
+          "id": "1747908370768",
+          "name": "政客",
+          "color": "#397cf0"
+        },
+        {
+          "id": "1747908375048",
+          "name": "贿赂",
+          "color": "#870d5f"
+        }
+      ],
+      "id": "1747905530663",
+      "createdAt": "2025-05-22T09:18:50.663Z",
+      "updatedAt": "2025-05-22T10:06:26.546Z"
+    },
+    {
+      "prompt": "这幅漫画是一幅政治讽刺作品。画面中，一位穿着西装的男子站在一艘木船的船头，船上挤满了乘客。男子面带微笑，双手张开，似乎在向乘客们保证或宣告什么。漫画中的对话框显示他正在说：“各位旅客请抓稳！前方就是闻名遐迩的‘繁荣自由’大瀑布啦！保证让各位体验到前所未有的‘解放’与‘新生’！”",
+      "promptEn": "This cartoon is a political satire. In the picture, a man in a suit is standing at the bow of a wooden boat, which is crowded with passengers. The man wore a smile on his face and spread his hands wide, as if assuring or announcing something to the passengers. The dialog box in the comic shows that he is saying: \"Dear passengers, hold on tight!\" Just ahead lies the renowned \"Prosperity and Freedom\" waterfall! We guarantee that everyone will experience an unprecedented sense of \"liberation\" and \"rebirth\"!",
+      "parameters": {
+        "steps": "27",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "loraName": "Eldritch_Classic_Comics_1.1.5.safetensors"
+      },
+      "imageUrl": "/images/prompts/1747906133226.png",
+      "width": 1264,
+      "height": 1024,
+      "tags": [
+        {
+          "id": "1747908416513",
+          "name": "赖清德",
+          "color": "#6ffcfd"
+        },
+        {
+          "id": "1747908423377",
+          "name": "欺诈",
+          "color": "#93f3ba"
+        }
+      ],
+      "id": "1747905532324",
+      "createdAt": "2025-05-22T09:18:52.324Z",
+      "updatedAt": "2025-05-22T10:07:12.805Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747970052823",
+          "name": "妄评妄议",
+          "color": "#7ac2a4"
+        },
+        {
+          "id": "1747970112352",
+          "name": "迷彩小人",
+          "color": "#8c69c"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747970046924.png",
+      "width": 512,
+      "height": 512,
+      "id": "1747970060253",
+      "createdAt": "2025-05-23T03:14:20.253Z",
+      "updatedAt": "2025-05-23T03:15:13.360Z"
+    },
+    {
+      "prompt": "",
+      "promptEn": "",
+      "parameters": {
+        "steps": "",
+        "sampler": "",
+        "scheduler": "",
+        "loraName": ""
+      },
+      "tags": [
+        {
+          "id": "1747970098256",
+          "name": "迷彩小人",
+          "color": "#e4f356"
+        },
+        {
+          "id": "1747970102368",
+          "name": "保密",
+          "color": "#e5b041"
+        }
+      ],
+      "imageUrl": "/images/prompts/1747970069936.png",
+      "width": 512,
+      "height": 512,
+      "id": "1747970103135",
+      "createdAt": "2025-05-23T03:15:03.135Z"
     }
   ]
 }
