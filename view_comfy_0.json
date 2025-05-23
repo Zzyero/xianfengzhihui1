@@ -3172,8 +3172,8 @@
     {
       "type": "smart_ps",
       "viewComfyJSON": {
-        "title": "局部重绘（无lora）",
-        "description": "打开蒙版编辑器涂抹需要重绘的区域，输入描述内容重绘图片",
+        "title": "局部重绘",
+        "description": "涂抹需要重绘的部分，填写绘制画面的描述",
         "previewImages": [
           null,
           null,
@@ -3181,36 +3181,14 @@
         ],
         "inputs": [
           {
-            "title": "加载图像",
-            "inputs": [
-              {
-                "title": "加载图像",
-                "placeholder": "加载图像",
-                "value": null,
-                "workflowPath": [
-                  "64",
-                  "inputs",
-                  "image"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "image",
-                "validations": {
-                  "required": true
-                },
-                "key": "64-inputs-image"
-              }
-            ],
-            "key": "64-LoadImage"
-          },
-          {
             "title": "CLIP文本编码器",
             "inputs": [
               {
                 "title": "CLIP文本编码器",
-                "placeholder": "CLIP文本编码器",
+                "placeholder": "画面描述",
                 "value": "",
                 "workflowPath": [
-                  "65",
+                  "6",
                   "inputs",
                   "text"
                 ],
@@ -3219,333 +3197,11 @@
                 "validations": {
                   "required": true
                 },
-                "key": "65-inputs-text"
+                "key": "6-inputs-text"
               }
             ],
-            "key": "65-CLIPTextEncode"
-          }
-        ],
-        "advancedInputs": [
-          {
-            "title": "K采样器",
-            "inputs": [
-              {
-                "title": "Seed",
-                "placeholder": "Seed",
-                "value": 656540956844036,
-                "workflowPath": [
-                  "61",
-                  "inputs",
-                  "seed"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "seed",
-                "validations": {
-                  "required": true
-                },
-                "key": "61-inputs-seed"
-              },
-              {
-                "title": "Steps",
-                "placeholder": "Steps",
-                "value": 25,
-                "workflowPath": [
-                  "61",
-                  "inputs",
-                  "steps"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "number",
-                "validations": {
-                  "required": true
-                },
-                "key": "61-inputs-steps"
-              },
-              {
-                "title": "Cfg",
-                "placeholder": "Cfg",
-                "value": 1,
-                "workflowPath": [
-                  "61",
-                  "inputs",
-                  "cfg"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "number",
-                "validations": {
-                  "required": true
-                },
-                "key": "61-inputs-cfg"
-              },
-              {
-                "title": "Sampler_name",
-                "placeholder": "Sampler_name",
-                "value": "dpm_adaptive",
-                "workflowPath": [
-                  "61",
-                  "inputs",
-                  "sampler_name"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "string",
-                "validations": {
-                  "required": true
-                },
-                "key": "61-inputs-sampler_name"
-              },
-              {
-                "title": "Scheduler",
-                "placeholder": "Scheduler",
-                "value": "simple",
-                "workflowPath": [
-                  "61",
-                  "inputs",
-                  "scheduler"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "string",
-                "validations": {
-                  "required": true
-                },
-                "key": "61-inputs-scheduler"
-              },
-              {
-                "title": "Denoise",
-                "placeholder": "Denoise",
-                "value": 1,
-                "workflowPath": [
-                  "61",
-                  "inputs",
-                  "denoise"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "number",
-                "validations": {
-                  "required": true
-                },
-                "key": "61-inputs-denoise"
-              }
-            ],
-            "key": "61-KSampler"
+            "key": "6-CLIPTextEncode"
           },
-          {
-            "title": "保存图像",
-            "inputs": [
-              {
-                "title": "Filename_prefix",
-                "placeholder": "Filename_prefix",
-                "value": "ZhiHui",
-                "workflowPath": [
-                  "349",
-                  "inputs",
-                  "filename_prefix"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "string",
-                "validations": {
-                  "required": true
-                },
-                "key": "349-inputs-filename_prefix"
-              }
-            ],
-            "key": "349-SaveImage"
-          }
-        ],
-        "type": "smart_ps",
-        "id": "0cc93cbf85b48"
-      },
-      "workflowApiJSON": {
-        "61": {
-          "inputs": {
-            "seed": 656540956844036,
-            "steps": 25,
-            "cfg": 1,
-            "sampler_name": "dpm_adaptive",
-            "scheduler": "simple",
-            "denoise": 1,
-            "model": [
-              "71",
-              0
-            ],
-            "positive": [
-              "70",
-              0
-            ],
-            "negative": [
-              "70",
-              1
-            ],
-            "latent_image": [
-              "70",
-              2
-            ]
-          },
-          "class_type": "KSampler",
-          "_meta": {
-            "title": "K采样器"
-          }
-        },
-        "63": {
-          "inputs": {
-            "samples": [
-              "61",
-              0
-            ],
-            "vae": [
-              "68",
-              0
-            ]
-          },
-          "class_type": "VAEDecode",
-          "_meta": {
-            "title": "VAE解码"
-          }
-        },
-        "64": {
-          "inputs": {
-            "image": "ComfyUI_00165_.png"
-          },
-          "class_type": "LoadImage",
-          "_meta": {
-            "title": "加载图像"
-          }
-        },
-        "65": {
-          "inputs": {
-            "text": "laiqingde,face",
-            "clip": [
-              "69",
-              0
-            ]
-          },
-          "class_type": "CLIPTextEncode",
-          "_meta": {
-            "title": "CLIP文本编码器"
-          }
-        },
-        "66": {
-          "inputs": {
-            "guidance": 30,
-            "conditioning": [
-              "65",
-              0
-            ]
-          },
-          "class_type": "FluxGuidance",
-          "_meta": {
-            "title": "Flux引导"
-          }
-        },
-        "67": {
-          "inputs": {
-            "unet_name": "flux_fill_dev_fp8_e4m3fn.safetensors",
-            "weight_dtype": "fp8_e4m3fn"
-          },
-          "class_type": "UNETLoader",
-          "_meta": {
-            "title": "UNET加载器"
-          }
-        },
-        "68": {
-          "inputs": {
-            "vae_name": "ae.safetensors"
-          },
-          "class_type": "VAELoader",
-          "_meta": {
-            "title": "VAE加载器"
-          }
-        },
-        "69": {
-          "inputs": {
-            "clip_name1": "clip_l.safetensors",
-            "clip_name2": "t5xxl_fp8_e4m3fn.safetensors",
-            "type": "flux",
-            "device": "default"
-          },
-          "class_type": "DualCLIPLoader",
-          "_meta": {
-            "title": "双CLIP加载器"
-          }
-        },
-        "70": {
-          "inputs": {
-            "noise_mask": true,
-            "positive": [
-              "66",
-              0
-            ],
-            "negative": [
-              "255",
-              0
-            ],
-            "vae": [
-              "68",
-              0
-            ],
-            "pixels": [
-              "64",
-              0
-            ],
-            "mask": [
-              "64",
-              1
-            ]
-          },
-          "class_type": "InpaintModelConditioning",
-          "_meta": {
-            "title": "内补模型条件"
-          }
-        },
-        "71": {
-          "inputs": {
-            "model": [
-              "67",
-              0
-            ]
-          },
-          "class_type": "DifferentialDiffusion",
-          "_meta": {
-            "title": "差异扩散"
-          }
-        },
-        "255": {
-          "inputs": {
-            "conditioning": [
-              "65",
-              0
-            ]
-          },
-          "class_type": "ConditioningZeroOut",
-          "_meta": {
-            "title": "条件零化"
-          }
-        },
-        "349": {
-          "inputs": {
-            "filename_prefix": "ZhiHui",
-            "images": [
-              "63",
-              0
-            ]
-          },
-          "class_type": "SaveImage",
-          "_meta": {
-            "title": "保存图像"
-          }
-        }
-      }
-    },
-    {
-      "type": "smart_ps",
-      "viewComfyJSON": {
-        "title": "局部重绘（加lora）",
-        "description": "涂抹需要重绘的部分，选择人物lora模型，点击生成重绘图片",
-        "previewImages": [
-          null,
-          null,
-          null
-        ],
-        "inputs": [
           {
             "title": "加载图像",
             "inputs": [
@@ -3554,7 +3210,7 @@
                 "placeholder": "加载图像",
                 "value": null,
                 "workflowPath": [
-                  "64",
+                  "45",
                   "inputs",
                   "image"
                 ],
@@ -3563,32 +3219,10 @@
                 "validations": {
                   "required": true
                 },
-                "key": "64-inputs-image"
+                "key": "45-inputs-image"
               }
             ],
-            "key": "64-LoadImage"
-          },
-          {
-            "title": "CLIP文本编码器",
-            "inputs": [
-              {
-                "title": "CLIP文本编码器",
-                "placeholder": "CLIP文本编码器",
-                "value": "",
-                "workflowPath": [
-                  "65",
-                  "inputs",
-                  "text"
-                ],
-                "helpText": "Helper Text",
-                "valueType": "long-text",
-                "validations": {
-                  "required": true
-                },
-                "key": "65-inputs-text"
-              }
-            ],
-            "key": "65-CLIPTextEncode"
+            "key": "45-LoadImage"
           },
           {
             "title": "LoRA加载器",
@@ -3596,9 +3230,9 @@
               {
                 "title": "Lora_name",
                 "placeholder": "Lora_name",
-                "value": "赖清德.safetensors",
+                "value": "特朗普.safetensors",
                 "workflowPath": [
-                  "348",
+                  "61",
                   "inputs",
                   "lora_name"
                 ],
@@ -3607,14 +3241,14 @@
                 "validations": {
                   "required": true
                 },
-                "key": "348-inputs-lora_name"
+                "key": "61-inputs-lora_name"
               },
               {
                 "title": "Strength_model",
                 "placeholder": "Strength_model",
-                "value": 1,
+                "value": "1",
                 "workflowPath": [
-                  "348",
+                  "61",
                   "inputs",
                   "strength_model"
                 ],
@@ -3623,14 +3257,14 @@
                 "validations": {
                   "required": true
                 },
-                "key": "348-inputs-strength_model"
+                "key": "61-inputs-strength_model"
               },
               {
                 "title": "Strength_clip",
                 "placeholder": "Strength_clip",
                 "value": 1,
                 "workflowPath": [
-                  "348",
+                  "61",
                   "inputs",
                   "strength_clip"
                 ],
@@ -3639,10 +3273,10 @@
                 "validations": {
                   "required": true
                 },
-                "key": "348-inputs-strength_clip"
+                "key": "61-inputs-strength_clip"
               }
             ],
-            "key": "348-LoraLoader"
+            "key": "61-LoraLoader"
           }
         ],
         "advancedInputs": [
@@ -3652,9 +3286,9 @@
               {
                 "title": "Seed",
                 "placeholder": "Seed",
-                "value": 656540956844036,
+                "value": 218245589489836,
                 "workflowPath": [
-                  "61",
+                  "39",
                   "inputs",
                   "seed"
                 ],
@@ -3663,14 +3297,14 @@
                 "validations": {
                   "required": true
                 },
-                "key": "61-inputs-seed"
+                "key": "39-inputs-seed"
               },
               {
                 "title": "Steps",
                 "placeholder": "Steps",
                 "value": 25,
                 "workflowPath": [
-                  "61",
+                  "39",
                   "inputs",
                   "steps"
                 ],
@@ -3679,14 +3313,14 @@
                 "validations": {
                   "required": true
                 },
-                "key": "61-inputs-steps"
+                "key": "39-inputs-steps"
               },
               {
                 "title": "Cfg",
                 "placeholder": "Cfg",
                 "value": 1,
                 "workflowPath": [
-                  "61",
+                  "39",
                   "inputs",
                   "cfg"
                 ],
@@ -3695,14 +3329,14 @@
                 "validations": {
                   "required": true
                 },
-                "key": "61-inputs-cfg"
+                "key": "39-inputs-cfg"
               },
               {
                 "title": "Sampler_name",
                 "placeholder": "Sampler_name",
-                "value": "euler",
+                "value": "dpm_adaptive",
                 "workflowPath": [
-                  "61",
+                  "39",
                   "inputs",
                   "sampler_name"
                 ],
@@ -3711,14 +3345,14 @@
                 "validations": {
                   "required": true
                 },
-                "key": "61-inputs-sampler_name"
+                "key": "39-inputs-sampler_name"
               },
               {
                 "title": "Scheduler",
                 "placeholder": "Scheduler",
                 "value": "simple",
                 "workflowPath": [
-                  "61",
+                  "39",
                   "inputs",
                   "scheduler"
                 ],
@@ -3727,14 +3361,14 @@
                 "validations": {
                   "required": true
                 },
-                "key": "61-inputs-scheduler"
+                "key": "39-inputs-scheduler"
               },
               {
                 "title": "Denoise",
                 "placeholder": "Denoise",
                 "value": 1,
                 "workflowPath": [
-                  "61",
+                  "39",
                   "inputs",
                   "denoise"
                 ],
@@ -3743,10 +3377,10 @@
                 "validations": {
                   "required": true
                 },
-                "key": "61-inputs-denoise"
+                "key": "39-inputs-denoise"
               }
             ],
-            "key": "61-KSampler"
+            "key": "39-KSampler"
           },
           {
             "title": "保存图像",
@@ -3756,7 +3390,7 @@
                 "placeholder": "Filename_prefix",
                 "value": "ZhiHui",
                 "workflowPath": [
-                  "349",
+                  "62",
                   "inputs",
                   "filename_prefix"
                 ],
@@ -3765,76 +3399,21 @@
                 "validations": {
                   "required": true
                 },
-                "key": "349-inputs-filename_prefix"
+                "key": "62-inputs-filename_prefix"
               }
             ],
-            "key": "349-SaveImage"
+            "key": "62-SaveImage"
           }
         ],
         "type": "smart_ps",
-        "id": "0b1a337893d44"
+        "id": "dad57cb7f4b8f"
       },
       "workflowApiJSON": {
-        "61": {
+        "6": {
           "inputs": {
-            "seed": 656540956844036,
-            "steps": 25,
-            "cfg": 1,
-            "sampler_name": "dpm_adaptive",
-            "scheduler": "simple",
-            "denoise": 1,
-            "model": [
-              "71",
-              0
-            ],
-            "positive": [
-              "70",
-              0
-            ],
-            "negative": [
-              "70",
-              1
-            ],
-            "latent_image": [
-              "70",
-              2
-            ]
-          },
-          "class_type": "KSampler",
-          "_meta": {
-            "title": "K采样器"
-          }
-        },
-        "63": {
-          "inputs": {
-            "samples": [
-              "61",
-              0
-            ],
-            "vae": [
-              "68",
-              0
-            ]
-          },
-          "class_type": "VAEDecode",
-          "_meta": {
-            "title": "VAE解码"
-          }
-        },
-        "64": {
-          "inputs": {
-            "image": "ComfyUI_00165_.png"
-          },
-          "class_type": "LoadImage",
-          "_meta": {
-            "title": "加载图像"
-          }
-        },
-        "65": {
-          "inputs": {
-            "text": "laiqingde,face",
+            "text": "",
             "clip": [
-              "348",
+              "61",
               1
             ]
           },
@@ -3843,30 +3422,7 @@
             "title": "CLIP文本编码器"
           }
         },
-        "66": {
-          "inputs": {
-            "guidance": 30,
-            "conditioning": [
-              "65",
-              0
-            ]
-          },
-          "class_type": "FluxGuidance",
-          "_meta": {
-            "title": "Flux引导"
-          }
-        },
-        "67": {
-          "inputs": {
-            "unet_name": "flux_fill_dev_fp8_e4m3fn.safetensors",
-            "weight_dtype": "fp8_e4m3fn"
-          },
-          "class_type": "UNETLoader",
-          "_meta": {
-            "title": "UNET加载器"
-          }
-        },
-        "68": {
+        "10": {
           "inputs": {
             "vae_name": "ae.safetensors"
           },
@@ -3875,10 +3431,10 @@
             "title": "VAE加载器"
           }
         },
-        "69": {
+        "11": {
           "inputs": {
-            "clip_name1": "clip_l.safetensors",
-            "clip_name2": "t5xxl_fp8_e4m3fn.safetensors",
+            "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
+            "clip_name2": "clip_l.safetensors",
             "type": "flux",
             "device": "default"
           },
@@ -3887,70 +3443,119 @@
             "title": "双CLIP加载器"
           }
         },
-        "70": {
+        "12": {
           "inputs": {
-            "noise_mask": true,
+            "unet_name": "flux1-dev-fp8.safetensors",
+            "weight_dtype": "fp8_e4m3fn"
+          },
+          "class_type": "UNETLoader",
+          "_meta": {
+            "title": "UNET加载器"
+          }
+        },
+        "39": {
+          "inputs": {
+            "seed": 218245589489836,
+            "steps": 25,
+            "cfg": 1,
+            "sampler_name": "dpm_adaptive",
+            "scheduler": "simple",
+            "denoise": 1,
+            "model": [
+              "61",
+              0
+            ],
             "positive": [
-              "66",
+              "6",
               0
             ],
             "negative": [
-              "255",
+              "66",
+              0
+            ],
+            "latent_image": [
+              "58",
+              0
+            ]
+          },
+          "class_type": "KSampler",
+          "_meta": {
+            "title": "K采样器"
+          }
+        },
+        "42": {
+          "inputs": {
+            "samples": [
+              "39",
               0
             ],
             "vae": [
-              "68",
+              "10",
+              0
+            ]
+          },
+          "class_type": "VAEDecode",
+          "_meta": {
+            "title": "VAE解码"
+          }
+        },
+        "45": {
+          "inputs": {
+            "image": "ComfyUI_00050_.png"
+          },
+          "class_type": "LoadImage",
+          "_meta": {
+            "title": "加载图像"
+          }
+        },
+        "46": {
+          "inputs": {
+            "pixels": [
+              "45",
               0
             ],
+            "vae": [
+              "10",
+              0
+            ]
+          },
+          "class_type": "VAEEncode",
+          "_meta": {
+            "title": "VAE编码"
+          }
+        },
+        "58": {
+          "inputs": {
+            "grow_mask_by": 6,
             "pixels": [
-              "64",
+              "45",
+              0
+            ],
+            "vae": [
+              "10",
               0
             ],
             "mask": [
-              "64",
+              "45",
               1
             ]
           },
-          "class_type": "InpaintModelConditioning",
+          "class_type": "VAEEncodeForInpaint",
           "_meta": {
-            "title": "内补模型条件"
+            "title": "VAE内补编码器"
           }
         },
-        "71": {
+        "61": {
           "inputs": {
-            "model": [
-              "348",
-              0
-            ]
-          },
-          "class_type": "DifferentialDiffusion",
-          "_meta": {
-            "title": "差异扩散"
-          }
-        },
-        "255": {
-          "inputs": {
-            "conditioning": [
-              "65",
-              0
-            ]
-          },
-          "class_type": "ConditioningZeroOut",
-          "_meta": {
-            "title": "条件零化"
-          }
-        },
-        "348": {
-          "inputs": {
-            "lora_name": "赖清德.safetensors",
-            "strength_model": 1,
+            "lora_name": "zhengzhi-000021.safetensors",
+            "strength_model": 0,
             "strength_clip": 1,
             "model": [
-              "67",
+              "12",
               0
             ],
             "clip": [
-              "69",
+              "11",
               0
             ]
           },
@@ -3959,17 +3564,34 @@
             "title": "LoRA加载器"
           }
         },
-        "349": {
+        "62": {
           "inputs": {
-            "filename_prefix": "ZhiHui",
+            "filename_prefix": [
+              "62",
+              "inputs",
+              "filename_prefix"
+            ],
             "images": [
-              "63",
+              "42",
               0
             ]
           },
           "class_type": "SaveImage",
           "_meta": {
             "title": "保存图像"
+          }
+        },
+        "66": {
+          "inputs": {
+            "text": "worst quality, low quality, normal quality, lowres, watermark, monochrome, grayscale, glans,distorted, bad anatomy,morbid, malformation, amputation, bad proportions,missing body, fused body, extra head,poorly drawn face, bad eyes,deformed eye, unclear eyes,cross-eyed, long neck, malformed limbs, extra limbs, extra arms, missing arms,  bad tongue,strange fingers, mutated hands,  missing hands,poorly drawn hands, extra hands, fused hands,connected hand, bad hands,wrong fingers, missing fingers, extra fingers, 4 fingers, 6 fingers, deformed hands, extra legs, bad legs, many legs, more than two legs, bad feet,wrong feet, extra feets,3 legs,\"",
+            "clip": [
+              "61",
+              1
+            ]
+          },
+          "class_type": "CLIPTextEncode",
+          "_meta": {
+            "title": "CLIP文本编码器"
           }
         }
       }
