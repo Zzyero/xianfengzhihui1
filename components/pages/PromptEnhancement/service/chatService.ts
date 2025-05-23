@@ -147,7 +147,7 @@ class ChatService {
   }
 
   /**
-   * 调用AI模型
+   * 调用AI模型 openai
    */
   private static async callModel(options: {
     model: Model;

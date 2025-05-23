@@ -19,18 +19,16 @@ export interface ChatCallbacks {
 }
 
 /**
- * 聊天服务类 - 使用fetch代替OpenAI SDK
+ * 聊天服务类
  */
-class ChatServiceWithoutOpenai {
-  // 固定的会话ID
-  private static readonly DEFAULT_SESSION_ID = 'single_chat_session';
+class ChatService {
   // 全局单例控制器，用于取消请求
   private static abortController: AbortController | null = null;
   
   /**
    * 发送消息并获取AI响应
    * @param content 消息内容
-   * @param sessionId 会话ID - 为了兼容原始接口保留，但不使用
+   * @param sessionId 会话ID
    * @param modelId 模型ID
    * @param callbacks 回调函数
    * @param customPrompt 自定义提示词
@@ -45,10 +43,24 @@ class ChatServiceWithoutOpenai {
     disableHistory: boolean = false
   ): Promise<void> {
     try {
+      // 处理会话ID - 如果不存在则创建新会话
+      let currentSessionId = sessionId || '';
+      if (!currentSessionId && !disableHistory) {
+        // 在非单轮对话模式下创建并保存新会话
+        const newSessionId = await this.createNewSession(content);
+        if (!newSessionId) {
+          throw new Error('创建会话失败');
+        }
+        currentSessionId = newSessionId;
+      } else if (!currentSessionId && disableHistory) {
+        // 单轮对话模式下，如果没有会话ID，创建一个临时ID但不创建新会话
+        currentSessionId = `session_temp_${Date.now()}`;
+      }
+
       // 创建用户消息
       const userMessage: Message = {
         id: Date.now().toString(),
-        sessionId: this.DEFAULT_SESSION_ID,
+        sessionId: currentSessionId,
         role: 'user',
         content,
         timestamp: new Date()
@@ -57,6 +69,10 @@ class ChatServiceWithoutOpenai {
       // 保存用户消息到数据库
       await db.addMessage(userMessage);
       callbacks.onUserMessageSaved?.(userMessage);
+
+      // 更新会话信息
+      await this.updateSessionInfo(currentSessionId, content);
+      callbacks.onSessionUpdated?.();
 
       // 获取模型
       const model = await db.getModel(modelId);
@@ -78,7 +94,7 @@ class ChatServiceWithoutOpenai {
         historyMessages = [userMessage];
       } else {
         // 否则获取完整的历史记录
-        historyMessages = await db.getMessagesBySession(this.DEFAULT_SESSION_ID);
+        historyMessages = await db.getMessagesBySession(currentSessionId);
       }
       
       // 调用AI接口
@@ -88,13 +104,13 @@ class ChatServiceWithoutOpenai {
         callbacks: {
           onStart: callbacks.onStart,
           onUpdate: (content, reasoning) => {
-            callbacks.onUpdate?.(content, aiMessageId, this.DEFAULT_SESSION_ID, {reasoning});
+            callbacks.onUpdate?.(content, aiMessageId, currentSessionId!, {reasoning});
           },
           onComplete: async (fullContent, metadata) => {
             // 保存AI消息
             const aiMessage: Message = {
               id: aiMessageId,
-              sessionId: this.DEFAULT_SESSION_ID,
+              sessionId: currentSessionId!,
               role: 'assistant',
               content: fullContent,
               reasoningContent: metadata?.reasoning,
@@ -102,6 +118,7 @@ class ChatServiceWithoutOpenai {
             };
             
             await db.addMessage(aiMessage);
+            await this.updateSessionInfo(currentSessionId!, fullContent);
             callbacks.onComplete?.(aiMessage);
             
             // 调用会话更新回调
@@ -123,7 +140,7 @@ class ChatServiceWithoutOpenai {
   }
 
   /**
-   * 调用AI模型 - 使用fetch直接请求API
+   * 调用AI模型 fetch
    */
   private static async callModel(options: {
     model: Model;
@@ -207,32 +224,14 @@ class ChatServiceWithoutOpenai {
         stream
       };
 
-      // 设置API URL，优先使用模型配置中的URL，否则使用默认URL
-      const originalApiUrl = model.url || 'https://api.openai.com/v1/chat/completions';
-      
-      // 检查是否需要使用代理
-      const useProxy = window.location.hostname === 'localhost' || 
-                      window.location.hostname === '127.0.0.1';
-      
-      // 如果在本地开发环境，使用代理API
-      const apiUrl = useProxy 
-        ? `/api/proxy?url=${encodeURIComponent(originalApiUrl)}`
-        : originalApiUrl;
-      
-      console.log(`使用API URL: ${apiUrl} ${useProxy ? '(通过代理)' : ''}`);
+      // 设置API URL
+      const apiUrl = model.url + "/chat/completions" || '';
       
       // 请求头
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${model.apiKey || ''}`
       };
-      
-      // 只有在不使用代理时才直接添加授权头
-      if (!useProxy) {
-        headers['Authorization'] = `Bearer ${model.apiKey || ''}`;
-      } else {
-        // 对于代理请求，将API密钥放在自定义头或请求体中，由服务端代理处理
-        headers['X-API-Key'] = model.apiKey || '';
-      }
 
       // 完整内容和思考内容
       let fullContent = '';
@@ -246,9 +245,7 @@ class ChatServiceWithoutOpenai {
             method: 'POST',
             headers,
             body: JSON.stringify(requestBody),
-            signal: this.abortController.signal,
-            // 添加credentials以便在使用代理时携带cookies
-            credentials: useProxy ? 'include' : 'same-origin'
+            signal: this.abortController.signal
           });
 
           if (!response.ok) {
@@ -322,9 +319,7 @@ class ChatServiceWithoutOpenai {
             method: 'POST',
             headers,
             body: JSON.stringify(requestBody),
-            signal: this.abortController.signal,
-            // 添加credentials以便在使用代理时携带cookies
-            credentials: useProxy ? 'include' : 'same-origin'
+            signal: this.abortController.signal
           });
 
           if (!response.ok) {
@@ -376,90 +371,43 @@ class ChatServiceWithoutOpenai {
   }
 
   /**
-   * 清空所有消息历史
-   */
-  static async clearHistory(): Promise<void> {
-    try {
-      // 中断当前请求
-      this.abortRequest();
-      
-      // 删除所有消息，使用deleteSession方法可以同时删除会话及其相关的所有消息
-      await db.deleteSession(this.DEFAULT_SESSION_ID);
-      
-      console.log('已清空所有消息历史');
-    } catch (error) {
-      console.error('清空历史记录失败:', error);
-      throw new Error('清空历史记录失败');
-    }
-  }
-
-  /**
-   * 加载会话消息 - 与原始API保持一致
-   */
-  static async loadSessionMessages(sessionId: string): Promise<Message[]> {
-    try {
-      // 实际上忽略传入的sessionId，始终使用DEFAULT_SESSION_ID
-      return await db.getMessagesBySession(this.DEFAULT_SESSION_ID);
-    } catch (error) {
-      console.error('加载消息失败:', error);
-      throw new Error('加载消息失败');
-    }
-  }
-  
-  /**
-   * 加载所有会话 - 与原始API保持一致
-   */
-  static async loadSessions(): Promise<ChatSession[]> {
-    try {
-      // 因为我们只使用单一会话，所以创建一个虚拟会话列表
-      const messages = await db.getMessagesBySession(this.DEFAULT_SESSION_ID);
-      if (messages.length === 0) {
-        return [];
-      }
-      
-      // 获取最新消息作为会话的最后消息
-      const latestMessage = [...messages].sort(
-        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      )[0];
-      
-      // 创建单一会话对象
-      const session: ChatSession = {
-        id: this.DEFAULT_SESSION_ID,
-        title: '单一对话',
-        lastMessage: latestMessage?.content || '',
-        timestamp: new Date(),
-        messageCount: messages.length
-      };
-      
-      return [session];
-    } catch (error) {
-      console.error('加载会话失败:', error);
-      throw new Error('加载会话列表失败');
-    }
-  }
-
-  /**
-   * 创建新会话 - 与原始API保持一致
+   * 创建新会话
    */
   static async createNewSession(firstMessage?: string, title?: string): Promise<string | undefined> {
     try {
-      // 清空历史记录
-      await this.clearHistory();
-      
-      // 如果有首条消息，则创建它
+      // 生成会话标题
+      let sessionTitle = '新对话';
+      if (title) {
+        sessionTitle = title;
+      } else if (firstMessage) {
+        sessionTitle = firstMessage.length > 15 
+          ? `${firstMessage.substring(0, 15)}...` 
+          : firstMessage;
+      }
+      // 创建会话ID
+      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const newSession: ChatSession = {
+        id: sessionId,
+        title: sessionTitle,
+        lastMessage: firstMessage || '',
+        timestamp: new Date(),
+        messageCount: firstMessage ? 1 : 0,
+        starred: false
+      };
+      await db.saveSession(newSession);
+      // 如果有首条消息，添加到数据库
       if (firstMessage) {
         const userMessage: Message = {
           id: Date.now().toString(),
-          sessionId: this.DEFAULT_SESSION_ID,
+          sessionId: sessionId,
           role: 'user',
           content: firstMessage,
           timestamp: new Date()
         };
         await db.addMessage(userMessage);
       }
-      
-      // 返回固定会话ID
-      return this.DEFAULT_SESSION_ID;
+      await db.saveLastUsedSessionId(sessionId);
+      return sessionId;
     } catch (error) {
       console.error('创建会话失败:', error);
       throw new Error('创建新对话失败');
@@ -467,15 +415,69 @@ class ChatServiceWithoutOpenai {
   }
 
   /**
-   * 删除会话 - 与原始API保持一致
+   * 更新会话信息（如最后消息、消息数、时间戳等）
+   */
+  static async updateSessionInfo(sessionId: string, lastMessage: string): Promise<void> {
+    try {
+      const session = await db.getSession(sessionId);
+      if (!session) return;
+      // 获取会话的所有消息数量
+      const messages = await db.getMessagesBySession(sessionId);
+      const messageCount = messages.length;
+      // 如果是第一条用户消息且标题是默认的"新对话"，则更新标题
+      let sessionTitle = session.title;
+      if (messageCount === 1 && session.title === "新对话" && messages[0]?.role === 'user') {
+        const userMessage = messages[0].content;
+        sessionTitle = userMessage.length > 15 
+          ? `${userMessage.substring(0, 15)}...` 
+          : userMessage;
+      }
+      const updatedSession: ChatSession = {
+        ...session,
+        title: sessionTitle,
+        lastMessage,
+        timestamp: new Date(),
+        messageCount: messageCount
+      };
+      await db.saveSession(updatedSession);
+    } catch (error) {
+      console.error('更新会话信息失败:', error);
+    }
+  }
+
+  /**
+   * 加载指定会话的所有消息
+   */
+  static async loadSessionMessages(sessionId: string): Promise<Message[]> {
+    try {
+      return await db.getMessagesBySession(sessionId);
+    } catch (error) {
+      console.error('加载消息失败:', error);
+      throw new Error('加载消息失败');
+    }
+  }
+
+  /**
+   * 加载所有会话
+   */
+  static async loadSessions(): Promise<ChatSession[]> {
+    try {
+      return await db.getAllSessions();
+    } catch (error) {
+      console.error('加载会话失败:', error);
+      throw new Error('加载会话列表失败');
+    }
+  }
+
+  /**
+   * 删除会话及其所有消息
    */
   static async deleteSession(sessionId: string): Promise<void> {
     try {
-      // 实际上忽略传入的sessionId，清空默认会话
       if (this.abortController) {
         this.abortRequest();
       }
-      await db.deleteSession(this.DEFAULT_SESSION_ID);
+      await db.deleteSession(sessionId);
     } catch (error) {
       console.error('删除会话失败:', error);
       throw new Error('删除会话失败');
@@ -483,4 +485,4 @@ class ChatServiceWithoutOpenai {
   }
 }
 
-export default ChatServiceWithoutOpenai; 
+export default ChatService; 
