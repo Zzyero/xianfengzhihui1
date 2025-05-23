@@ -71,6 +71,8 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
           type="file"
           accept="image/*"
           className="hidden"
+          title="上传图片"
+          aria-label="上传图片"
           onChange={handleFileChange}
         />
         <Button
