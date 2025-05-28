@@ -37,9 +37,8 @@ type PopoverTriggerProps = React.ComponentPropsWithoutRef<typeof PopoverTrigger>
 
 interface WorkflowSwitcherProps extends PopoverTriggerProps {
     viewComfys: IViewComfy[];                      // 所有工作流列表
-    currentViewComfy: IViewComfy;                 // 当前选中的工作流
+    currentViewComfy?: IViewComfy;                 // 当前选中的工作流，可能为undefined
     onSelectChange: (data: IViewComfy) => void;    // 选择变更回调
-
 }
 
 /**
@@ -49,7 +48,7 @@ interface WorkflowSwitcherProps extends PopoverTriggerProps {
 export default function WorkflowSwitcher({ className, currentViewComfy, viewComfys, onSelectChange }: WorkflowSwitcherProps) {
     const [open, setOpen] = React.useState(false);
     const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
-    const [currentWorkflow, setCurrentWorkflow] = React.useState<IViewComfy>(currentViewComfy);
+    const [currentWorkflow, setCurrentWorkflow] = React.useState<IViewComfy | undefined>(currentViewComfy);
 
     useEffect(() => {
         setCurrentWorkflow(currentViewComfy);
@@ -74,7 +73,7 @@ export default function WorkflowSwitcher({ className, currentViewComfy, viewComf
                         aria-label="请选择一个功能"
                         className={cn("w-full max-w-[300px] justify-between", className)}
                     >
-                        {currentWorkflow.viewComfyJSON.title}
+                        {currentWorkflow?.viewComfyJSON?.title || "请选择功能"}
                         <CaretSortIcon className="ml-auto h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                 </PopoverTrigger>
@@ -99,7 +98,7 @@ export default function WorkflowSwitcher({ className, currentViewComfy, viewComf
                                             <CheckIcon
                                                 className={cn(
                                                     "ml-auto h-4 w-4",
-                                                    currentWorkflow.viewComfyJSON.id === viewComfy.viewComfyJSON.id
+                                                    currentWorkflow?.viewComfyJSON?.id === viewComfy.viewComfyJSON.id
                                                         ? "opacity-100"
                                                         : "opacity-0"
                                                 )}
@@ -110,21 +109,6 @@ export default function WorkflowSwitcher({ className, currentViewComfy, viewComf
                             ))}
                         </CommandList>
                         <CommandSeparator />
-                        {/* <CommandList>
-                            <CommandGroup>
-                                <DialogTrigger asChild>
-                                    <CommandItem
-                                        onSelect={() => {
-                                            setOpen(false)
-                                            setShowNewTeamDialog(true)
-                                        }}
-                                    >
-                                        <PlusCircledIcon className="mr-2 h-5 w-5" />
-                                        Add Workflow
-                                    </CommandItem>
-                                </DialogTrigger>
-                            </CommandGroup>
-                        </CommandList> */}
                     </Command>
                 </PopoverContent>
             </Popover>
