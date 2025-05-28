@@ -132,9 +132,10 @@ export function ViewComfyForm(args: {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="image_generation">生图</SelectItem>
+                                                            <SelectItem value="image_generation">智能生图</SelectItem>
                                                             <SelectItem value="smart_ps">智能修图</SelectItem>
                                                             <SelectItem value="audio_generation">智能音频</SelectItem>
+                                                            <SelectItem value="video_generation">智能视频</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormDescription>

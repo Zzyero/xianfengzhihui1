@@ -18,6 +18,7 @@ import { Loader } from "@/components/loader";
 import { PanelRightOpen } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import SmartAudioPage from "@/components/pages/smartAudio/smart-audio-page";
+import SmartVideoPage from "@/components/pages/smartVideo/smart-video-page";
 
 // export const description =
 //     "An AI playground with a sidebar navigation and a main content area. The playground has a header with a settings drawer and a share button. The sidebar has navigation links and a user menu. The main content area shows a form to configure the model and messages."
@@ -229,6 +230,9 @@ function HomeContent() {
                         
                         {/* 智能音频页面 */}
                         {currentTab === TabValue.SmartAudio && <SmartAudioPage />}
+                        
+                        {/* 智能视频页面 */}
+                        {currentTab === TabValue.SmartVideo && <SmartVideoPage />}
                         
                         {/* 帮助页面 */}
                         {currentTab === TabValue.Help && <HelpPage />}

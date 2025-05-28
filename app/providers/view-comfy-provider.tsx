@@ -52,7 +52,7 @@ export interface IGenerationOutput {
 export interface IGenerationResult {
     outputs: IGenerationOutput[];
     timestamp: number; // 用于排序
-    pageType: 'image_generation' | 'smart_ps' | 'audio_generation'; // 标记生成结果属于哪个页面
+    pageType: 'image_generation' | 'smart_ps' | 'audio_generation' | 'video_generation'; // 标记生成结果属于哪个页面
 }
 
 // 视图模式状态接口
@@ -96,10 +96,10 @@ export type Action =
         payload: { 
             id: string, 
             outputs: { type: string, data: string }[],
-            pageType: 'image_generation' | 'smart_ps' | 'audio_generation'
+            pageType: 'image_generation' | 'smart_ps' | 'audio_generation' | 'video_generation'
         } 
     }
-    | { type: ActionType.CLEAR_GENERATION_RESULTS; payload: { pageType: 'image_generation' | 'smart_ps' | 'audio_generation' } }
+    | { type: ActionType.CLEAR_GENERATION_RESULTS; payload: { pageType: 'image_generation' | 'smart_ps' | 'audio_generation' | 'video_generation' } }
     | { type: ActionType.SET_RESULT_ANIMATED; payload: { id: string, index: number } };
 
 // 状态处理器

@@ -5,7 +5,16 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { ViewComfyForm } from '@/components/view-comfy/view-comfy-form';
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from '@/hooks/use-toast';
-import { CheckIcon } from 'lucide-react';
+import { CheckIcon, Trash2 } from 'lucide-react';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import JsonView from 'react18-json-view'
 
 interface ViewComfyFormEditorProps {
     onSubmit: (data: IViewComfyBase) => void;
@@ -13,11 +22,15 @@ interface ViewComfyFormEditorProps {
 }
 
 //视图配置表单编辑器组件
-export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewComfyFormEditorProps) {
+export default function ViewComfyFormEditor(props: ViewComfyFormEditorProps) {
+    const { onSubmit, viewComfyJSON } = props;
+    const { toast } = useToast();
+    const [viewType, setViewType] = useState<'image_generation' | 'smart_ps' | 'audio_generation' | 'video_generation'>(
+        viewComfyJSON?.type || 'image_generation'
+    );
 
     //获取视图配置
     const { viewComfyState } = useViewComfy();
-    const { toast } = useToast();
 
     const [downloadJson, setDownloadJson] = useState<boolean>(false);
 
@@ -132,6 +145,36 @@ export default function ViewComfyFormEditor({ onSubmit, viewComfyJSON }: ViewCom
                 editMode={true}
                 downloadViewComfyJSON={downloadViewComfyJSON}
                 >
+                <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                        <FormItem className="pb-5">
+                            <FormLabel>类型</FormLabel>
+                            <Select
+                                value={field.value}
+                                onValueChange={(value) => {
+                                    field.onChange(value);
+                                    const workflowType = value as 'image_generation' | 'smart_ps' | 'audio_generation' | 'video_generation';
+                                    setViewType(workflowType);
+                                }}
+                            >
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="选择类型" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="image_generation">智能生图</SelectItem>
+                                    <SelectItem value="smart_ps">智能修图</SelectItem>
+                                    <SelectItem value="audio_generation">智能音频</SelectItem>
+                                    <SelectItem value="video_generation">智能视频</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
             </ViewComfyForm>
         </div>
     )

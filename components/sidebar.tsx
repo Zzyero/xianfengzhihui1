@@ -1,4 +1,4 @@
-import { SquareTerminal, LifeBuoy, Book, Bot, BookOpen, Star, History, Music } from "lucide-react"
+import { SquareTerminal, LifeBuoy, Book, Bot, BookOpen, Star, History, Music, Video } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TooltipButton } from "@/components/ui/tooltip-button"
 import Link from "next/link";
@@ -20,6 +20,7 @@ export enum TabValue {
     PromptEnhance = 'prompt_enhance',
     SmartPS = 'smart_ps',
     SmartAudio = 'smart_audio',
+    SmartVideo = 'smart_video',
     GenerateHistory = 'generate_history'
 }
 
@@ -88,6 +89,13 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                             onClick={() => onTabChange(TabValue.SmartAudio)}
                             isSmallScreen={isSmallScreen}
                         />
+                        <SidebarButton
+                            icon={<Video className="size-5" />}
+                            label="智能视频"
+                            isActive={currentTab === TabValue.SmartVideo}
+                            onClick={() => onTabChange(TabValue.SmartVideo)}
+                            isSmallScreen={isSmallScreen}
+                        />
                         <SidebarButton 
                             icon={<BookOpen className="size-5" />}
                             label="画廊"
@@ -141,7 +149,14 @@ export function Sidebar({ currentTab, onTabChange, deployWindow, onDeployWindow 
                             onClick={() => onTabChange(TabValue.SmartAudio)}
                             isSmallScreen={isSmallScreen}
                         />
-                        <SidebarButton 
+                        <SidebarButton
+                            icon={<Video className="size-5" />}
+                            label="智能视频"
+                            isActive={currentTab === TabValue.SmartVideo}
+                            onClick={() => onTabChange(TabValue.SmartVideo)}
+                            isSmallScreen={isSmallScreen}
+                        />
+                        <SidebarButton
                             icon={<BookOpen className="size-5" />}
                             label="画廊"
                             isActive={currentTab === TabValue.PromptLibrary}

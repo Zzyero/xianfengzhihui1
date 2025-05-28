@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/drawer"
 import { Fragment, useEffect, useState } from "react";
 import { Header } from "@/components/header";
-import SmartAudioForm from "./smart-audio-form";
+import SmartVideoForm from "./smart-video-form";
 import { Loader } from "@/components/loader";
 import { usePostPlayground } from "@/hooks/playground/use-post-playground";
 import { ActionType, type IViewComfy, type IViewComfyWorkflow, type IViewComfyJSON, useViewComfy } from "@/app/providers/view-comfy-provider";
@@ -32,12 +32,12 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 const apiErrorHandler = new ApiErrorHandler();
 
 //页面内容组件
-function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setLoading: (loading: boolean) => void }) {
+function SmartVideoPageContent({ loading, setLoading }: { loading: boolean, setLoading: (loading: boolean) => void }) {
     const { viewComfyState, viewComfyStateDispatcher } = useViewComfy();
     const viewMode = process.env.NEXT_PUBLIC_VIEW_MODE === "true";
     const [errorAlertDialog, setErrorAlertDialog] = useState<{ open: boolean, errorTitle: string | undefined, errorDescription: React.JSX.Element, onClose: () => void }>({ open: false, errorTitle: undefined, errorDescription: <></>, onClose: () => { } });
     
-    // 图片预览状态
+    // 视频预览状态
     const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
 
     // 打开图片预览
@@ -64,14 +64,14 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
                     }
                     const data = await response.json() as { viewComfyJSON: IViewComfyJSON };
                     
-                    // Filter workflows with type 'audio_generation' from the nested structure
-                    const audioGenerationWorkflows = data.viewComfyJSON.workflows.filter(
-                        (workflow: IViewComfy) => workflow.type === 'audio_generation'
+                    // Filter workflows with type 'video_generation' from the nested structure
+                    const videoGenerationWorkflows = data.viewComfyJSON.workflows.filter(
+                        (workflow: IViewComfy) => workflow.type === 'video_generation'
                     );
 
-                    // If no audio generation workflows are found, handle appropriately (e.g., show an error or default state)
-                    if (audioGenerationWorkflows.length === 0) {
-                         console.error("No audio generation workflows found.");
+                    // If no video generation workflows are found, handle appropriately (e.g., show an error or default state)
+                    if (videoGenerationWorkflows.length === 0) {
+                         console.error("No video generation workflows found.");
                          // Optionally set an error state or return early
                          return; 
                     }
@@ -81,7 +81,7 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
                         type: ActionType.INIT_VIEW_COMFY, 
                         payload: { 
                             ...data.viewComfyJSON, // Pass other potential fields from the JSON
-                            workflows: audioGenerationWorkflows // Use the filtered list
+                            workflows: videoGenerationWorkflows // Use the filtered list
                         } 
                     });
 
@@ -101,22 +101,22 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
         }
     }, [viewMode, viewComfyStateDispatcher]);
 
-    // 自动切换到 audio_generation 类型的工作流
+    // 自动切换到 video_generation 类型的工作流
     useEffect(() => {
-        // 如果有工作流且当前工作流类型不是 audio_generation
+        // 如果有工作流且当前工作流类型不是 video_generation
         if (viewComfyState.viewComfys.length > 0 && 
-            (!viewComfyState.currentViewComfy || viewComfyState.currentViewComfy.type !== 'audio_generation')) {
+            (!viewComfyState.currentViewComfy || viewComfyState.currentViewComfy.type !== 'video_generation')) {
             
-            // 查找第一个 audio_generation 类型的工作流
-            const audioGenerationWorkflow = viewComfyState.viewComfys.find(
-                workflow => workflow.type === 'audio_generation'
+            // 查找第一个 video_generation 类型的工作流
+            const videoGenerationWorkflow = viewComfyState.viewComfys.find(
+                workflow => workflow.type === 'video_generation'
             );
             
             // 如果找到了匹配的工作流，自动选择它
-            if (audioGenerationWorkflow) {
+            if (videoGenerationWorkflow) {
                 viewComfyStateDispatcher({
                     type: ActionType.UPDATE_CURRENT_VIEW_COMFY,
-                    payload: audioGenerationWorkflow
+                    payload: videoGenerationWorkflow
                 });
             }
         }
@@ -141,7 +141,7 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
         // 只清除当前页面类型的结果
         viewComfyStateDispatcher({
             type: ActionType.CLEAR_GENERATION_RESULTS,
-            payload: { pageType: 'audio_generation' }
+            payload: { pageType: 'video_generation' }
         });
     };
 
@@ -189,7 +189,7 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
                     payload: { 
                         id, 
                         outputs,
-                        pageType: 'audio_generation'
+                        pageType: 'video_generation'
                     }
                 });
                 
@@ -213,8 +213,8 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
 
     //选择变更
     const onSelectChange = (data: IViewComfy) => {
-        // 确保只选择 audio_generation 类型的工作流
-        if (data.type !== 'audio_generation') {
+        // 确保只选择 video_generation 类型的工作流
+        if (data.type !== 'video_generation') {
             return;
         }
         
@@ -226,7 +226,7 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
 
     // 获取当前页面类型的生成结果
     const filteredResults = Object.entries(viewComfyState.generationResults)
-        .filter(([id, result]) => result.pageType === 'audio_generation')
+        .filter(([id, result]) => result.pageType === 'video_generation')
         .sort(([idA, a], [idB, b]) => b.timestamp - a.timestamp);
 
     if (!viewComfyState.currentViewComfy) {
@@ -241,7 +241,7 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
         <>
             <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center p-4 border-b">
-                    <h1 className="text-2xl font-bold">智能音频</h1>
+                    <h1 className="text-2xl font-bold">智能视频</h1>
                     <QueueManager 
                         onInterrupt={handleInterrupt}
                         onClear={handleClearQueue}
@@ -249,7 +249,7 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
                 </div>
                 <div className="md:hidden w-full flex pl-4 gap-x-2">
                     <WorkflowSwitcher 
-                        viewComfys={viewComfyState.viewComfys.filter(workflow => workflow.type === 'audio_generation')} 
+                        viewComfys={viewComfyState.viewComfys.filter(workflow => workflow.type === 'video_generation')} 
                         currentViewComfy={viewComfyState.currentViewComfy} 
                         onSelectChange={onSelectChange} 
                     />
@@ -262,7 +262,7 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
                         </DrawerTrigger>
                         <DrawerContent className="max-h-[80vh] gap-4 px-4 h-full">
                             {viewComfyState.currentViewComfy && viewComfyState.currentViewComfy.viewComfyJSON && (
-                                <SmartAudioForm 
+                                <SmartVideoForm 
                                     viewComfyJSON={viewComfyState.currentViewComfy.viewComfyJSON} 
                                     onSubmit={onSubmit} 
                                     loading={loading} 
@@ -276,22 +276,22 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
                         {viewComfyState.viewComfys.length > 0 && viewComfyState.currentViewComfy && (
                             <div className="px-3 w-full">
                                 <WorkflowSwitcher 
-                                    viewComfys={viewComfyState.viewComfys.filter(workflow => workflow.type === 'audio_generation')} 
+                                    viewComfys={viewComfyState.viewComfys.filter(workflow => workflow.type === 'video_generation')} 
                                     currentViewComfy={viewComfyState.currentViewComfy} 
                                     onSelectChange={onSelectChange} 
                                 />
                             </div>
                         )}
                         {viewComfyState.currentViewComfy && viewComfyState.currentViewComfy.viewComfyJSON ? (
-                            <SmartAudioForm 
+                            <SmartVideoForm 
                                 viewComfyJSON={viewComfyState.currentViewComfy.viewComfyJSON} 
                                 onSubmit={onSubmit} 
                                 loading={loading} 
                             />
                         ) : (
                             <div className="flex flex-col items-center justify-center p-10 text-center">
-                                <p className="text-muted-foreground">无可用的音频生成配置</p>
-                                <p className="text-muted-foreground text-sm mt-2">请确保已配置音频生成工作流</p>
+                                <p className="text-muted-foreground">无可用的视频生成配置</p>
+                                <p className="text-muted-foreground text-sm mt-2">请确保已配置视频生成工作流</p>
                             </div>
                         )}
                     </div>
@@ -300,7 +300,7 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
                             {(filteredResults.length === 0) && !loading && (
                                 <>
                                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full text-center">
-                                        <p className="text-muted-foreground">填写左侧表单并点击"生成音频"按钮</p>
+                                        <p className="text-muted-foreground">填写左侧表单并点击"生成视频"按钮</p>
                                     </div>
                                     <Badge variant="outline" className="absolute right-3 top-3">
                                         输出
@@ -439,9 +439,9 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
 }
 
 //页面组件
-export default function SmartAudioPage() {
+export default function SmartVideoPage() {
     const [loading, setLoading] = useState(false);
     return (
-        <SmartAudioPageContent loading={loading} setLoading={setLoading} />
+        <SmartVideoPageContent loading={loading} setLoading={setLoading} />
     );
 } 
