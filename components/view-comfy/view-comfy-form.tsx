@@ -79,177 +79,179 @@ export function ViewComfyForm(args: {
                     <div className='flex-col flex-1 items-start gap-4 flex mr-1 min-h-0'>
                         <div id="inputs-form" className="grid w-full items-start gap-2 h-full">
                             <ScrollArea className="w-full h-full flex-1 rounded-md px-[5px] pr-4">
-                                {/* 编辑模式下显示的表单字段 */}
-                                {editMode && (
-                                    <>
-                                        {/* 标题输入字段 */}
-                                        <FormField
-                                            control={form.control}
-                                            name="title"
-                                            render={({ field }) => (
-                                                <FormItem key="title" className="ml-0.5">
-                                                    <FormLabel>标题</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="工作流的名称" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        {/* 描述输入字段 */}
-                                        <FormField
-                                            control={form.control}
-                                            name="description"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>描述</FormLabel>
-                                                    <FormControl>
-                                                        <Textarea
-                                                            placeholder="描述"
-                                                            className={TEXT_AREA_STYLE}
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription>
-                                                        工作流的描述
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="type"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>工作流类型</FormLabel>
-                                                    <Select
-                                                        onValueChange={field.onChange}
-                                                        defaultValue={field.value || "image_generation"}
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="选择工作流类型" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="image_generation">智能生图</SelectItem>
-                                                            <SelectItem value="smart_ps">智能修图</SelectItem>
-                                                            <SelectItem value="audio_generation">智能音频</SelectItem>
-                                                            <SelectItem value="video_generation">智能视频</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormDescription>
-                                                        选择工作流的类型，不同类型的工作流会在不同的页面显示
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        {/* 文本输出启用开关 */}
-                                        <FormField
-                                            control={form.control}
-                                            name="textOutputEnabled"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={field.value}
-                                                            onCheckedChange={field.onChange}
-                                                        />
-                                                    </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            启用文本输出
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            是否启用文本输出
-                                                        </FormDescription>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </>
-                                )}
-
-                                {/* 非编辑模式下显示的标题和描述 */}
-                                {!editMode && (
-                                    <div id="workflow-title-description">
-                                        <h1 className="text-xl font-semibold">{form.getValues("title")}</h1>
-                                        <p className="text-md text-muted-foreground whitespace-pre-wrap">{form.getValues("description")}</p>
-                                    </div>
-                                )}
-
-                                {/* 基础输入字段区域 */}
-                                <fieldset className="grid gap-2 rounded-lg p-1">
-                                    {/* 编辑模式下显示的标题 */}
+                                <div className="pb-16">
+                                    {/* 编辑模式下显示的表单字段 */}
                                     {editMode && (
-                                        <legend className="-ml-1 px-1 text-sm font-medium">
-                                            基础输入
-                                        </legend>
+                                        <>
+                                            {/* 标题输入字段 */}
+                                            <FormField
+                                                control={form.control}
+                                                name="title"
+                                                render={({ field }) => (
+                                                    <FormItem key="title" className="ml-0.5">
+                                                        <FormLabel>标题</FormLabel>
+                                                        <FormControl>
+                                                            <Input placeholder="工作流的名称" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            {/* 描述输入字段 */}
+                                            <FormField
+                                                control={form.control}
+                                                name="description"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>描述</FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                placeholder="描述"
+                                                                className={TEXT_AREA_STYLE}
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormDescription>
+                                                            工作流的描述
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="type"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>工作流类型</FormLabel>
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                            defaultValue={field.value || "image_generation"}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="选择工作流类型" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="image_generation">智能生图</SelectItem>
+                                                                <SelectItem value="smart_ps">智能修图</SelectItem>
+                                                                <SelectItem value="audio_generation">智能音频</SelectItem>
+                                                                <SelectItem value="video_generation">智能视频</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormDescription>
+                                                            选择工作流的类型，不同类型的工作流会在不同的页面显示
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            {/* 文本输出启用开关 */}
+                                            <FormField
+                                                control={form.control}
+                                                name="textOutputEnabled"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                            />
+                                                        </FormControl>
+                                                        <div className="space-y-1 leading-none">
+                                                            <FormLabel>
+                                                                启用文本输出
+                                                            </FormLabel>
+                                                            <FormDescription>
+                                                                是否启用文本输出
+                                                            </FormDescription>
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </>
                                     )}
-                                    {/* 渲染输入字段数组 */}
-                                    {inputFieldArray.fields.map((field, index) => {
-                                        // 检查是否有输入项
-                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                        // @ts-ignore
-                                        if (field.inputs.length > 0) {
-                                            // 检查是否是文本编码器或上传图片组件
-                                            // 使用类型断言确保field有title属性
-                                            const fieldTitle = (field as any).title || '';
-                                            const isSpecialComponent = fieldTitle === "CLIP文本编码" || fieldTitle === "加载图像" || fieldTitle === "CLIP文本编码器" || fieldTitle === "加载音频";
-                                            
-                                            if (isSpecialComponent) {
-                                                // 特殊组件不显示圆角方框
+
+                                    {/* 非编辑模式下显示的标题和描述 */}
+                                    {!editMode && (
+                                        <div id="workflow-title-description">
+                                            <h1 className="text-xl font-semibold">{form.getValues("title")}</h1>
+                                            <p className="text-md text-muted-foreground whitespace-pre-wrap">{form.getValues("description")}</p>
+                                        </div>
+                                    )}
+
+                                    {/* 基础输入字段区域 */}
+                                    <fieldset className="grid gap-2 rounded-lg p-1">
+                                        {/* 编辑模式下显示的标题 */}
+                                        {editMode && (
+                                            <legend className="-ml-1 px-1 text-sm font-medium">
+                                                基础输入
+                                            </legend>
+                                        )}
+                                        {/* 渲染输入字段数组 */}
+                                        {inputFieldArray.fields.map((field, index) => {
+                                            // 检查是否有输入项
+                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                            // @ts-ignore
+                                            if (field.inputs.length > 0) {
+                                                // 检查是否是文本编码器或上传图片组件
+                                                // 使用类型断言确保field有title属性
+                                                const fieldTitle = (field as any).title || '';
+                                                const isSpecialComponent = fieldTitle === "CLIP文本编码" || fieldTitle === "加载图像" || fieldTitle === "CLIP文本编码器" || fieldTitle === "加载音频";
+                                                
+                                                if (isSpecialComponent) {
+                                                    // 特殊组件不显示圆角方框
+                                                    return (
+                                                        <div className="grid gap-4">
+                                                            <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
+                                                        </div>
+                                                    );
+                                                }
+
+                                                // 其他组件显示圆角方框
                                                 return (
-                                                    <div className="grid gap-4">
+                                                    <fieldset className="grid gap-4 rounded-lg border p-4">
+                                                        <legend className="-ml-1 px-1 text-sm font-medium">
+                                                            {
+                                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                                // @ts-ignore
+                                                                (field as any).title || '未命名组件'
+                                                            }
+                                                            {/* 编辑模式下显示删除按钮 */}
+                                                            {editMode && (
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="ghost"
+                                                                    className="text-muted-foreground"
+                                                                    onClick={() => {
+                                                                        // 删除索引对应组件
+                                                                        inputFieldArray.remove(index);
+                                                                        // 更新表单值
+                                                                        const currentValues = form.getValues();
+                                                                        form.reset(currentValues);
+                                                                    }}
+                                                                >
+                                                                    <Trash2 className="size-5" />
+                                                                </Button>
+                                                            )}
+                                                        </legend>
                                                         <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
-                                                    </div>
+                                                    </fieldset>
                                                 );
                                             }
-
-                                            // 其他组件显示圆角方框
-                                            return (
-                                                <fieldset className="grid gap-4 rounded-lg border p-4">
-                                                    <legend className="-ml-1 px-1 text-sm font-medium">
-                                                        {
-                                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                                            // @ts-ignore
-                                                            (field as any).title || '未命名组件'
-                                                        }
-                                                        {/* 编辑模式下显示删除按钮 */}
-                                                        {editMode && (
-                                                            <Button
-                                                                size="icon"
-                                                                variant="ghost"
-                                                                className="text-muted-foreground"
-                                                                onClick={() => {
-                                                                    // 删除索引对应组件
-                                                                    inputFieldArray.remove(index);
-                                                                    // 更新表单值
-                                                                    const currentValues = form.getValues();
-                                                                    form.reset(currentValues);
-                                                                }}
-                                                            >
-                                                                <Trash2 className="size-5" />
-                                                            </Button>
-                                                        )}
-                                                    </legend>
-                                                    <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="inputs" />
-                                                </fieldset>
-                                            );
-                                        }
-                                        return undefined;
-                                    })}
-                                    {/* 非编辑模式下的子组件 */}
-                                    {!editMode && (children)}
-                                </fieldset>
-                                {/* 如果存在高级输入字段，显示高级输入区域 */}
-                                {advancedFieldArray.fields.length > 0 && (
-                                    <AdvancedInputSection advancedFieldArray={advancedFieldArray} form={form} editMode={editMode} />
-                                )}
-                                {/* 编辑模式下显示子组件 */}
-                                {editMode && (children)}
+                                            return undefined;
+                                        })}
+                                        {/* 非编辑模式下的子组件 */}
+                                        {!editMode && (children)}
+                                    </fieldset>
+                                    {/* 如果存在高级输入字段，显示高级输入区域 */}
+                                    {advancedFieldArray.fields.length > 0 && (
+                                        <AdvancedInputSection advancedFieldArray={advancedFieldArray} form={form} editMode={editMode} />
+                                    )}
+                                    {/* 编辑模式下显示子组件 */}
+                                    {editMode && (children)}
+                                </div>
                             </ScrollArea >
                         </div>
                     </div>
@@ -387,65 +389,70 @@ function AdvancedInputSection(args: { advancedFieldArray: UseFieldArrayReturn<an
     // 控制折叠状态，编辑模式下默认展开
     const [isOpen, setIsOpen] = useState(editMode);
     
-    return (<>
-        <Collapsible
-            open={isOpen}
-            onOpenChange={setIsOpen}
-            className="space-y-2 mb-2"
-        >
-            {/* 非编辑模式下显示折叠触发器 */}
-            {!editMode && (<div className="flex items-center space-x-4 px-4">
-                <CollapsibleTrigger asChild>
-                    <Button variant="ghost" size="default" className="w-full">
-                        高级设置
-                        <ChevronsUpDown className="size-5" />
-                    </Button>
-                </CollapsibleTrigger>
-            </div>
-            )}
-            <CollapsibleContent className="space-y-2">
-                <fieldset className="grid gap-2 rounded-lg p-1">
-                    {/* 编辑模式下显示标题 */}
-                    {editMode && (
-                        <legend className="-ml-1 px-1 text-sm font-medium">
-                            高级设置
-                        </legend>
-                    )}
-                    {/* 渲染高级输入字段 */}
-                    {advancedFieldArray.fields.map((advancedField, index) => (
-                        <fieldset className="grid gap-4 rounded-lg border p-4">
+    return (
+        <div className="mb-8"> {/* 增加底部边距 */}
+            <Collapsible
+                open={isOpen}
+                onOpenChange={setIsOpen}
+                className="space-y-2"
+            >
+                {/* 非编辑模式下显示折叠触发器 */}
+                {!editMode && (
+                    <div className="flex items-center space-x-4 px-4">
+                        <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="default" className="w-full">
+                                高级设置
+                                <ChevronsUpDown className="size-5" />
+                            </Button>
+                        </CollapsibleTrigger>
+                    </div>
+                )}
+                <CollapsibleContent className="space-y-2 overflow-visible">
+                    <fieldset className="grid gap-2 rounded-lg p-1 pb-6">
+                        {/* 编辑模式下显示标题 */}
+                        {editMode && (
                             <legend className="-ml-1 px-1 text-sm font-medium">
-                                {
-                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                    // @ts-ignore
-                                    advancedField.title
-                                }
-                                {/* 编辑模式下显示删除按钮 */}
-                                {editMode && (
-                                    <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="text-muted-foreground"
-                                        onClick={() => {
-                                            // 删除索引对应组件
-                                            advancedFieldArray.remove(index);
-                                            // 更新表单值
-                                            const currentValues = form.getValues();
-                                            form.reset(currentValues);
-                                        }}
-                                    >
-                                        <Trash2 className="size-5" />
-                                    </Button>
-                                )}
+                                高级设置
                             </legend>
-                            {/* 渲染嵌套的高级输入字段 */}
-                            <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="advancedInputs" />
-                        </fieldset>
-                    ))}
-                </fieldset>
-            </CollapsibleContent>
-        </Collapsible>
-    </>)
+                        )}
+                        {/* 渲染高级输入字段 */}
+                        <div className="space-y-4"> {/* 添加间距容器 */}
+                            {advancedFieldArray.fields.map((advancedField, index) => (
+                                <fieldset key={index} className="grid gap-4 rounded-lg border p-4">
+                                    <legend className="-ml-1 px-1 text-sm font-medium">
+                                        {
+                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                            // @ts-ignore
+                                            advancedField.title
+                                        }
+                                        {/* 编辑模式下显示删除按钮 */}
+                                        {editMode && (
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                className="text-muted-foreground"
+                                                onClick={() => {
+                                                    // 删除索引对应组件
+                                                    advancedFieldArray.remove(index);
+                                                    // 更新表单值
+                                                    const currentValues = form.getValues();
+                                                    form.reset(currentValues);
+                                                }}
+                                            >
+                                                <Trash2 className="size-5" />
+                                            </Button>
+                                        )}
+                                    </legend>
+                                    {/* 渲染嵌套的高级输入字段 */}
+                                    <NestedInputField form={form} nestedIndex={index} editMode={editMode} formFieldName="advancedInputs" />
+                                </fieldset>
+                            ))}
+                        </div>
+                    </fieldset>
+                </CollapsibleContent>
+            </Collapsible>
+        </div>
+    )
 }
 
 /**
