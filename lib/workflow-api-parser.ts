@@ -8,7 +8,7 @@ export interface IInputField {
     value: any;
     workflowPath: string[];
     helpText?: string;
-    valueType: InputValueType | "long-text" | "video" | "seed" | "noise_seed" | "rand_seed";
+    valueType: InputValueType | "long-text" | "video" | "audio" | "seed" | "noise_seed" | "rand_seed";
     validations: { required: boolean };
     key: string;
 }
@@ -72,6 +72,20 @@ export function workflowAPItoViewComfy(source: WorkflowApiJSON): IViewComfyBase 
                     basicInputs.push({
                         title: getTitleFromValue(value.class_type, value),
                         inputs: [input],
+                        key: `${key}-${value.class_type}`
+                    });
+                    break;
+
+                // 处理音频加载
+                case "LoadAudio":
+                    const audioInput = inputs[0];
+                    audioInput.valueType = "audio";
+                    audioInput.title = getTitleFromValue(value.class_type, value);
+                    audioInput.placeholder = getTitleFromValue(value.class_type, value);
+                    audioInput.value = null;
+                    basicInputs.push({
+                        title: getTitleFromValue(value.class_type, value),
+                        inputs: [audioInput],
                         key: `${key}-${value.class_type}`
                     });
                     break;
@@ -141,7 +155,7 @@ export function workflowAPItoViewComfy(source: WorkflowApiJSON): IViewComfyBase 
         advancedInputs = [];
     }
 
-    return { inputs: basicInputs, advancedInputs, title: "", description: "", previewImages: [] };
+    return { inputs: basicInputs, advancedInputs, title: "", description: "", previewImages: [], previewAudios: [] };
 
 }
 
@@ -179,7 +193,7 @@ function parseInputField(args: { node: { key: string, value: any }, path: string
     return input;
 }
 
-export type InputValueType = "string" | "number" | "bigint" | "boolean" | "float" | "image";
+export type InputValueType = "string" | "number" | "bigint" | "boolean" | "float" | "image" | "audio";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseValueType(value: any): InputValueType {

@@ -7,6 +7,7 @@ export interface IViewComfyBase {
     description: string;
     textOutputEnabled?: boolean;
     previewImages: string[];
+    previewAudios?: string[];
     inputs: IMultiValueInput[];
     advancedInputs: IMultiValueInput[];
     type?: 'image_generation' | 'smart_ps' | 'audio_generation' | 'video_generation';

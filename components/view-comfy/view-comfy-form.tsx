@@ -589,6 +589,13 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
         )
     }
 
+    // 音频文件类型判断
+    if (input.valueType === "audio") {
+        return (
+            <FormAudioInput input={input} field={field} editMode={editMode} remove={remove} index={index} />
+        )
+    }
+
     // 种子类型判断
     if (input.key?.includes("seed") || input.key?.includes("noise_seed")) {
         return (
@@ -835,6 +842,107 @@ function FormMediaInput(args: { input: IInputForm, field: any, editMode?: boolea
                     />
                 </DialogContent>
             </Dialog>
+        </FormItem>
+    )
+}
+
+/**
+ * 音频文件输入组件
+ * 支持音频文件上传和预览播放
+ */
+function FormAudioInput(args: { input: IInputForm, field: any, editMode?: boolean, remove?: UseFieldArrayRemove, index: number }) {
+    const { input, field, editMode, remove, index } = args;
+    const [audio, setAudio] = useState<{ src: string, name: string }>({
+        src: "",
+        name: ""
+    });
+
+    // 文件扩展名
+    const fileExtensions = ['mp3', 'wav', 'ogg', 'aac', 'm4a'];
+
+    // 当文件值改变时更新预览
+    useEffect(() => {
+        if (field.value && field.value instanceof File) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const content = e.target?.result as string;
+                    const name = field.value.name;
+                    setAudio({
+                        src: content,
+                        name: name
+                    });
+                } catch (error) {
+                    console.error('Error parsing audio:', error);
+                    setAudio({
+                        src: "",
+                        name: ""
+                    });
+                }
+            };
+            reader.readAsDataURL(field.value);
+        }
+    }, [field.value]);
+
+    // 删除音频文件
+    const onDelete = () => {
+        field.onChange(null);
+        setAudio({
+            src: "",
+            name: ""
+        });
+    }
+
+    return (
+        <FormItem key={input.id}>
+            <FormLabel className={FORM_STYLE.label}>{input.title}
+                {editMode && (
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="text-muted-foreground"
+                        onClick={remove ? () => remove(index) : undefined}
+                    >
+                        <Trash2 className="size-5" />
+                    </Button>
+                )}
+            </FormLabel>
+            <FormControl>
+                {audio.src ? (
+                    <div key={input.id} className="flex flex-col items-center gap-2">
+                        <div className="w-full flex items-center justify-center border rounded-md p-4 bg-card">
+                            <audio
+                                src={audio.src}
+                                controls
+                                className="w-full"
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="secondary"
+                                className="border-2 text-muted-foreground"
+                                onClick={onDelete}
+                            >
+                                <Trash2 className="size-5 mr-2" /> 删除音频
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <Dropzone
+                        key={input.id}
+                        onChange={field.onChange}
+                        fileExtensions={fileExtensions}
+                        className="form-dropzone"
+                        inputPlaceholder="拖放或点击上传音频文件"
+                    />
+                )}
+            </FormControl>
+            {/* 帮助文本 */}
+            {input.helpText !== "Helper Text" && (
+                <FormDescription>
+                    {input.helpText}
+                </FormDescription>
+            )}
         </FormItem>
     )
 }
