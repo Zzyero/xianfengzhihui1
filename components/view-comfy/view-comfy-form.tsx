@@ -49,6 +49,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { PreviewAudio } from "@/components/preview-audio";
 
 interface IInputForm extends IInputField {
     id: string;
@@ -196,7 +197,7 @@ export function ViewComfyForm(args: {
                                             // 检查是否是文本编码器或上传图片组件
                                             // 使用类型断言确保field有title属性
                                             const fieldTitle = (field as any).title || '';
-                                            const isSpecialComponent = fieldTitle === "CLIP文本编码" || fieldTitle === "加载图像" || fieldTitle === "CLIP文本编码器";
+                                            const isSpecialComponent = fieldTitle === "CLIP文本编码" || fieldTitle === "加载图像" || fieldTitle === "CLIP文本编码器" || fieldTitle === "加载音频";
                                             
                                             if (isSpecialComponent) {
                                                 // 特殊组件不显示圆角方框
@@ -858,7 +859,7 @@ function FormAudioInput(args: { input: IInputForm, field: any, editMode?: boolea
     });
 
     // 文件扩展名
-    const fileExtensions = ['mp3', 'wav', 'ogg', 'aac', 'm4a'];
+    const fileExtensions = ['mp3', 'wav', 'ogg', 'aac', 'm4a', 'flac'];
 
     // 当文件值改变时更新预览
     useEffect(() => {
@@ -910,22 +911,11 @@ function FormAudioInput(args: { input: IInputForm, field: any, editMode?: boolea
             <FormControl>
                 {audio.src ? (
                     <div key={input.id} className="flex flex-col items-center gap-2">
-                        <div className="w-full flex items-center justify-center border rounded-md p-4 bg-card">
-                            <audio
-                                src={audio.src}
-                                controls
-                                className="w-full"
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            <Button
-                                variant="secondary"
-                                className="border-2 text-muted-foreground"
-                                onClick={onDelete}
-                            >
-                                <Trash2 className="size-5 mr-2" /> 删除音频
-                            </Button>
-                        </div>
+                        <PreviewAudio 
+                            src={audio.src} 
+                            onDelete={onDelete}
+                            showDelete={true}
+                        />
                     </div>
                 ) : (
                     <Dropzone

@@ -28,6 +28,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { PreviewOutputsImageGallery } from "@/components/images-preview"
 import { QueueManager } from "@/components/queue-manager";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { PreviewAudio } from "@/components/preview-audio";
 
 const apiErrorHandler = new ApiErrorHandler();
 
@@ -371,27 +372,9 @@ function SmartAudioPageContent({ loading, setLoading }: { loading: boolean, setL
                                                                 </pre>
                                                             )}
                                                             {output.type.startsWith('audio/') && (
-                                                                <div className="border rounded-md p-4 bg-card w-full">
-                                                                    <audio 
-                                                                        controls 
-                                                                        src={`data:${output.type};base64,${output.data}`} 
-                                                                        className="w-full mb-2" 
-                                                                    />
-                                                                    <div className="flex justify-end mt-2">
-                                                                        <Button 
-                                                                            variant="outline" 
-                                                                            size="sm"
-                                                                            onClick={() => {
-                                                                                const link = document.createElement('a');
-                                                                                link.href = `data:${output.type};base64,${output.data}`;
-                                                                                link.download = `audio-${Date.now()}.wav`;
-                                                                                link.click();
-                                                                            }}
-                                                                        >
-                                                                            下载
-                                                                        </Button>
-                                                                    </div>
-                                                                </div>
+                                                                <PreviewAudio 
+                                                                    src={output.data.startsWith('data:') ? output.data : `data:${output.type};base64,${output.data}`}
+                                                                />
                                                             )}
                                                         </Fragment>
                                                     ))}
