@@ -14,3 +14,17 @@ export const SEED_LIKE_INPUT_VALUES = ["seed", "noise_seed", "rand_seed"];
 
 // 上传预览图片路径
 export const UPLOAD_PREVIEW_IMAGES_PATH = "preview_images";
+
+// LoRA选项字典 - 所有支持的LoRA模型
+export const LORA_OPTIONS = [
+    "安倍晋三.safetensors",
+    "蔡英文.safetensors",
+    "赖清德.safetensors",
+    "默克尔.safetensors",
+    "萨科齐.safetensors",
+    "特朗普.safetensors",
+    "山姆大叔.safetensors",
+    "曾小萌迷彩.safetensors",
+    "曾小萌体能.safetensors",
+    "曾小萌常服.safetensors",
+];

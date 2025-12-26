@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/collapsible"
 import { useState, useEffect } from "react";
 import { getComfyUIRandomSeed, cn } from "@/lib/utils";
+import { LORA_OPTIONS } from "@/app/constants";
 import {
     Dialog,
     DialogContent,
@@ -540,23 +541,11 @@ function InputFieldToUI(args: { input: IInputForm, field: any, editMode?: boolea
 
     // Lora加载器下拉选择框
     if (input.key?.includes("lora_name")) {
-        const loraOptions = [
-            "安倍晋三.safetensors",
-            "蔡英文.safetensors",
-            "赖清德.safetensors",
-            "默克尔.safetensors",
-            "萨科齐.safetensors",
-            "特朗普.safetensors",
-            "山姆大叔.safetensors",
-            "曾小萌迷彩.safetensors",
-            "曾小萌体能.safetensors",
-            "曾小萌常服.safetensors",
-        ];
         return (
             <FormSelectInput 
                 input={input} 
                 field={field} 
-                options={loraOptions} 
+                options={LORA_OPTIONS} 
                 editMode={editMode} 
                 remove={remove} 
                 index={index} 
